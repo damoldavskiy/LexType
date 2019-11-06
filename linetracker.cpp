@@ -1,6 +1,5 @@
 #include "linetracker.h"
 
-#include <cassert>
 #include <QDebug>
 
 LineTracker::LineTracker(int n)
@@ -9,10 +8,11 @@ LineTracker::LineTracker(int n)
 
 void LineTracker::insert(int pos, int count)
 {
-    assert(pos >= 0);
-    assert(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-    assert(count > 0);
-    int line = getLine(pos);
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+    Q_ASSERT(count > 0);
+
+    int line = find(pos);
     _lines[line].size += count;
     for (int i = line + 1; i < _lines.size(); ++i)
         _lines[i].start += count;
@@ -20,9 +20,10 @@ void LineTracker::insert(int pos, int count)
 
 void LineTracker::insertLine(int pos)
 {
-    assert(pos >= 0);
-    assert(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-    int line = getLine(pos);
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+
+    int line = find(pos);
     int start = _lines[line].start;
     int shift = pos - start;
 
@@ -36,10 +37,11 @@ void LineTracker::insertLine(int pos)
 
 void LineTracker::remove(int pos, int count)
 {
-    assert(pos >= 0);
-    assert(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-    assert(count > 0);
-    int line = getLine(pos);
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+    Q_ASSERT(count > 0);
+
+    int line = find(pos);
 
     int deleted;
     while (count > 0)
@@ -63,29 +65,36 @@ void LineTracker::remove(int pos, int count)
     }
 }
 
-int LineTracker::getLine(int pos) const
+int LineTracker::find(int pos) const
 {
-    assert(pos >= 0);
-    assert(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-    // TODO binary search
-    for (int i = 0; i < _lines.size(); ++i)
-        if (_lines[i].start <= pos && pos <= _lines[i].start + _lines[i].size)
-            return i;
-    assert(false);
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+
+    int left = 0;
+    int right = _lines.size() - 1;
+    int cur;
+
+    while (true)
+    {
+        cur = (right + left) / 2;
+
+        if (_lines[cur].start > pos)
+            right = cur - 1;
+        else if (pos > _lines[cur].start + _lines[cur].size)
+            left = cur + 1;
+        else
+            return cur;
+    }
+
+    Q_ASSERT(false);
 }
 
-int LineTracker::lineStart(int line) const
+const Line &LineTracker::operator [](int line) const
 {
-    assert(line >= 0);
-    assert(line < _lines.size());
-    return _lines[line].start;
-}
+    Q_ASSERT(line >= 0);
+    Q_ASSERT(line < _lines.size());
 
-int LineTracker::lineSize(int line) const
-{
-    assert(line >= 0);
-    assert(line < _lines.size());
-    return _lines[line].size;
+    return _lines[line];
 }
 
 int LineTracker::size() const

@@ -16,9 +16,8 @@ public:
     void insert(int pos, int count);
     void insertLine(int pos);
     void remove(int pos, int count);
-    int getLine(int pos) const;
-    int lineStart(int line) const;
-    int lineSize(int line) const;
+    int find(int pos) const;
+    const Line &operator [](int line) const;
     int size() const;
 
 private:
