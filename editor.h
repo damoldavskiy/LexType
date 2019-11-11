@@ -6,7 +6,7 @@
 #include <QKeyEvent>
 #include <QTimer>
 
-#include "linetracker.h"
+#include "text.h"
 
 class Editor : public QWidget
 {
@@ -39,10 +39,10 @@ protected:
     int findPos(qreal x, qreal y) const;
     QPair<qreal, qreal> findShift(int pos) const;
     qreal advanceWidth(qreal left, int pos) const;
+    qreal lineWidth(int line) const;
 
 private:
-    QString _text;
-    LineTracker _tr = LineTracker(1);
+    Text _text = Text(font());
     QFontMetricsF _fm = QFontMetricsF(font());
 
     int _pos = 0;
@@ -53,7 +53,6 @@ private:
     QTimer *_timer = new QTimer(this);
     bool _caret = true;
 
-    qreal _tabWidth = _fm.width('x') * 8;
     int _timerInterval = 600;
 
     QColor _background = { 50, 50, 50 };

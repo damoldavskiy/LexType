@@ -6,26 +6,42 @@ LineTracker::LineTracker(int n)
     : _lines(n)
 { }
 
-void LineTracker::insert(int pos, int count)
+QPair<int, int> LineTracker::insert(int pos, const QString &text)
 {
-    Q_ASSERT(pos >= 0);
-    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-    Q_ASSERT(count > 0);
-
     int line = find(pos);
+    int startLine = line;
+    int count = 0;
+    for (int i = 0; i < text.size(); ++i)
+        if (text[i] == '\n')
+        {
+            if (count > 0)
+            {
+                insertText(line, count);
+                pos += count;
+                count = 0;
+            }
+            insertLine(line, pos++ - _lines[line].start);
+            ++line;
+        }
+        else
+            ++count;
+
+    if (count > 0)
+        insertText(line, count);
+
+    return { startLine, line - startLine };
+}
+
+void LineTracker::insertText(int line, int count)
+{
     _lines[line].size += count;
     for (int i = line + 1; i < _lines.size(); ++i)
         _lines[i].start += count;
 }
 
-void LineTracker::insertLine(int pos)
+void LineTracker::insertLine(int line, int shift)
 {
-    Q_ASSERT(pos >= 0);
-    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
-
-    int line = find(pos);
     int start = _lines[line].start;
-    int shift = pos - start;
 
     _lines.insert(line, { start, shift });
     _lines[line + 1].start += shift;
@@ -35,7 +51,7 @@ void LineTracker::insertLine(int pos)
         ++_lines[i].start;
 }
 
-void LineTracker::remove(int pos, int count)
+QPair<int, int> LineTracker::remove(int pos, int count)
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
@@ -44,12 +60,14 @@ void LineTracker::remove(int pos, int count)
     int line = find(pos);
 
     int deleted;
+    int deletedLines = 0;
     while (count > 0)
     {
         if (_lines[line].start + _lines[line].size == pos)
         {
             _lines[line].size += _lines[line + 1].size;
             _lines.remove(line + 1);
+            ++deletedLines;
             deleted = 1;
         }
         else
@@ -63,6 +81,8 @@ void LineTracker::remove(int pos, int count)
 
         count -= deleted;
     }
+
+    return { line, deletedLines };
 }
 
 int LineTracker::find(int pos) const

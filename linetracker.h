@@ -2,6 +2,8 @@
 #define LINETRACKER_H
 
 #include <QVector>
+#include <QString>
+#include <QPair>
 
 struct Line
 {
@@ -13,9 +15,10 @@ class LineTracker
 {
 public:
     explicit LineTracker(int n);
-    void insert(int pos, int count);
-    void insertLine(int pos);
-    void remove(int pos, int count);
+    QPair<int, int> insert(int pos, const QString &text);
+    void insertText(int line, int count);
+    void insertLine(int line, int shift);
+    QPair<int, int> remove(int pos, int count);
     int find(int pos) const;
     const Line &operator [](int line) const;
     int size() const;
