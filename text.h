@@ -24,7 +24,10 @@ public:
     int size() const;
     int lineCount() const;
 
-    qreal maxWidth() const;
+    qreal width() const;
+
+    qreal fontHeight() const;
+    qreal fontAscent() const;
 
     qreal advanceWidth(qreal left, int pos) const;
     qreal lineWidth(int line) const;

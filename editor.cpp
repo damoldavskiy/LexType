@@ -95,28 +95,26 @@ void Editor::paintEvent(QPaintEvent *)
     painter.setPen(_foreground);
 
     qreal left, cwidth, top;
-    int topLine = _yshift / _fm.height();
-    top = topLine * _fm.height() - _yshift;
-    for (int i = topLine; i < _text.lineCount(); ++i)
-    {
-        if (top - _fm.height() > height)
+    int topLine = _yshift / _text.fontHeight();
+    top = topLine * _text.fontHeight() - _yshift;
+    for (int i = topLine; i < _text.lineCount(); ++i) {
+        if (top - _text.fontHeight() > height)
             break;
 
         int pos = _text.lineStart(i);
         int end = pos + _text.lineSize(i);
 
         if (i == line)
-            painter.fillRect(0, top, width, _fm.height(), _activeLine);
+            painter.fillRect(0, top, width, _text.fontHeight(), _activeLine);
 
         left = 0;
-        do
-        {
+        do {
             // TODO if wordwrap is enabled, continue writing to next line instead
             if (left - _xshift > width)
                 break;
 
             if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
-                painter.drawLine(QPointF { left - _xshift, top }, QPointF { left - _xshift, top + _fm.height() - 1 });
+                painter.drawLine(QPointF { left - _xshift, top }, QPointF { left - _xshift, top + _text.fontHeight() - 1 });
 
             // It should be possible to draw the caret on empty line
             if (pos == end)
@@ -124,22 +122,21 @@ void Editor::paintEvent(QPaintEvent *)
 
             cwidth = _text.advanceWidth(left, pos);
             if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
-                painter.drawText(QPointF { left - _xshift, top + _fm.ascent() }, static_cast<QString>(_text[pos]));
+                painter.drawText(QPointF { left - _xshift, top + _text.fontAscent() }, static_cast<QString>(_text[pos]));
 
             // TODO replace with style range
             if (_spos != -1)
                 if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
-                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _fm.height() }, _selection);
+                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _selection);
 
             left += cwidth;
-        }
-        while (pos++ < end);
+        } while (pos++ < end);
 
         if (_spos != -1)
             if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
-                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _fm.height() }, _selection);
+                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, _selection);
 
-        top += _fm.height();
+        top += _text.fontHeight();
     }
 }
 
@@ -161,28 +158,25 @@ void Editor::keyPressEvent(QKeyEvent *event)
             _text.remove(_pos, 1);
         break;
     case Qt::Key_Left:
-        if (_spos != -1)
-        {
+        if (_spos != -1) {
             _pos = qMin(_pos, _spos);
             _spos = -1;
-        }
-        else if (_pos > 0)
+        } else if (_pos > 0) {
             --_pos;
+        }
         break;
     case Qt::Key_Right:
-        if (_spos != -1)
-        {
+        if (_spos != -1) {
             _pos = qMax(_pos, _spos);
             _spos = -1;
-        }
-        else if (_pos < _text.size())
+        } else if (_pos < _text.size()) {
             ++_pos;
+        }
         break;
     case Qt::Key_Up:
         _spos = -1;
         line = _text.findLine(_pos);
-        if (line > 0)
-        {
+        if (line > 0) {
             _pos -= _text.lineStart(line);
             _pos = qMin(_pos, _text.lineSize(line - 1));
             _pos += _text.lineStart(line - 1);
@@ -191,8 +185,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Down:
         _spos = -1;
         line = _text.findLine(_pos);
-        if (line < _text.lineCount() - 1)
-        {
+        if (line < _text.lineCount() - 1) {
             _pos -= _text.lineStart(line);
             _pos = qMin(_pos, _text.lineSize(line + 1));
             _pos += _text.lineStart(line + 1);
@@ -236,28 +229,13 @@ void Editor::mouseMoveEvent(QMouseEvent *event)
     update();
 }
 
-void Editor::resizeEvent(QResizeEvent *event)
-{
-    qreal lines = _text.lineCount() * _fm.height();
-    int oldHeight = event->oldSize().height();
-    int height = event->size().height();
-
-    if (lines > size().height())
-    {
-        if (lines < size().height() + _yshift && oldHeight < height)
-            _yshift += oldHeight - height;
-    }
-    else
-        _yshift = 0;
-}
-
 void Editor::wheelEvent(QWheelEvent *event)
 {
     _yshift -= event->angleDelta().y();
     _xshift -= event->angleDelta().x();
 
-    limit(_yshift, static_cast<qreal>(0), (_text.lineCount() - 1) * _fm.height());
-    limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.maxWidth() - size().width() + 1));
+    limit(_yshift, static_cast<qreal>(0), (_text.lineCount() - 1) * _text.fontHeight());
+    limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1));
 
     update();
 }
@@ -290,8 +268,8 @@ void Editor::updateShift()
     x = pair.first;
     y = pair.second;
 
-    limitMax(_xshift, qMax(static_cast<qreal>(0), _text.maxWidth() - size().width() + 1));
-    limit(_yshift, y - size().height() + _fm.height(), y);
+    limitMax(_xshift, qMax(static_cast<qreal>(0), _text.width() - size().width() + 1));
+    limit(_yshift, y - size().height() + _text.fontHeight(), y);
     limit(_xshift, x - size().width() + 1, x);
 
     Q_ASSERT(_yshift >= 0);
@@ -315,19 +293,17 @@ int Editor::findPos(qreal x, qreal y) const
     if (x < 0)
         x = 0;
 
-    int line = (y + _yshift) / _fm.height();
+    int line = (y + _yshift) / _text.fontHeight();
     if (line < 0)
         line = 0;
-    if (line < _text.lineCount())
-    {
+    if (line < _text.lineCount()) {
         int pos = _text.lineStart(line);
         int end = pos + _text.lineSize(line);
 
         qreal width, left;
         width = 0;
         left = 0;
-        while (pos < end && left < x)
-        {
+        while (pos < end && left < x) {
             width = _text.advanceWidth(left, pos);
             left += width;
             pos++;
@@ -341,9 +317,9 @@ int Editor::findPos(qreal x, qreal y) const
         Q_ASSERT(pos <= _text.size());
 
         return pos;
-    }
-    else
+    } else {
         return _text.size();
+    }
 }
 
 QPair<qreal, qreal> Editor::findShift(int pos) const
@@ -352,7 +328,7 @@ QPair<qreal, qreal> Editor::findShift(int pos) const
     Q_ASSERT(pos <= _text.size());
 
     int line = _text.findLine(pos);
-    qreal y = line * _fm.height();
+    qreal y = line * _text.fontHeight();
     qreal x = 0;
 
     for (int i = _text.lineStart(line); i < pos; ++i)

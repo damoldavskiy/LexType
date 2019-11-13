@@ -9,18 +9,15 @@ class MaxVector
 {
 public:
     explicit MaxVector(int n)
-        : _values(n), _max(-1)
+        : _values(n)
     {
-        if (n > 0)
-            _max = 0;
+        Q_ASSERT(n > 0);
     }
 
     void set(int pos, T value)
     {
         Q_ASSERT(pos >= 0);
         Q_ASSERT(pos < _values.size());
-        Q_ASSERT(_max >= 0);
-        Q_ASSERT(_max < _values.size());
 
         T oldValue = _values[pos];
         _values[pos] = value;
@@ -28,6 +25,7 @@ public:
             update();
         else if (value > _values[_max])
             _max = pos;
+
         Q_ASSERT(_max < _values.size());
     }
 
@@ -35,7 +33,7 @@ public:
     {
         Q_ASSERT(pos >= 0);
         Q_ASSERT(pos <= _values.size());
-        Q_ASSERT(count >= 1);
+        Q_ASSERT(count > 0);
 
         if (pos <= _max)
             _max += count;
@@ -49,6 +47,7 @@ public:
         Q_ASSERT(pos < _values.size());
         Q_ASSERT(count > 0);
         Q_ASSERT(pos + count <= _values.size());
+
         _values.remove(pos, count);
         if (pos <= _max && _max < pos + count)
             update();
@@ -56,9 +55,8 @@ public:
             _max -= count;
     }
 
-    int max() const
+    T max() const
     {
-        Q_ASSERT(_max >= 0);
         return _values[_max];
     }
 

@@ -72,9 +72,19 @@ int Text::lineCount() const
     return _tracker.size();
 }
 
-qreal Text::maxWidth() const
+qreal Text::width() const
 {
     return _widths.max();
+}
+
+qreal Text::fontHeight() const
+{
+    return _fm.height();
+}
+
+qreal Text::fontAscent() const
+{
+    return _fm.ascent();
 }
 
 qreal Text::advanceWidth(qreal left, int pos) const
@@ -83,15 +93,14 @@ qreal Text::advanceWidth(qreal left, int pos) const
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos < _data.size());
 
-    if (_data[pos] == '\t')
-    {
+    if (_data[pos] == '\t') {
         qreal space = _tabWidth * static_cast<int>(left / _tabWidth);
         if (space <= left)
             space += _tabWidth;
         return space - left;
-    }
-    else
+    } else {
         return _fm.width(_data[pos]);
+    }
 }
 
 qreal Text::lineWidth(int line) const

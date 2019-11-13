@@ -28,7 +28,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    void resizeEvent(QResizeEvent *event);
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent *event);
 
@@ -43,7 +42,6 @@ protected:
 
 private:
     Text _text = Text(font());
-    QFontMetricsF _fm = QFontMetricsF(font());
 
     int _pos = 0;
     int _spos = -1;
