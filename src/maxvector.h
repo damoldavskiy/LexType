@@ -9,7 +9,7 @@ class MaxVector
 {
 public:
     explicit MaxVector(int n)
-        : _values(n)
+        : _values(n), _max(0)
     {
         Q_ASSERT(n > 0);
     }
