@@ -4,8 +4,11 @@
 #include <QDebug>
 
 Text::Text(const QFont &font)
-    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 8)
-{ }
+    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 8), _cachedWidths(256)
+{
+    for (int i = 0; i < 256; ++i)
+        _cachedWidths[i] = _fm.width(static_cast<QChar>(i));
+}
 
 void Text::insert(int pos, const QString &text)
 {
@@ -93,12 +96,17 @@ qreal Text::advanceWidth(qreal left, int pos) const
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos < _data.size());
 
-    if (_data[pos] == '\t') {
+    QChar symbol = _data[pos];
+
+    if (symbol == '\t') {
         qreal space = _tabWidth * static_cast<int>(left / _tabWidth);
         if (space <= left)
             space += _tabWidth;
         return space - left;
     } else {
+        int code = symbol.unicode();
+        if (code < 256)
+            return _cachedWidths[code];
         return _fm.width(_data[pos]);
     }
 }

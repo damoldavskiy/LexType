@@ -69,7 +69,7 @@ void tst_Text::multiLineBenchmark()
     Text text(font);
 
     QBENCHMARK {
-        text.insert(0, "Simple text with length of 30\n");
+        text.insert(0, "Simple line with length of 30\n");
     }
 }
 

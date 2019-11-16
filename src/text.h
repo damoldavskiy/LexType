@@ -2,6 +2,7 @@
 #define TEXT_H
 
 #include <QString>
+#include <QVector>
 #include <QFontMetrics>
 
 #include "linetracker.h"
@@ -38,6 +39,7 @@ private:
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;
     qreal _tabWidth;
+    QVector<qreal> _cachedWidths;
 };
 
 #endif // TEXT_H
