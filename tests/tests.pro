@@ -3,10 +3,14 @@ QT += testlib widgets
 CONFIG += testcase
 
 SOURCES += \
-    ..\src\text.cpp \
     ..\src\linetracker.cpp \
-    tst_text.cpp
+    ..\src\text.cpp \
+    ..\src\editor.cpp \
+    main.cpp
 
 HEADERS += \
+    ..\src\linetracker.h \
     ..\src\text.h \
-    ..\src\linetracker.h
+    ..\src\editor.h \
+    tst_editor.h \
+    tst_text.h

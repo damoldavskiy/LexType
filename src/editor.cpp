@@ -4,20 +4,11 @@
 #include <QClipboard>
 #include <QShortcut>
 
-#include <QDebug>
-
 template <typename T>
 void limit(T& value, T min, T max)
 {
     if (value < min)
         value = min;
-    if (value > max)
-        value = max;
-}
-
-template <typename T>
-void limitMax(T& value, T max)
-{
     if (value > max)
         value = max;
 }
@@ -35,6 +26,11 @@ Editor::Editor(QWidget *parent)
 
     connect(_timer, SIGNAL(timeout()), this, SLOT(tick()));
     _timer->start(_timerInterval);
+}
+
+QString Editor::text() const
+{
+    return _text.text();
 }
 
 void Editor::cut()
@@ -268,9 +264,8 @@ void Editor::updateShift()
     x = pair.first;
     y = pair.second;
 
-    limitMax(_xshift, qMax(static_cast<qreal>(0), _text.width() - size().width() + 1));
     limit(_yshift, y - size().height() + _text.fontHeight(), y);
-    limit(_xshift, x - size().width() + 1, x);
+    limit(_xshift, x - size().width() + 1, qMin(x, qMax(static_cast<qreal>(0), _text.width() - size().width() + 1)));
 
     Q_ASSERT(_yshift >= 0);
     Q_ASSERT(_xshift >= 0);

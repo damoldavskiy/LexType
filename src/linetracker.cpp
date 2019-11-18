@@ -1,7 +1,5 @@
 #include "linetracker.h"
 
-#include <QDebug>
-
 LineTracker::LineTracker(int n)
     : _lines(n)
 { }

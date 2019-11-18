@@ -33,6 +33,8 @@ public:
     qreal advanceWidth(qreal left, int pos) const;
     qreal lineWidth(int line) const;
 
+    QString text() const;
+
 private:
     QString _data;
     LineTracker _tracker;

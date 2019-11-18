@@ -14,6 +14,7 @@ class Editor : public QWidget
 
 public:
     Editor(QWidget *parent = 0);
+    QString text() const;
 
 public slots:
     void cut();

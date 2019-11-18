@@ -1,8 +1,5 @@
 #include "text.h"
 
-#include "maxvector.h"
-#include <QDebug>
-
 Text::Text(const QFont &font)
     : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 8), _cachedWidths(256)
 {
@@ -22,7 +19,6 @@ void Text::insert(int pos, const QString &text)
 
     for (int i = 0; i < added + 1; ++i)
         _widths.set(line + i, lineWidth(line + i));
-    // One more update?
 }
 
 void Text::remove(int pos, int count)
@@ -37,7 +33,6 @@ void Text::remove(int pos, int count)
         _widths.remove(line + 1, deleted);
 
     _widths.set(line, lineWidth(line));
-    // Update line + 1?
 }
 
 QString Text::mid(int pos, int count) const
@@ -124,4 +119,9 @@ qreal Text::lineWidth(int line) const
         width += advanceWidth(width, pos);
 
     return width;
+}
+
+QString Text::text() const
+{
+    return _data;
 }

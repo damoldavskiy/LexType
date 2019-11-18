@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+
 #include "editor.h"
 
 MainWindow::MainWindow(QWidget *parent)

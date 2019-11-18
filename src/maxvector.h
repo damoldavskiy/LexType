@@ -2,7 +2,6 @@
 #define MAXVECTOR_H
 
 #include <QVector>
-#include <QDebug>
 
 template <typename T>
 class MaxVector
