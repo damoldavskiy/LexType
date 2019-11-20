@@ -54,6 +54,14 @@ public:
             _max -= count;
     }
 
+    T operator [](int pos) const
+    {
+        Q_ASSERT(pos >= 0);
+        Q_ASSERT(pos < _values.size());
+
+        return _values[pos];
+    }
+
     T max() const
     {
         return _values[_max];

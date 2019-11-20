@@ -65,27 +65,16 @@ QPair<int, int> LineTracker::remove(int pos, int count)
     Q_ASSERT(count > 0);
 
     int line = find(pos);
+    int lastLine = find(pos + count);
+    _lines[line].size = pos - _lines[line].start;
+    if (line != lastLine)
+        _lines[line].size += _lines[lastLine].start + _lines[lastLine].size - pos - count;
+    _lines.remove(line + 1, lastLine - line);
 
-    int deleted;
-    int deletedLines = 0;
-    while (count > 0) {
-        if (_lines[line].start + _lines[line].size == pos) {
-            _lines[line].size += _lines[line + 1].size;
-            _lines.remove(line + 1);
-            ++deletedLines;
-            deleted = 1;
-        } else {
-            deleted = qMin(_lines[line].size - (pos - _lines[line].start), count);
-            _lines[line].size -= deleted;
-        }
+    for (int i = line + 1; i < _lines.size(); ++i)
+        _lines[i].start = _lines[i - 1].start + _lines[i - 1].size + 1;
 
-        for (int i = line + 1; i < _lines.size(); ++i)
-            _lines[i].start -= deleted;
-
-        count -= deleted;
-    }
-
-    return { line, deletedLines };
+    return { line, lastLine - line };
 }
 
 int LineTracker::find(int pos) const

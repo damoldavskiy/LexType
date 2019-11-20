@@ -10,15 +10,27 @@ Text::Text(const QFont &font)
 void Text::insert(int pos, const QString &text)
 {
     _data.insert(pos, text);
+    int line = _tracker.find(pos);
+    int start = _tracker[line].start;
+    int end = start + _tracker[line].size;
+
     QPair<int, int> pair = _tracker.insert(pos, text);
-    int line = pair.first;
     int added = pair.second;
 
     if (added > 0)
         _widths.insert(line, added, 0);
 
-    for (int i = 0; i < added + 1; ++i)
-        _widths.set(line + i, lineWidth(line + i));
+    if (pos == end) {
+        qreal width = _widths[line];
+        for (int i = end; i < start + _tracker[line].size; ++i)
+            width += advanceWidth(width, i);
+        _widths.set(line, width);
+        ++line;
+        --added;
+    }
+
+    for (int i = line; i < line + added + 1; ++i)
+        _widths.set(i, lineWidth(i));
 }
 
 void Text::remove(int pos, int count)
@@ -102,7 +114,7 @@ qreal Text::advanceWidth(qreal left, int pos) const
         int code = symbol.unicode();
         if (code < 256)
             return _cachedWidths[code];
-        return _fm.width(_data[pos]);
+        return _fm.width(symbol);
     }
 }
 
