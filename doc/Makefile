@@ -1,14 +1,18 @@
 OUTDIR = ../../build-lextype-Documentation/
 
+.ONESHELL:
 all:
 	rm -f $(OUTDIR)*
 	mkdir -p $(OUTDIR)
+	cp * $(OUTDIR)
+	cd $(OUTDIR)
+	pdflatex *.tex
+	bibtex *.aux
 	pdflatex *.tex
 	pdflatex *.tex
-	bibtex *.aux | true
-	pdflatex *.tex
-	mv *.pdf $(OUTDIR)
 	make clean
+	rm Makefile
+	rm *.tex
 
 clean:
 	rm -f *\(busy\)
@@ -17,6 +21,8 @@ clean:
 	rm -f *.blg
 	rm -f *.gz
 	rm -f *.log
-	rm -f *.pdf
 	rm -f *.toc
 
+remove:
+	make clean
+	rm -f *.pdf

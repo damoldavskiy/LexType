@@ -9,6 +9,10 @@ Text::Text(const QFont &font)
 
 void Text::insert(int pos, const QString &text)
 {
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= _data.size());
+    Q_ASSERT(text.size() > 0);
+
     _data.insert(pos, text);
     int line = _tracker.find(pos);
     int start = _tracker[line].start;
@@ -20,7 +24,7 @@ void Text::insert(int pos, const QString &text)
     if (added > 0)
         _widths.insert(line, added, 0);
 
-    if (pos == end) {
+    if (pos == end && text[0] != '\n') {
         qreal width = _widths[line];
         for (int i = end; i < start + _tracker[line].size; ++i)
             width += advanceWidth(width, i);
