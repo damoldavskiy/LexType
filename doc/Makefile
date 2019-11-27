@@ -13,6 +13,7 @@ all:
 	make clean
 	rm Makefile
 	rm *.tex
+	rm *.bib
 
 clean:
 	rm -f *\(busy\)
@@ -21,6 +22,7 @@ clean:
 	rm -f *.blg
 	rm -f *.gz
 	rm -f *.log
+	rm -f *.out
 	rm -f *.toc
 
 remove:
