@@ -7,13 +7,13 @@ class tst_Text : public QObject
     Q_OBJECT
 
 private slots:
-    inline void oneline();
+    inline void line();
     inline void multiline();
-    inline void removeline();
-    inline void removeall();
+    inline void removeLine();
+    inline void removeAll();
 };
 
-void tst_Text::oneline()
+void tst_Text::line()
 {
     QFont font;
     Text text(font);
@@ -33,7 +33,7 @@ void tst_Text::multiline()
     }
 }
 
-void tst_Text::removeline()
+void tst_Text::removeLine()
 {
     QFont font;
     Text text(font);
@@ -47,7 +47,7 @@ void tst_Text::removeline()
     }
 }
 
-void tst_Text::removeall()
+void tst_Text::removeAll()
 {
     QFont font;
     Text text(font);

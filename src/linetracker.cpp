@@ -66,10 +66,12 @@ QPair<int, int> LineTracker::remove(int pos, int count)
 
     int line = find(pos);
     int lastLine = find(pos + count);
-    _lines[line].size = pos - _lines[line].start;
-    if (line != lastLine)
-        _lines[line].size += _lines[lastLine].start + _lines[lastLine].size - pos - count;
-    _lines.remove(line + 1, lastLine - line);
+    if (line != lastLine) {
+        _lines[line].size = pos - _lines[line].start + _lines[lastLine].start + _lines[lastLine].size - pos - count;
+        _lines.remove(line + 1, lastLine - line);
+    } else {
+        _lines[line].size -= count;
+    }
 
     for (int i = line + 1; i < _lines.size(); ++i)
         _lines[i].start = _lines[i - 1].start + _lines[i - 1].size + 1;

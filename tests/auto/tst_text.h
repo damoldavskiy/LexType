@@ -8,7 +8,8 @@ class tst_Text : public QObject
 
 private slots:
     inline void basic();
-    inline void remove();
+    inline void removeInline();
+    inline void removeOutline();
 };
 
 void tst_Text::basic()
@@ -51,7 +52,24 @@ void tst_Text::basic()
     QCOMPARE(text.lineStart(0), 0);
 }
 
-void tst_Text::remove()
+void tst_Text::removeInline()
+{
+    QFont font;
+    Text text(font);
+
+    text.insert(0,"some\ttext\n");
+    text.remove(1, 3);
+    text.insert(1, "body");
+
+    QCOMPARE(text.text(), QString("sbody\ttext\n"));
+    QCOMPARE(text.lineCount(), 2);
+    QCOMPARE(text.lineSize(0), 10);
+    QCOMPARE(text.lineStart(0), 0);
+    QCOMPARE(text.lineSize(1), 0);
+    QCOMPARE(text.lineStart(1), 11);
+}
+
+void tst_Text::removeOutline()
 {
     QFont font;
     Text text(font);
@@ -61,7 +79,10 @@ void tst_Text::remove()
 
     QCOMPARE(text.text(), QString("01235678\n"));
     QCOMPARE(text.size(), 9);
-    QCOMPARE(text.lineCount(), 1);
-    QCOMPARE(text.lineSize(0), 9);
+    QCOMPARE(text.lineCount(), 2);
+    QCOMPARE(text.lineSize(0), 8);
     QCOMPARE(text.lineStart(0), 0);
+    QCOMPARE(text.lineSize(1), 0);
+    QCOMPARE(text.lineStart(1), 9);
+
 }

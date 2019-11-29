@@ -15,12 +15,15 @@ class Editor : public QWidget
 public:
     Editor(QWidget *parent = 0);
     QString text() const;
+    void setText(const QString &text);
 
 public slots:
     void cut();
     void copy();
     void paste();
     void selectAll();
+
+private slots:
     void tick();
 
 protected:

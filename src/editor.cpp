@@ -19,10 +19,10 @@ Editor::Editor(QWidget *parent)
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
 
-    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_X), this, SLOT(cut()));
-    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_C), this, SLOT(copy()));
-    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_V), this, SLOT(paste()));
-    new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_A), this, SLOT(selectAll()));
+    new QShortcut(QKeySequence::Cut, this, SLOT(cut()));
+    new QShortcut(QKeySequence::Copy, this, SLOT(copy()));
+    new QShortcut(QKeySequence::Paste, this, SLOT(paste()));
+    new QShortcut(QKeySequence::SelectAll, this, SLOT(selectAll()));
 
     connect(_timer, SIGNAL(timeout()), this, SLOT(tick()));
     _timer->start(_timerInterval);
@@ -31,6 +31,12 @@ Editor::Editor(QWidget *parent)
 QString Editor::text() const
 {
     return _text.text();
+}
+
+void Editor::setText(const QString &text)
+{
+    _text.remove(0, _text.size());
+    _text.insert(0, text);
 }
 
 void Editor::cut()
