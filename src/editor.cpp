@@ -87,6 +87,7 @@ void Editor::tick()
 
 void Editor::paintEvent(QPaintEvent *)
 {
+    // TODO the font is default, not from Text
     QPainter painter(this);
     int width = size().width();
     int height = size().height();
@@ -160,7 +161,12 @@ void Editor::keyPressEvent(QKeyEvent *event)
             _text.remove(_pos, 1);
         break;
     case Qt::Key_Left:
-        if (_spos != -1) {
+        if (event->modifiers() & Qt::ShiftModifier) {
+            if (_spos == -1)
+                _spos = _pos;
+            if (_pos > 0)
+                --_pos;
+        } else if (_spos != -1) {
             _pos = qMin(_pos, _spos);
             _spos = -1;
         } else if (_pos > 0) {
@@ -168,7 +174,12 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Right:
-        if (_spos != -1) {
+        if (event->modifiers() & Qt::ShiftModifier) {
+            if (_spos == -1)
+                _spos = _pos;
+            if (_pos < _text.size())
+                ++_pos;
+        } else if (_spos != -1) {
             _pos = qMax(_pos, _spos);
             _spos = -1;
         } else if (_pos < _text.size()) {
@@ -176,7 +187,12 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Up:
-        _spos = -1;
+        if (event->modifiers() & Qt::ShiftModifier) {
+            if (_spos == -1)
+                _spos = _pos;
+        } else {
+            _spos = -1;
+        }
         line = _text.findLine(_pos);
         if (line > 0) {
             _pos -= _text.lineStart(line);
@@ -185,7 +201,12 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Down:
-        _spos = -1;
+        if (event->modifiers() & Qt::ShiftModifier) {
+            if (_spos == -1)
+                _spos = _pos;
+        } else {
+            _spos = -1;
+        }
         line = _text.findLine(_pos);
         if (line < _text.lineCount() - 1) {
             _pos -= _text.lineStart(line);
