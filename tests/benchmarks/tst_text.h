@@ -1,6 +1,6 @@
 #include <QtTest>
 
-#include "../../src/text.h"
+#include "../../src/editor/text.h"
 
 class tst_Text : public QObject
 {

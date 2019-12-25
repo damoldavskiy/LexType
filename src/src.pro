@@ -1,15 +1,5 @@
-QT += widgets
+TEMPLATE = subdirs
 
-SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    editor.cpp \
-    linetracker.cpp \
-    text.cpp
-
-HEADERS += \
-    mainwindow.h \
-    editor.h \
-    linetracker.h \
-    maxvector.h \
-    text.h
+SUBDIRS += \
+    editor \
+    viewer
