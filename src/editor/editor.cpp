@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QShortcut>
+#include <QStaticText>
 
 template <typename T>
 void limit(T& value, T min, T max)
@@ -125,7 +126,7 @@ void Editor::paintEvent(QPaintEvent *)
 
             cwidth = _text.advanceWidth(left, pos);
             if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
-                painter.drawText(QPointF { left - _xshift, top + _text.fontAscent() }, static_cast<QString>(_text[pos]));
+                painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
 
             // TODO replace with style range
             if (_spos != -1)

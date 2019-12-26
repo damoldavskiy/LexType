@@ -12,4 +12,6 @@ HEADERS += \
     editor.h \
     linetracker.h \
     maxvector.h \
-    text.h
+    text.h \
+    multirange.h \
+    range.h \

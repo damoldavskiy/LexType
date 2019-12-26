@@ -5,11 +5,7 @@
 #include <QString>
 #include <QPair>
 
-struct Line
-{
-    int start;
-    int size;
-};
+#include "range.h"
 
 class LineTracker
 {
@@ -20,11 +16,11 @@ public:
     void insertLine(int line, int shift);
     QPair<int, int> remove(int pos, int count);
     int find(int pos) const;
-    const Line &operator [](int line) const;
+    const Range &operator [](int line) const;
     int size() const;
 
 private:
-    QVector<Line> _lines;
+    QVector<Range> _lines;
 };
 
 #endif // LINETRACKER_H

@@ -102,7 +102,7 @@ int LineTracker::find(int pos) const
     Q_ASSERT(false);
 }
 
-const Line &LineTracker::operator [](int line) const
+const Range &LineTracker::operator [](int line) const
 {
     Q_ASSERT(line >= 0);
     Q_ASSERT(line < _lines.size());

@@ -4,9 +4,11 @@
 #include <QString>
 #include <QVector>
 #include <QFontMetrics>
+#include <QStaticText>
 
 #include "linetracker.h"
 #include "maxvector.h"
+#include "multirange.h"
 
 class Text
 {
@@ -34,6 +36,7 @@ public:
     qreal lineWidth(int line) const;
 
     QString text() const;
+    QStaticText text(int pos) const;
 
 private:
     QString _data;
@@ -41,7 +44,7 @@ private:
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;
     qreal _tabWidth;
-    QVector<qreal> _cachedWidths;
+    MultiRange<QStaticText> _cachedText;
 };
 
 #endif // TEXT_H

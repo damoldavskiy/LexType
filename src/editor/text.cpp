@@ -1,10 +1,20 @@
 #include "text.h"
 
-Text::Text(const QFont &font)
-    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 8), _cachedWidths(256)
+QVector<QStaticText> cacheText(int start, int end, QFontMetricsF fm)
 {
-    for (int i = 0; i < 256; ++i)
-        _cachedWidths[i] = _fm.width(static_cast<QChar>(i));
+    QVector<QStaticText> values(end - start + 1);
+    for (int i = 0; i < end - start; ++i) {
+        values[i] = QStaticText(static_cast<QChar>(start + i));
+        values[i].setTextWidth(fm.width(static_cast<QChar>(start + i)));
+    }
+    return values;
+}
+
+Text::Text(const QFont &font)
+    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 8)
+{
+    _cachedText.add(0x0000, cacheText(0x0000, 0x00FF, _fm)); // ASCII
+    _cachedText.add(0x0400, cacheText(0x0400, 0x04FF, _fm)); // Cyrillic
 }
 
 void Text::insert(int pos, const QString &text)
@@ -116,9 +126,10 @@ qreal Text::advanceWidth(qreal left, int pos) const
         return space - left;
     } else {
         int code = symbol.unicode();
-        if (code < 256)
-            return _cachedWidths[code];
-        return _fm.width(symbol);
+        int index = _cachedText.find(code);
+        if (index == -1)
+            return _fm.width(symbol);
+        return _cachedText.get(index, code).textWidth();
     }
 }
 
@@ -140,4 +151,19 @@ qreal Text::lineWidth(int line) const
 QString Text::text() const
 {
     return _data;
+}
+
+QStaticText Text::text(int pos) const
+{
+    QChar symbol = _data[pos];
+    int code = symbol.unicode();
+
+    int index = _cachedText.find(code);
+    if (index == -1) {
+        QStaticText text(symbol);
+        text.setTextWidth(_fm.width(symbol));
+        return text;
+    }
+
+    return _cachedText.get(index, code);
 }
