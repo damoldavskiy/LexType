@@ -34,6 +34,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 
     void removeSelection();
     void updateShift();

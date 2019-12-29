@@ -4,6 +4,7 @@
 #include <QClipboard>
 #include <QShortcut>
 #include <QStaticText>
+#include <QMenu>
 
 template <typename T>
 void limit(T& value, T min, T max)
@@ -234,6 +235,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
 
 void Editor::mousePressEvent(QMouseEvent *event)
 {
+    if (event->button() != Qt::MouseButton::LeftButton)
+        return;
     _pos = findPos(event->x(), event->y());
     _spos = _pos;
     updateShift();
@@ -248,6 +251,8 @@ void Editor::mouseReleaseEvent(QMouseEvent *)
 
 void Editor::mouseMoveEvent(QMouseEvent *event)
 {
+    if ((event->buttons() & Qt::MouseButton::LeftButton) == 0)
+        return;
     _pos = findPos(event->x(), event->y());
     updateShift();
     update();
@@ -269,6 +274,26 @@ void Editor::focusInEvent(QFocusEvent *)
     _caret = true;
     _timer->start(_timerInterval);
     update();
+}
+
+void Editor::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.setStyleSheet("QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
+                       "QMenu { background: rgb(50, 50, 50); }"
+                       "QMenu::item { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
+
+    QAction* action;
+    action = menu.addAction("Cut");
+    connect(action, &QAction::triggered, this, &Editor::cut);
+    action = menu.addAction("Copy");
+    connect(action, &QAction::triggered, this, &Editor::copy);
+    action = menu.addAction("Paste");
+    connect(action, &QAction::triggered, this, &Editor::paste);
+    action = menu.addAction("Select all");
+    connect(action, &QAction::triggered, this, &Editor::selectAll);
+
+    menu.exec(event->globalPos());
 }
 
 void Editor::removeSelection()
