@@ -5,6 +5,7 @@ CONFIG += testcase
 SOURCES += \
     ..\..\src\editor\linetracker.cpp \
     ..\..\src\editor\text.cpp \
+    ..\..\src\editor\memorydata.cpp \
     main.cpp
 
 HEADERS += \

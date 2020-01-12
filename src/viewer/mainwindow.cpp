@@ -21,10 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     layout->setSpacing(0);
     parent->setLayout(layout);
 
+    createActions();
     createMenus();
-
-    new QShortcut(QKeySequence::ZoomIn, this, SLOT(zoomIn()));
-    new QShortcut(QKeySequence::ZoomOut, this, SLOT(zoomOut()));
 
     parent->setStyleSheet("QWidget { background: rgb(50, 50, 50); }");
 
@@ -62,21 +60,33 @@ void MainWindow::zoomOut()
     loadDocument();
 }
 
+void MainWindow::createActions()
+{
+    _openAction = new QAction("Open", this);
+    _openAction->setShortcut(QKeySequence("Ctrl+O"));
+    connect(_openAction, &QAction::triggered, this, &MainWindow::open);
+
+    _quitAction = new QAction("Quit", this);
+    connect(_quitAction, &QAction::triggered, this, &MainWindow::quit);
+
+    _zoomInAction = new QAction("Zoom in", this);
+    _zoomInAction->setShortcut(QKeySequence("Ctrl+="));
+    connect(_zoomInAction, &QAction::triggered, this, &MainWindow::zoomIn);
+
+    _zoomOutAction = new QAction("Zoom out", this);
+    _zoomOutAction->setShortcut(QKeySequence("Ctrl+-"));
+    connect(_zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
+}
+
 void MainWindow::createMenus()
 {
-    QAction *action;
+    QMenu *menu;
 
-    fileMenu = menuBar()->addMenu("File");
-    action = fileMenu->addAction("Open");
-    connect(action, &QAction::triggered, this, &MainWindow::open);
-    action = fileMenu->addAction("Quit");
-    connect(action, &QAction::triggered, this, &MainWindow::quit);
+    menu = menuBar()->addMenu("File");
+    menu->addActions({ _openAction, _quitAction });
 
-    viewMenu = menuBar()->addMenu("View");
-    action = viewMenu->addAction("Zoom in");
-    connect(action, &QAction::triggered, this, &MainWindow::zoomIn);
-    action = viewMenu->addAction("Zoom out");
-    connect(action, &QAction::triggered, this, &MainWindow::zoomOut);
+    menu = menuBar()->addMenu("View");
+    menu->addActions({ _zoomInAction, _zoomOutAction });
 }
 
 void MainWindow::loadDocument()

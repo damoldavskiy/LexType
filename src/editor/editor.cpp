@@ -5,6 +5,9 @@
 #include <QShortcut>
 #include <QStaticText>
 #include <QMenu>
+#include <QStyle>
+
+#include "styler.h"
 
 template <typename T>
 void limit(T& value, T min, T max)
@@ -21,11 +24,6 @@ Editor::Editor(QWidget *parent)
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
 
-    new QShortcut(QKeySequence::Cut, this, SLOT(cut()));
-    new QShortcut(QKeySequence::Copy, this, SLOT(copy()));
-    new QShortcut(QKeySequence::Paste, this, SLOT(paste()));
-    new QShortcut(QKeySequence::SelectAll, this, SLOT(selectAll()));
-
     connect(_timer, SIGNAL(timeout()), this, SLOT(tick()));
     _timer->start(_timerInterval);
 }
@@ -37,8 +35,35 @@ QString Editor::text() const
 
 void Editor::setText(const QString &text)
 {
-    _text.remove(0, _text.size());
+    if (_text.size() > 0)
+        _text.remove(0, _text.size());
     _text.insert(0, text);
+    _pos = 0;
+    _spos = -1;
+    updateShift();
+    update();
+}
+
+void Editor::undo()
+{
+    if (!_text.canUndo())
+        return;
+
+    _pos = _text.undo();
+    _spos = -1;
+    updateShift();
+    update();
+}
+
+void Editor::redo()
+{
+    if (!_text.canRedo())
+        return;
+
+    _pos = _text.redo();
+    _spos = -1;
+    updateShift();
+    update();
 }
 
 void Editor::cut()
@@ -279,20 +304,25 @@ void Editor::focusInEvent(QFocusEvent *)
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.setStyleSheet("QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
-                       "QMenu { background: rgb(50, 50, 50); }"
-                       "QMenu::item { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
+    menu.setStyleSheet(Styler::menuStyle());
 
-    QAction* action;
-    action = menu.addAction("Cut");
-    connect(action, &QAction::triggered, this, &Editor::cut);
-    action = menu.addAction("Copy");
-    connect(action, &QAction::triggered, this, &Editor::copy);
-    action = menu.addAction("Paste");
-    connect(action, &QAction::triggered, this, &Editor::paste);
-    action = menu.addAction("Select all");
-    connect(action, &QAction::triggered, this, &Editor::selectAll);
+    QAction *cutAction, *copyAction, *pasteAction, *selectAllAction;
 
+    cutAction = new QAction("Cut", &menu);
+    cutAction->setEnabled(_spos != -1);
+    connect(cutAction, &QAction::triggered, this, &Editor::cut);
+
+    copyAction = new QAction("Copy", &menu);
+    copyAction->setEnabled(_spos != -1);
+    connect(copyAction, &QAction::triggered, this, &Editor::copy);
+
+    pasteAction = new QAction("Paste", &menu);
+    connect(pasteAction, &QAction::triggered, this, &Editor::paste);
+
+    selectAllAction = new QAction("Select all");
+    connect(selectAllAction, &QAction::triggered, this, &Editor::selectAll);
+
+    menu.addActions({ cutAction, copyAction, pasteAction, selectAllAction });
     menu.exec(event->globalPos());
 }
 

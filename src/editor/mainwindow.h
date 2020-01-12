@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QFileInfo>
 
 #include "editor.h"
 
@@ -16,17 +17,33 @@ public:
 public slots:
     void open();
     void save();
+    void saveAs();
     void quit();
+    void compile();
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
+    void createActions();
     void createMenus();
+    void saveFile(const QString &path);
+    void updateFileName(const QString &path);
 
-    Editor *editor;
-    QMenu *fileMenu;
-    QMenu *editMenu;
+    Editor *_editor;
+    QAction *_openAction;
+    QAction *_saveAction;
+    QAction *_saveAsAction;
+    QAction *_quitAction;
+    QAction *_undoAction;
+    QAction *_redoAction;
+    QAction *_cutAction;
+    QAction *_copyAction;
+    QAction *_pasteAction;
+    QAction *_selectAllAction;
+    QAction *_compileAction;
+
+    QFileInfo _fileInfo;
 };
 
 #endif // MAINWINDOW_H

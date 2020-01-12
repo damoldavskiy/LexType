@@ -3,48 +3,63 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QProcess>
+
+#include "styler.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    editor = new Editor(this);
-    editor->setFocus();
-    setCentralWidget(editor);
+    setWindowTitle("LexType");
 
+    _editor = new Editor(this);
+    _editor->setFocus();
+    setCentralWidget(_editor);
+
+    createActions();
     createMenus();
 
-    menuBar()->setStyleSheet("QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
-                             "QMenu { background: rgb(50, 50, 50); }"
-                             "QMenu::item { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
+    menuBar()->setStyleSheet(Styler::menuStyle());
 }
 
 void MainWindow::open()
 {
     QString path = QFileDialog::getOpenFileName(this, "Open");
-    if (path != "")
-    {
+    if (path != "") {
         QFile file(path);
         file.open(QIODevice::ReadOnly);
         QTextStream in(&file);
-        editor->setText(in.readAll());
+        _editor->setText(in.readAll());
+        updateFileName(path);
     }
 }
 
 void MainWindow::save()
 {
+    if (_fileInfo.isWritable())
+        saveFile(_fileInfo.filePath());
+}
+
+void MainWindow::saveAs()
+{
     QString path = QFileDialog::getSaveFileName(this, "Save");
+
     if (path != "")
-    {
-        QFile file(path);
-        file.open(QIODevice::WriteOnly);
-        QTextStream out(&file);
-        out << editor->text() << endl;
-    }
+        saveFile(path);
 }
 
 void MainWindow::quit()
 {
     close();
+}
+
+void MainWindow::compile()
+{
+    save();
+    QProcess process;
+    process.setWorkingDirectory(_fileInfo.dir().absolutePath());
+    process.start("pdflatex", { _fileInfo.filePath() });
+    process.waitForFinished();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -54,25 +69,81 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
 }
 
+void MainWindow::createActions()
+{
+    _openAction = new QAction("Open", this);
+    _openAction->setShortcut(QKeySequence("Ctrl+O"));
+    connect(_openAction, &QAction::triggered, this, &MainWindow::open);
+
+    _saveAction = new QAction("Save", this);
+    _saveAction->setShortcut(QKeySequence("Ctrl+S"));
+    connect(_saveAction, &QAction::triggered, this, &MainWindow::save);
+
+    _saveAsAction = new QAction("Save as...", this);
+    _saveAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
+    connect(_saveAsAction, &QAction::triggered, this, &MainWindow::saveAs);
+
+    _quitAction = new QAction("Quit", this);
+    connect(_quitAction, &QAction::triggered, this, &MainWindow::quit);
+
+    _undoAction = new QAction("Undo", this);
+    _undoAction->setShortcut(QKeySequence("Ctrl+Z"));
+    connect(_undoAction, &QAction::triggered, _editor, &Editor::undo);
+
+    _redoAction = new QAction("Redo", this);
+    _redoAction->setShortcut(QKeySequence("Ctrl+Shift+Z"));
+    connect(_redoAction, &QAction::triggered, _editor, &Editor::redo);
+
+    _cutAction = new QAction("Cut", this);
+    _cutAction->setShortcut(QKeySequence("Ctrl+X"));
+    connect(_cutAction, &QAction::triggered, _editor, &Editor::cut);
+
+    _copyAction = new QAction("Copy", this);
+    _copyAction->setShortcut(QKeySequence("Ctrl+C"));
+    connect(_copyAction, &QAction::triggered, _editor, &Editor::copy);
+
+    _pasteAction = new QAction("Paste", this);
+    _pasteAction->setShortcut(QKeySequence("Ctrl+V"));
+    connect(_pasteAction, &QAction::triggered, _editor, &Editor::paste);
+
+    _selectAllAction = new QAction("Select all", this);
+    _selectAllAction->setShortcut(QKeySequence("Ctrl+A"));
+    connect(_selectAllAction, &QAction::triggered, _editor, &Editor::selectAll);
+
+    _compileAction = new QAction("Compile", this);
+    _compileAction->setShortcut(QKeySequence("F5"));
+    connect(_compileAction, &QAction::triggered, this, &MainWindow::compile);
+}
+
 void MainWindow::createMenus()
 {
-    QAction *action;
+    QMenu *menu;
 
-    fileMenu = menuBar()->addMenu("File");
-    action = fileMenu->addAction("Open");
-    connect(action, &QAction::triggered, this, &MainWindow::open);
-    action = fileMenu->addAction("Save");
-    connect(action, &QAction::triggered, this, &MainWindow::save);
-    action = fileMenu->addAction("Quit");
-    connect(action, &QAction::triggered, this, &MainWindow::quit);
+    menu = menuBar()->addMenu("File");
+    menu->addActions({ _openAction, _saveAction, _saveAsAction, _quitAction });
 
-    editMenu = menuBar()->addMenu("Edit");
-    action = editMenu->addAction("Cut");
-    connect(action, &QAction::triggered, editor, &Editor::cut);
-    action = editMenu->addAction("Copy");
-    connect(action, &QAction::triggered, editor, &Editor::copy);
-    action = editMenu->addAction("Paste");
-    connect(action, &QAction::triggered, editor, &Editor::paste);
-    action = editMenu->addAction("Select all");
-    connect(action, &QAction::triggered, editor, &Editor::selectAll);
+    menu = menuBar()->addMenu("Edit");
+    menu->addActions({ _undoAction, _redoAction });
+    menu->addSeparator();
+    menu->addActions({ _cutAction, _copyAction, _pasteAction, _selectAllAction });
+
+    menu = menuBar()->addMenu("Assembly");
+    menu->addActions({ _compileAction });
+}
+
+void MainWindow::saveFile(const QString &path)
+{
+    Q_ASSERT(path.size() > 0);
+
+    QFile file(path);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    out << _editor->text() << endl;
+    updateFileName(path);
+}
+
+void MainWindow::updateFileName(const QString &path)
+{
+    _fileInfo.setFile(path);
+    setWindowTitle(_fileInfo.fileName() + " - LexType");
 }

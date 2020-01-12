@@ -9,6 +9,7 @@
 #include "linetracker.h"
 #include "maxvector.h"
 #include "multirange.h"
+#include "memorydata.h"
 
 class Text
 {
@@ -16,7 +17,13 @@ public:
     Text(const QFont &font);
 
     void insert(int pos, const QString &text);
+    void insertLinesAdjust(int pos, const QString &text);
     void remove(int pos, int count);
+    void removeLinesAdjust(int pos, int count);
+    int undo();
+    int redo();
+    bool canUndo() const;
+    bool canRedo() const;
     QString mid(int pos, int count) const;
 
     QChar operator [](int pos) const;
@@ -39,7 +46,7 @@ public:
     QStaticText text(int pos) const;
 
 private:
-    QString _data;
+    MemoryData _data;
     LineTracker _tracker;
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;

@@ -18,6 +18,8 @@ public:
     void setText(const QString &text);
 
 public slots:
+    void undo();
+    void redo();
     void cut();
     void copy();
     void paste();

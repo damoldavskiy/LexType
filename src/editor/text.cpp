@@ -24,6 +24,11 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(text.size() > 0);
 
     _data.insert(pos, text);
+    insertLinesAdjust(pos, text);
+}
+
+void Text::insertLinesAdjust(int pos, const QString &text)
+{
     int line = _tracker.find(pos);
     int start = _tracker[line].start;
     int end = start + _tracker[line].size;
@@ -49,8 +54,15 @@ void Text::insert(int pos, const QString &text)
 
 void Text::remove(int pos, int count)
 {
-    _data.remove(pos, count);
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos + count <= _data.size());
 
+    _data.remove(pos, count);
+    removeLinesAdjust(pos, count);
+}
+
+void Text::removeLinesAdjust(int pos, int count)
+{
     QPair<int, int> pair = _tracker.remove(pos, count);
     int line = pair.first;
     int deleted = pair.second;
@@ -59,6 +71,42 @@ void Text::remove(int pos, int count)
         _widths.remove(line + 1, deleted);
 
     _widths.set(line, lineWidth(line));
+}
+
+int Text::undo()
+{
+    Action action = _data.undo();
+
+    if (action.type == Action::INSERT) {
+        removeLinesAdjust(action.index, action.text.size());
+        return action.index;
+    } else {
+        insertLinesAdjust(action.index, action.text);
+        return action.index + action.text.size();
+    }
+}
+
+int Text::redo()
+{
+    Action action = _data.redo();
+
+    if (action.type == Action::INSERT) {
+        insertLinesAdjust(action.index, action.text);
+        return action.index + action.text.size();
+    } else {
+        removeLinesAdjust(action.index, action.text.size());
+        return action.index;
+    }
+}
+
+bool Text::canUndo() const
+{
+    return _data.canUndo();
+}
+
+bool Text::canRedo() const
+{
+    return _data.canRedo();
 }
 
 QString Text::mid(int pos, int count) const
@@ -150,7 +198,7 @@ qreal Text::lineWidth(int line) const
 
 QString Text::text() const
 {
-    return _data;
+    return _data.text();
 }
 
 QStaticText Text::text(int pos) const

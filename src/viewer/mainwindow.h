@@ -21,6 +21,7 @@ public slots:
     void zoomOut();
 
 private:
+    void createActions();
     void createMenus();
     void loadDocument();
 
@@ -31,8 +32,10 @@ private:
     QWidget *parent;
     QVBoxLayout *layout;
 
-    QMenu *fileMenu;
-    QMenu *viewMenu;
+    QAction *_openAction;
+    QAction *_quitAction;
+    QAction *_zoomInAction;
+    QAction *_zoomOutAction;
 
     QString path;
     qreal res = 72;
