@@ -5,41 +5,40 @@
 #include <QMessageBox>
 #include <QLabel>
 
+#include "../editor/styler.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
-    setCentralWidget(scroll);
+    _scroll = new QScrollArea(this);
+    _scroll->setWidgetResizable(true);
+    setCentralWidget(_scroll);
 
     parent = new QWidget;
-    scroll->setWidget(parent);
+    _scroll->setWidget(parent);
 
-    layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
-    layout->setSpacing(0);
-    parent->setLayout(layout);
+    _layout = new QVBoxLayout;
+    _layout->setAlignment(Qt::AlignHCenter);
+    _layout->setMargin(0);
+    _layout->setSpacing(0);
+    parent->setLayout(_layout);
+
+    connect(&_watcher, &QFileSystemWatcher::fileChanged, this, &MainWindow::fileChanged);
 
     createActions();
     createMenus();
 
-    parent->setStyleSheet("QWidget { background: rgb(50, 50, 50); }");
-
-    menuBar()->setStyleSheet("QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
-                             "QMenu { background: rgb(50, 50, 50); }"
-                             "QMenu::item { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
-
-    scroll->setStyleSheet("QScrollArea { border: none; }"
-                          "QAbstractScrollArea::corner { background: rgb(50, 50, 50); }"
-                          "QScrollBar::add-line, QScrollBar::sub-line { background: rgb(50, 50, 50); width: 0px; height: 0px; }"
-                          "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }"
-                          "QScrollBar { background: rgb(50, 50, 50); margin: 0; }");
+    parent->setStyleSheet(Styler::widgetStyle());
+    menuBar()->setStyleSheet(Styler::menuStyle());
+    _scroll->setStyleSheet(Styler::scrollStyle());
 }
 
 void MainWindow::open()
 {
-    path = QFileDialog::getOpenFileName(this, "Open");
+    if (_fileInfo.isReadable())
+        _watcher.removePath(_fileInfo.filePath());
+    _fileInfo.setFile(QFileDialog::getOpenFileName(this, "Open"));
+    _watcher.addPath(_fileInfo.filePath());
     loadDocument();
 }
 
@@ -50,13 +49,18 @@ void MainWindow::quit()
 
 void MainWindow::zoomIn()
 {
-    res *= 1.5;
+    _res *= 1.5;
     loadDocument();
 }
 
 void MainWindow::zoomOut()
 {
-    res /= 1.5;
+    _res /= 1.5;
+    loadDocument();
+}
+
+void MainWindow::fileChanged()
+{
     loadDocument();
 }
 
@@ -91,36 +95,37 @@ void MainWindow::createMenus()
 
 void MainWindow::loadDocument()
 {
-    if (path != "")
-    {
-        while (layout->count() > 0)
-            delete layout->takeAt(0)->widget();
+    if (!_fileInfo.isReadable())
+        return;
 
-        Poppler::Document *document = Poppler::Document::load(path);
+    Poppler::Document *document = Poppler::Document::load(_fileInfo.filePath());
+    if (document == nullptr)
+        return;
 
-        uchar back[4] = { static_cast<uchar>(_background.blue()), static_cast<uchar>(_background.green()), static_cast<uchar>(_background.red()), 0 };
-        uchar fore[4] = { static_cast<uchar>(_foreground.blue()), static_cast<uchar>(_foreground.green()), static_cast<uchar>(_foreground.red()), 0 };
+    while (_layout->count() > 0)
+        delete _layout->takeAt(0)->widget();
 
-        for (int i = 0; i < document->numPages(); ++i) {
-            QLabel *widget = new QLabel;
+    uchar back[4] = { static_cast<uchar>(_background.blue()), static_cast<uchar>(_background.green()), static_cast<uchar>(_background.red()), 0 };
+    uchar fore[4] = { static_cast<uchar>(_foreground.blue()), static_cast<uchar>(_foreground.green()), static_cast<uchar>(_foreground.red()), 0 };
 
-            Poppler::Page *page = document->page(i);
-            QImage image = page->renderToImage(res, res);
+    for (int i = 0; i < document->numPages(); ++i) {
+        QLabel *widget = new QLabel;
 
-            int size = image.byteCount();
-            uchar *begin = image.bits();
-            for (int i = 0; i < size; ++i) {
-                uchar cur = begin[i];
-                begin[i] = back[i % 4] * cur / 255 + fore[i % 4] * (255 - cur) / 255;
-            }
+        Poppler::Page *page = document->page(i);
+        QImage image = page->renderToImage(_res, _res);
 
-            widget->setPixmap(QPixmap::fromImage(image));
-            layout->addWidget(widget);
-
-            delete page;
+        int size = image.byteCount();
+        uchar *begin = image.bits();
+        for (int i = 0; i < size; ++i) {
+            uchar cur = begin[i];
+            begin[i] = back[i % 4] * cur / 255 + fore[i % 4] * (255 - cur) / 255;
         }
 
-        delete document;
+        widget->setPixmap(QPixmap::fromImage(image));
+        _layout->addWidget(widget);
+
+        delete page;
     }
 
+    delete document;
 }
