@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QEventLoop>
+#include <QLayout>
 
 #include "styler.h"
 #include "painterdialog.h"
@@ -15,9 +16,20 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("LexType");
     resize(640, 480);
 
-    _editor = new Editor(this);
+    QWidget *window = new QWidget;
+    setCentralWidget(window);
+
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    window->setLayout(layout);
+
+    _numbers = new LineNumbers;
+    _editor = new Editor(0, _numbers);
+    layout->addWidget(_numbers);
+    layout->addWidget(_editor);
+
     _editor->setFocus();
-    setCentralWidget(_editor);
 
     createActions();
     createMenus();

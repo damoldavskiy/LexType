@@ -7,13 +7,14 @@
 #include <QTimer>
 
 #include "text.h"
+#include "linenumbers.h"
 
 class Editor : public QWidget
 {
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = 0);
+    Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
     QString text() const;
     void setText(const QString &text);
     void insert(const QString &text);
@@ -51,6 +52,7 @@ protected:
 
 private:
     Text _text = Text(font());
+    LineNumbers *_numbers;
 
     int _pos = 0;
     int _spos = -1;
@@ -61,11 +63,6 @@ private:
     bool _caret = true;
 
     int _timerInterval = 600;
-
-    QColor _background = { 50, 50, 50 };
-    QColor _foreground = { 240, 240, 240 };
-    QColor _activeLine = { 60, 60, 60 };
-    QColor _selection = { 40, 60, 130, 90 };
 };
 
 #endif // EDITOR_H

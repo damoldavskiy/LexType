@@ -18,8 +18,8 @@ void limit(T& value, T min, T max)
         value = max;
 }
 
-Editor::Editor(QWidget *parent)
-    : QWidget(parent)
+Editor::Editor(QWidget *parent, LineNumbers *numbers)
+    : QWidget(parent), _numbers(numbers)
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -124,8 +124,13 @@ void Editor::paintEvent(QPaintEvent *)
 
     int line = _text.findLine(_pos);
 
-    painter.fillRect(0, 0, width, height, _background);
-    painter.setPen(_foreground);
+    painter.fillRect(0, 0, width, height, Styler::editorBack());
+    painter.setPen(Styler::editorFore());
+
+    if (_numbers != nullptr) {
+        _numbers->clear();
+        _numbers->setMax(_text.lineCount());
+    }
 
     qreal left, cwidth, top;
     int topLine = _yshift / _text.fontHeight();
@@ -137,8 +142,11 @@ void Editor::paintEvent(QPaintEvent *)
         int pos = _text.lineStart(i);
         int end = pos + _text.lineSize(i);
 
+        if (_numbers != nullptr)
+            _numbers->add(top + _text.fontAscent(), i + 1);
+
         if (i == line)
-            painter.fillRect(0, top, width, _text.fontHeight(), _activeLine);
+            painter.fillRect(0, top, width, _text.fontHeight(), Styler::editorLine());
 
         left = 0;
         do {
@@ -160,17 +168,19 @@ void Editor::paintEvent(QPaintEvent *)
             // TODO replace with style range
             if (_spos != -1)
                 if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
-                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _selection);
+                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::editorSelection());
 
             left += cwidth;
         } while (pos++ < end);
 
         if (_spos != -1)
             if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
-                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, _selection);
+                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::editorSelection());
 
         top += _text.fontHeight();
     }
+
+    _numbers->update();
 }
 
 void Editor::keyPressEvent(QKeyEvent *event)

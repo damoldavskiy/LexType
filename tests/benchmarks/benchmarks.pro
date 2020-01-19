@@ -11,4 +11,5 @@ SOURCES += \
 HEADERS += \
     ..\..\src\editor\linetracker.h \
     ..\..\src\editor\text.h \
+    ..\..\src\editor\memorydata.h \
     tst_text.h

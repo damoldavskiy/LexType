@@ -25,3 +25,33 @@ QString Styler::scrollStyle()
            "QScrollBar::add-line, QScrollBar::sub-line { background: rgb(50, 50, 50); width: 0px; height: 0px; }"
            "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }";
 }
+
+QColor Styler::editorBack()
+{
+    return { 50, 50, 50 };
+}
+
+QColor Styler::editorFore()
+{
+    return { 240, 240, 240 };
+}
+
+QColor Styler::editorLine()
+{
+    return { 60, 60, 60 };
+}
+
+QColor Styler::editorSelection()
+{
+    return { 40, 60, 130, 90 };
+}
+
+QColor Styler::numbersBack()
+{
+    return { 50, 50, 50 };
+}
+
+QColor Styler::numbersFore()
+{
+    return { 150, 150, 150 };
+}

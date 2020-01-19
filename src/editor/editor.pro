@@ -15,7 +15,8 @@ SOURCES += \
     figureellipse.cpp \
     figurerectangle.cpp \
     figurepath.cpp \
-    math.cpp
+    math.cpp \
+    linenumbers.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -35,4 +36,5 @@ HEADERS += \
     figureellipse.h \
     figurerectangle.h \
     figurepath.h \
-    math.h
+    math.h \
+    linenumbers.h

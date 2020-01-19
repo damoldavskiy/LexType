@@ -6,8 +6,30 @@
 
 namespace Math {
 
-qreal sign(qreal n);
-qreal abs(qreal n);
+template <typename T>
+T min(T a, T b)
+{
+    return a < b ? a : b;
+}
+
+template <typename T>
+T max(T a, T b)
+{
+    return a > b ? a : b;
+}
+
+template <typename T>
+int sign(T n)
+{
+    return n < 0 ? -1 : 1;
+}
+
+template <typename T>
+T abs(T n)
+{
+    return n < 0 ? -n : n;
+}
+
 qreal dist(QPointF p1, QPointF p2);
 
 }

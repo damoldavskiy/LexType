@@ -10,25 +10,25 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    _scroll = new QScrollArea(this);
+    _scroll = new QScrollArea;
     _scroll->setWidgetResizable(true);
     setCentralWidget(_scroll);
 
-    parent = new QWidget;
-    _scroll->setWidget(parent);
+    QWidget *window = new QWidget;
+    _scroll->setWidget(window);
 
     _layout = new QVBoxLayout;
     _layout->setAlignment(Qt::AlignHCenter);
     _layout->setMargin(0);
     _layout->setSpacing(0);
-    parent->setLayout(_layout);
+    window->setLayout(_layout);
 
     connect(&_watcher, &QFileSystemWatcher::fileChanged, this, &MainWindow::fileChanged);
 
     createActions();
     createMenus();
 
-    parent->setStyleSheet(Styler::widgetStyle());
+    window->setStyleSheet(Styler::widgetStyle());
     menuBar()->setStyleSheet(Styler::menuStyle());
     _scroll->setStyleSheet(Styler::scrollStyle());
 }

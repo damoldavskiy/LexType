@@ -31,6 +31,7 @@ private:
     void saveFile(const QString &path);
     void updateFileName(const QString &path);
 
+    LineNumbers *_numbers;
     Editor *_editor;
     QAction *_openAction;
     QAction *_saveAction;
