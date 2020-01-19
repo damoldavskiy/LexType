@@ -20,6 +20,7 @@ public slots:
     void saveAs();
     void quit();
     void compile();
+    void painter();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -42,6 +43,7 @@ private:
     QAction *_pasteAction;
     QAction *_selectAllAction;
     QAction *_compileAction;
+    QAction *_painterAction;
 
     QFileInfo _fileInfo;
 };

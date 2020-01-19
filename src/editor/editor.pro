@@ -7,7 +7,15 @@ SOURCES += \
     linetracker.cpp \
     text.cpp \
     memorydata.cpp \
-    styler.cpp
+    styler.cpp \
+    painter.cpp \
+    painterdialog.cpp \
+    figure.cpp \
+    figureline.cpp \
+    figureellipse.cpp \
+    figurerectangle.cpp \
+    figurepath.cpp \
+    math.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -19,4 +27,12 @@ HEADERS += \
     range.h \
     action.h \
     memorydata.h \
-    styler.h
+    styler.h \
+    painter.h \
+    painterdialog.h \
+    figure.h \
+    figureline.h \
+    figureellipse.h \
+    figurerectangle.h \
+    figurepath.h \
+    math.h

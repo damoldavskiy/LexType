@@ -43,7 +43,7 @@ private:
     QAction *_zoomOutAction;
 
     QFileInfo _fileInfo;
-    qreal _res = 72;
+    qreal _res = 300;
 
     QFileSystemWatcher _watcher;
 };

@@ -7,8 +7,8 @@ struct Action
 {
     enum Type
     {
-        INSERT,
-        REMOVE
+        Insert,
+        Remove
     };
 
     int index;

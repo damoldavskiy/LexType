@@ -2,14 +2,14 @@
 
 void MemoryData::insert(int pos, const QString &text)
 {
-    _before.push({ pos, text, Action::INSERT });
+    _before.push({ pos, text, Action::Insert });
     _after.clear();
     _data.insert(pos, text);
 }
 
 void MemoryData::remove(int pos, int count)
 {
-    _before.push({ pos, _data.mid(pos, count), Action::REMOVE });
+    _before.push({ pos, _data.mid(pos, count), Action::Remove });
     _after.clear();
     _data.remove(pos, count);
 }
@@ -21,7 +21,7 @@ Action MemoryData::undo()
     Action action = _before.pop();
     _after.push(action);
 
-    if (action.type == Action::INSERT)
+    if (action.type == Action::Insert)
         _data.remove(action.index, action.text.size());
     else
         _data.insert(action.index, action.text);
@@ -36,7 +36,7 @@ Action MemoryData::redo()
     Action action = _after.pop();
     _before.push(action);
 
-    if (action.type == Action::INSERT)
+    if (action.type == Action::Insert)
         _data.insert(action.index, action.text);
     else
         _data.remove(action.index, action.text.size());

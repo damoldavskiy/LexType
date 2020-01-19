@@ -40,8 +40,16 @@ void Editor::setText(const QString &text)
     _text.insert(0, text);
     _pos = 0;
     _spos = -1;
-    updateShift();
-    update();
+    updateGui(true);
+}
+
+void Editor::insert(const QString &text)
+{
+    _spos = -1;
+
+    _text.insert(_pos, text);
+    _pos += text.size();
+    updateGui(true);
 }
 
 void Editor::undo()
@@ -51,8 +59,7 @@ void Editor::undo()
 
     _pos = _text.undo();
     _spos = -1;
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::redo()
@@ -62,8 +69,7 @@ void Editor::redo()
 
     _pos = _text.redo();
     _spos = -1;
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::cut()
@@ -75,8 +81,7 @@ void Editor::cut()
     int length = qMax(_pos, _spos) - start;
     QApplication::clipboard()->setText(_text.mid(start, length));
     removeSelection();
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::copy()
@@ -91,9 +96,8 @@ void Editor::copy()
 
 void Editor::paste()
 {
-    insert(QApplication::clipboard()->text());
-    updateShift();
-    update();
+    insertData(QApplication::clipboard()->text());
+    updateGui(false);
 }
 
 void Editor::selectAll()
@@ -102,8 +106,7 @@ void Editor::selectAll()
         return;
     _spos = 0;
     _pos = _text.size();
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::tick()
@@ -242,20 +245,17 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Return:
-        insert("\n");
+        insertData("\n");
         break;
     case Qt::Key_Escape:
         break;
     default:
         QString text = event->text();
         if (text.size() > 0)
-            insert(text);
+            insertData(text);
     }
 
-    _timer->start(_timerInterval);
-    _caret = true;
-    updateShift();
-    update();
+    updateGui(true);
 }
 
 void Editor::mousePressEvent(QMouseEvent *event)
@@ -264,8 +264,7 @@ void Editor::mousePressEvent(QMouseEvent *event)
         return;
     _pos = findPos(event->x(), event->y());
     _spos = _pos;
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::mouseReleaseEvent(QMouseEvent *)
@@ -279,8 +278,7 @@ void Editor::mouseMoveEvent(QMouseEvent *event)
     if ((event->buttons() & Qt::MouseButton::LeftButton) == 0)
         return;
     _pos = findPos(event->x(), event->y());
-    updateShift();
-    update();
+    updateGui(false);
 }
 
 void Editor::wheelEvent(QWheelEvent *event)
@@ -354,7 +352,17 @@ void Editor::updateShift()
     Q_ASSERT(_xshift >= 0);
 }
 
-void Editor::insert(const QString &text)
+void Editor::updateGui(bool resetCaret)
+{
+    if (resetCaret) {
+        _timer->start(_timerInterval);
+        _caret = true;
+    }
+    updateShift();
+    update();
+}
+
+void Editor::insertData(const QString &text)
 {
     if (_spos != -1 && _spos != _pos) // _spos == _pos possible only if mouse button is pressed
         removeSelection();

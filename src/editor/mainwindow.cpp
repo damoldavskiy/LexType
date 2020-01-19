@@ -4,13 +4,16 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QProcess>
+#include <QEventLoop>
 
 #include "styler.h"
+#include "painterdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("LexType");
+    resize(640, 480);
 
     _editor = new Editor(this);
     _editor->setFocus();
@@ -55,11 +58,21 @@ void MainWindow::quit()
 
 void MainWindow::compile()
 {
+    if (!_fileInfo.isReadable())
+        return;
+
     save();
     QProcess process;
     process.setWorkingDirectory(_fileInfo.dir().absolutePath());
     process.start("pdflatex", { _fileInfo.filePath() });
     process.waitForFinished();
+}
+
+void MainWindow::painter()
+{
+    PainterDialog *dialog = new PainterDialog();
+    dialog->exec();
+    _editor->insert(dialog->latex());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -113,6 +126,10 @@ void MainWindow::createActions()
     _compileAction = new QAction("Compile", this);
     _compileAction->setShortcut(QKeySequence("F5"));
     connect(_compileAction, &QAction::triggered, this, &MainWindow::compile);
+
+    _painterAction = new QAction("Painter", this);
+    _painterAction->setShortcut(QKeySequence("Ctrl+D"));
+    connect(_painterAction, &QAction::triggered, this, &MainWindow::painter);
 }
 
 void MainWindow::createMenus()
@@ -127,8 +144,8 @@ void MainWindow::createMenus()
     menu->addSeparator();
     menu->addActions({ _cutAction, _copyAction, _pasteAction, _selectAllAction });
 
-    menu = menuBar()->addMenu("Assembly");
-    menu->addActions({ _compileAction });
+    menu = menuBar()->addMenu("Tools");
+    menu->addActions({ _compileAction, _painterAction });
 }
 
 void MainWindow::saveFile(const QString &path)

@@ -16,6 +16,7 @@ public:
     Editor(QWidget *parent = 0);
     QString text() const;
     void setText(const QString &text);
+    void insert(const QString &text);
 
 public slots:
     void undo();
@@ -40,7 +41,8 @@ protected:
 
     void removeSelection();
     void updateShift();
-    void insert(const QString &text);
+    void updateGui(bool resetCaret);
+    void insertData(const QString &text);
 
     int findPos(qreal x, qreal y) const;
     QPair<qreal, qreal> findShift(int pos) const;

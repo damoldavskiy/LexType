@@ -113,6 +113,7 @@ void MainWindow::loadDocument()
 
         Poppler::Page *page = document->page(i);
         QImage image = page->renderToImage(_res, _res);
+        image = image.scaled(image.width() / 4, image.height() / 4, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         int size = image.byteCount();
         uchar *begin = image.bits();

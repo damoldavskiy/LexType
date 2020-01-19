@@ -77,7 +77,7 @@ int Text::undo()
 {
     Action action = _data.undo();
 
-    if (action.type == Action::INSERT) {
+    if (action.type == Action::Insert) {
         removeLinesAdjust(action.index, action.text.size());
         return action.index;
     } else {
@@ -90,7 +90,7 @@ int Text::redo()
 {
     Action action = _data.redo();
 
-    if (action.type == Action::INSERT) {
+    if (action.type == Action::Insert) {
         insertLinesAdjust(action.index, action.text);
         return action.index + action.text.size();
     } else {
