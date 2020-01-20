@@ -19,7 +19,7 @@ public:
     enum StrokeModifier
     {
         Solid,
-        Dots
+        Dashes
     };
 
     Figure(QPointF start);

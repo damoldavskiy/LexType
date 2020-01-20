@@ -39,8 +39,8 @@ void Figure::applyPenModifier(QPen& pen) const
     case Solid:
         pen.setStyle(Qt::SolidLine);
         break;
-    case Dots:
-        pen.setStyle(Qt::DotLine);
+    case Dashes:
+        pen.setStyle(Qt::DashLine);
         break;
     }
 }
@@ -50,11 +50,11 @@ QString Figure::latexModifier() const
     switch (_strokeModifier) {
     case Solid:
         return "";
-    case Dots:
-        return "[dotted] ";
-    default:
-        return "";
+    case Dashes:
+        return "[dashed] ";
     }
+
+    return "";
 }
 
 qreal Figure::dx() const

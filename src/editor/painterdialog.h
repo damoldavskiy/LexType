@@ -20,7 +20,7 @@ public slots:
     void rectangle();
     void path();
     void solid();
-    void dots();
+    void dashes();
 
 private:
     Painter *_painter;

@@ -22,7 +22,7 @@ PainterDialog::PainterDialog()
     new QShortcut(QKeySequence("R"), this, SLOT(rectangle()));
     new QShortcut(QKeySequence("P"), this, SLOT(path()));
     new QShortcut(QKeySequence("S"), this, SLOT(solid()));
-    new QShortcut(QKeySequence("D"), this, SLOT(dots()));
+    new QShortcut(QKeySequence("D"), this, SLOT(dashes()));
 }
 
 QString PainterDialog::latex() const
@@ -61,7 +61,7 @@ void PainterDialog::solid()
     _painter->setStrokeModifier(Figure::Solid);
 }
 
-void PainterDialog::dots()
+void PainterDialog::dashes()
 {
-    _painter->setStrokeModifier(Figure::Dots);
+    _painter->setStrokeModifier(Figure::Dashes);
 }
