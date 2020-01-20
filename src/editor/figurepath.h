@@ -8,7 +8,7 @@ class FigurePath : public Figure
 public:
     FigurePath(QPointF start);
 
-    void update(QPointF point, bool);
+    void update(QPointF point, bool, StrokeModifier strokeModifier);
     void release();
     void paint(QPainter *painter) const;
     QString latex() const;

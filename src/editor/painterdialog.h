@@ -19,6 +19,8 @@ public slots:
     void ellipse();
     void rectangle();
     void path();
+    void solid();
+    void dots();
 
 private:
     Painter *_painter;

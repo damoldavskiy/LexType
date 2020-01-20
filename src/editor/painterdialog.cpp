@@ -21,6 +21,8 @@ PainterDialog::PainterDialog()
     new QShortcut(QKeySequence("E"), this, SLOT(ellipse()));
     new QShortcut(QKeySequence("R"), this, SLOT(rectangle()));
     new QShortcut(QKeySequence("P"), this, SLOT(path()));
+    new QShortcut(QKeySequence("S"), this, SLOT(solid()));
+    new QShortcut(QKeySequence("D"), this, SLOT(dots()));
 }
 
 QString PainterDialog::latex() const
@@ -52,4 +54,14 @@ void PainterDialog::rectangle()
 void PainterDialog::path()
 {
     _painter->setType(Figure::Path);
+}
+
+void PainterDialog::solid()
+{
+    _painter->setStrokeModifier(Figure::Solid);
+}
+
+void PainterDialog::dots()
+{
+    _painter->setStrokeModifier(Figure::Dots);
 }

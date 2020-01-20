@@ -7,13 +7,21 @@ Figure::Figure(QPointF start)
 Figure::~Figure()
 { }
 
-void Figure::update(QPointF point, bool)
+void Figure::update(QPointF point, bool, StrokeModifier strokeModifier)
 {
     _end = point;
+    _strokeModifier = strokeModifier;
 }
 
 void Figure::release()
 { }
+
+void Figure::paint(QPainter *painter) const
+{
+    QPen pen = painter->pen();
+    applyPenModifier(pen);
+    painter->setPen(pen);
+}
 
 QString Figure::num(qreal n)
 {
@@ -23,6 +31,30 @@ QString Figure::num(qreal n)
 QString Figure::pair(QPointF point)
 {
     return "(" + num(point.x()) + "," + num(-point.y()) + ")";
+}
+
+void Figure::applyPenModifier(QPen& pen) const
+{
+    switch (_strokeModifier) {
+    case Solid:
+        pen.setStyle(Qt::SolidLine);
+        break;
+    case Dots:
+        pen.setStyle(Qt::DotLine);
+        break;
+    }
+}
+
+QString Figure::latexModifier() const
+{
+    switch (_strokeModifier) {
+    case Solid:
+        return "";
+    case Dots:
+        return "[dotted] ";
+    default:
+        return "";
+    }
 }
 
 qreal Figure::dx() const

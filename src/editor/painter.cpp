@@ -1,5 +1,6 @@
 #include "painter.h"
 
+#include "styler.h"
 #include "figureline.h"
 #include "figureellipse.h"
 #include "figurerectangle.h"
@@ -30,12 +31,17 @@ QString Painter::latex() const
     for (const auto& figure : _figures)
         result += figure->latex() + "\n";
 
-    return "\\begin{center}\n\\begin{tikzpicture}\n" + result + "\\end{tikzpicture}\n\\end{center}\n";
+    return "\\begin{picture}\n" + result + "\\end{picture}\n";
 }
 
 void Painter::setType(Figure::Type type)
 {
     _type = type;
+}
+
+void Painter::setStrokeModifier(Figure::StrokeModifier modifier)
+{
+    _strokeModifier = modifier;
 }
 
 void Painter::undo()
@@ -60,8 +66,8 @@ void Painter::paintEvent(QPaintEvent *)
 
     painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.fillRect(0, 0, width, height, _background);
-    painter.setPen(_foreground);
+    painter.fillRect(0, 0, width, height, Styler::painterBack());
+    painter.setPen(Styler::painterFore());
 
     for (const auto& figure : _figures)
         figure->paint(&painter);
@@ -70,14 +76,14 @@ void Painter::paintEvent(QPaintEvent *)
 void Painter::keyPressEvent(QKeyEvent *event)
 {
     if (_edit)
-        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier);
+        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
     update();
 }
 
 void Painter::keyReleaseEvent(QKeyEvent *event)
 {
     if (_edit)
-        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier);
+        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
     update();
 }
 
@@ -114,6 +120,6 @@ void Painter::mouseReleaseEvent(QMouseEvent *)
 void Painter::mouseMoveEvent(QMouseEvent *event)
 {
     _mouse = event->pos();
-    _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier);
+    _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
     update();
 }

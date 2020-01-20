@@ -18,6 +18,9 @@ public:
 
     static QColor numbersBack();
     static QColor numbersFore();
+
+    static QColor painterBack();
+    static QColor painterFore();
 };
 
 #endif // STYLER_H

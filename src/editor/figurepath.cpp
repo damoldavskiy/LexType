@@ -4,8 +4,9 @@ FigurePath::FigurePath(QPointF start)
     : Figure(start), _path({ start })
 { }
 
-void FigurePath::update(QPointF point, bool)
+void FigurePath::update(QPointF point, bool modifier, StrokeModifier strokeModifier)
 {
+    Figure::update(point, modifier, strokeModifier);
     _path.append(point);
 }
 
@@ -32,6 +33,7 @@ void FigurePath::release()
 
 void FigurePath::paint(QPainter *painter) const
 {
+    Figure::paint(painter);
     QVector<QPointF> points = getPoints();
     QPainterPath painterPath(points[0]);
 
@@ -59,7 +61,7 @@ void FigurePath::paint(QPainter *painter) const
 QString FigurePath::latex() const
 {
     QVector<QPointF> points = getPoints();
-    QString result = "\\draw " + pair(points[0]);
+    QString result = "\\draw " + latexModifier() + pair(points[0]);
 
     for (int i = 3; i < points.size(); i += 3)
         result += " .. controls " + pair(points[i - 2]) + " and " + pair(points[i - 1]) + " .. " + pair(points[i]);

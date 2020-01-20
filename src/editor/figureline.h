@@ -8,7 +8,7 @@ class FigureLine : public Figure
 public:
     FigureLine(QPointF start);
 
-    void update(QPointF point, bool modifier);
+    void update(QPointF point, bool modifier, StrokeModifier strokeModifier);
     void paint(QPainter *painter) const;
     QString latex() const;
 };

@@ -53,5 +53,15 @@ QColor Styler::numbersBack()
 
 QColor Styler::numbersFore()
 {
-    return { 150, 150, 150 };
+    return { 100, 100, 100 };
+}
+
+QColor Styler::painterBack()
+{
+    return { 50, 50, 50 };
+}
+
+QColor Styler::painterFore()
+{
+    return { 240, 240, 240 };
 }

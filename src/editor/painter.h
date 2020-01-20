@@ -17,6 +17,7 @@ public:
     ~Painter();
     QString latex() const;
     void setType(Figure::Type type);
+    void setStrokeModifier(Figure::StrokeModifier modifier);
 
 public slots:
     void undo();
@@ -37,9 +38,7 @@ private:
     QStack<Figure*> _figures;
     QStack<Figure*> _afterFigures;
     Figure::Type _type = Figure::Path;
-
-    QColor _background = { 50, 50, 50 };
-    QColor _foreground = { 240, 240, 240 };
+    Figure::StrokeModifier _strokeModifier = Figure::Solid;
 };
 
 #endif // PAINTER_H

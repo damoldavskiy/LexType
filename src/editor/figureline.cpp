@@ -4,9 +4,9 @@ FigureLine::FigureLine(QPointF start)
     : Figure(start)
 { }
 
-void FigureLine::update(QPointF point, bool modifier)
+void FigureLine::update(QPointF point, bool modifier, StrokeModifier strokeModifier)
 {
-    _end = point;
+    Figure::update(point, modifier, strokeModifier);
 
     if (modifier) {
         qreal len = Math::dist(_start, _end);
@@ -22,10 +22,11 @@ void FigureLine::update(QPointF point, bool modifier)
 
 void FigureLine::paint(QPainter *painter) const
 {
+    Figure::paint(painter);
     painter->drawLine(_start, _end);
 }
 
 QString FigureLine::latex() const
 {
-    return "\\draw " + pair(_start) + " -- " + pair(_end) + ";";
+    return "\\draw " + latexModifier() + pair(_start) + " -- " + pair(_end) + ";";
 }
