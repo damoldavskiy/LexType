@@ -26,6 +26,17 @@ QString Styler::scrollStyle()
            "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }";
 }
 
+QString Styler::statusStyle()
+{
+    return "QWidget { background: rgb(50, 50, 50); }";
+}
+
+QString Styler::statusLabelStyle()
+{
+    return "QWidget { color: rgb(150, 150, 150); }";
+}
+
+
 QColor Styler::editorBack()
 {
     return { 50, 50, 50 };

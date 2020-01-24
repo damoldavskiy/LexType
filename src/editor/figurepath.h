@@ -9,6 +9,7 @@ public:
     FigurePath(QPointF start);
 
     void update(QPointF point, bool, StrokeModifier strokeModifier);
+    void shift(qreal shiftX, qreal shiftY);
     void release();
     void paint(QPainter *painter) const;
     QString latex() const;

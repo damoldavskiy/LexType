@@ -9,4 +9,10 @@ qreal dist(QPointF p1, QPointF p2)
     return qSqrt(dx * dx + dy * dy);
 }
 
+void shift(QPointF &p, qreal shiftX, qreal shiftY)
+{
+    p.setX(p.x() + shiftX);
+    p.setY(p.y() + shiftY);
+}
+
 }

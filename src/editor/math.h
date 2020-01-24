@@ -31,6 +31,7 @@ T abs(T n)
 }
 
 qreal dist(QPointF p1, QPointF p2);
+void shift(QPointF &p, qreal shiftX, qreal shiftY);
 
 }
 

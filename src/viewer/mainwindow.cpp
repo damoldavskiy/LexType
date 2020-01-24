@@ -37,7 +37,7 @@ void MainWindow::open()
 {
     if (_fileInfo.isReadable())
         _watcher.removePath(_fileInfo.filePath());
-    _fileInfo.setFile(QFileDialog::getOpenFileName(this, "Open"));
+    _fileInfo.setFile(QFileDialog::getOpenFileName(this, "Open", "", "PDF (*.pdf)"));
     _watcher.addPath(_fileInfo.filePath());
     loadDocument();
 }

@@ -3,12 +3,22 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QProcess>
 #include <QEventLoop>
 #include <QLayout>
+#include <QStatusBar>
+#include <QLabel>
 
 #include "styler.h"
 #include "painterdialog.h"
+#include "mathwriter.h"
+
+void writeText(const QString &path, const QString &text)
+{
+    QFile file(path);
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    out << text << endl;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,18 +26,31 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("LexType");
     resize(640, 480);
 
-    QWidget *window = new QWidget;
-    setCentralWidget(window);
+//    QWidget *window = new QWidget;
+//    setCentralWidget(window);
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
-    window->setLayout(layout);
+//    window->setLayout(layout);
 
     _numbers = new LineNumbers;
     _editor = new Editor(0, _numbers);
     layout->addWidget(_numbers);
     layout->addWidget(_editor);
+
+    _console = new Editor(0, 0, { 60, 60, 60 });
+
+    QWidget *editorWidget = new QWidget;
+    editorWidget->setLayout(layout);
+
+    _splitter = new QSplitter;
+    _splitter->setOrientation(Qt::Vertical);
+    _splitter->setHandleWidth(0);
+    _splitter->addWidget(editorWidget);
+    _splitter->addWidget(_console);
+    _splitter->setSizes({ 1, 0 });
+    setCentralWidget(_splitter);
 
     _editor->setFocus();
 
@@ -35,11 +58,17 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     menuBar()->setStyleSheet(Styler::menuStyle());
+
+    _status = new QLabel();
+    _status->setStyleSheet(Styler::statusLabelStyle());
+
+    statusBar()->addWidget(_status);
+    statusBar()->setStyleSheet(Styler::statusStyle());
 }
 
 void MainWindow::open()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open");
+    QString path = QFileDialog::getOpenFileName(this, "Open", "", "LexType (*.lex);;TeX (*.tex)");
     if (path != "") {
         QFile file(path);
         file.open(QIODevice::ReadOnly);
@@ -51,16 +80,12 @@ void MainWindow::open()
 
 void MainWindow::save()
 {
-    if (_fileInfo.isWritable())
-        saveFile(_fileInfo.filePath());
+    saveFile(_fileInfo.filePath());
 }
 
 void MainWindow::saveAs()
 {
-    QString path = QFileDialog::getSaveFileName(this, "Save");
-
-    if (path != "")
-        saveFile(path);
+    saveFile(QFileDialog::getSaveFileName(this, "Save", "", "LexType (*.lex);;TeX (*.tex)"));
 }
 
 void MainWindow::quit()
@@ -74,17 +99,51 @@ void MainWindow::compile()
         return;
 
     save();
-    QProcess process;
-    process.setWorkingDirectory(_fileInfo.dir().absolutePath());
-    process.start("pdflatex", { _fileInfo.filePath() });
-    process.waitForFinished();
+
+    QFileInfo fileInfo(_fileInfo.dir(), _fileInfo.baseName() + ".tex");
+    writeText(fileInfo.filePath(), MathWriter::pass(_editor->text()));
+
+    if (_compilation != nullptr)
+        delete _compilation;
+    _compilation = new QProcess;
+    _compilation->setWorkingDirectory(fileInfo.dir().absolutePath());
+    // TODO do we need it?
+//    process->deleteLater();
+
+    connect(_compilation, &QProcess::readyRead, this, &MainWindow::output);
+    connect(_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
+    _splitter->setSizes({ 7, 3 });
+    _console->setText("");
+    _compilation->start("pdflatex", { fileInfo.filePath() });
 }
 
 void MainWindow::painter()
 {
     PainterDialog *dialog = new PainterDialog();
     dialog->exec();
+    QString latex = dialog->latex();
+    if (latex == "")
+        _status->setText("Figure insertion canceled");
+    else
+        _status->setText("Figure inserted");
     _editor->insert(dialog->latex());
+}
+
+void MainWindow::output()
+{
+    _console->insert(QString(_compilation->readAll()));
+    _status->setText("Compiling...");
+}
+
+void MainWindow::compiled(int exitCode, QProcess::ExitStatus)
+{
+    _console->insert("Process finished with exit code " + QString::number(exitCode));
+    _splitter->setSizes({ 1, 0 });
+
+    if (exitCode == 0)
+        _status->setText("Compilation succesful");
+    else
+        _status->setText("Compilation failed");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -162,12 +221,10 @@ void MainWindow::createMenus()
 
 void MainWindow::saveFile(const QString &path)
 {
-    Q_ASSERT(path.size() > 0);
+    if (path == "")
+        return;
 
-    QFile file(path);
-    file.open(QIODevice::WriteOnly);
-    QTextStream out(&file);
-    out << _editor->text() << endl;
+    writeText(path, _editor->text());
     updateFileName(path);
 }
 

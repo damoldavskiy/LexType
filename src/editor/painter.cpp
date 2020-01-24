@@ -29,7 +29,7 @@ QString Painter::latex() const
 
     QString result;
     for (const auto& figure : _figures)
-        result += figure->latex() + "\n";
+        result += "\t" + figure->latex() + "\n";
 
     return "\\begin{picture}\n" + result + "\\end{picture}\n";
 }
@@ -46,6 +46,8 @@ void Painter::setStrokeModifier(Figure::StrokeModifier modifier)
 
 void Painter::undo()
 {
+    if (_edit)
+        return;
     if (!_figures.isEmpty())
         _afterFigures.push(_figures.pop());
     update();
@@ -53,6 +55,8 @@ void Painter::undo()
 
 void Painter::redo()
 {
+    if (_edit)
+        return;
     if (!_afterFigures.isEmpty())
         _figures.push(_afterFigures.pop());
     update();
@@ -69,7 +73,7 @@ void Painter::paintEvent(QPaintEvent *)
     painter.fillRect(0, 0, width, height, Styler::painterBack());
     painter.setPen(Styler::painterFore());
 
-    for (const auto& figure : _figures)
+    for (const auto &figure : _figures)
         figure->paint(&painter);
 }
 
@@ -122,4 +126,13 @@ void Painter::mouseMoveEvent(QMouseEvent *event)
     _mouse = event->pos();
     _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
     update();
+}
+
+void Painter::resizeEvent(QResizeEvent *event)
+{
+    qreal dx = event->size().width() - event->oldSize().width();
+    qreal dy = event->size().height() - event->oldSize().height();
+
+    for (auto &figure : _figures)
+        figure->shift(dx / 2, dy / 2);
 }

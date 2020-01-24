@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QFileInfo>
+#include <QSplitter>
+#include <QProcess>
+#include <QLabel>
 
 #include "editor.h"
 
@@ -22,6 +25,10 @@ public slots:
     void compile();
     void painter();
 
+private slots:
+    void output();
+    void compiled(int exitCode, QProcess::ExitStatus exitStatus);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -31,8 +38,12 @@ private:
     void saveFile(const QString &path);
     void updateFileName(const QString &path);
 
+    QSplitter *_splitter;
     LineNumbers *_numbers;
     Editor *_editor;
+    Editor *_console;
+    QLabel *_status;
+
     QAction *_openAction;
     QAction *_saveAction;
     QAction *_saveAsAction;
@@ -47,6 +58,7 @@ private:
     QAction *_painterAction;
 
     QFileInfo _fileInfo;
+    QProcess *_compilation = nullptr;
 };
 
 #endif // MAINWINDOW_H

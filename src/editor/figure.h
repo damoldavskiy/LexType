@@ -26,6 +26,7 @@ public:
     virtual ~Figure();
 
     virtual void update(QPointF point, bool, StrokeModifier strokeModifier);
+    virtual void shift(qreal shiftX, qreal shiftY);
     virtual void release();
 
     virtual void paint(QPainter *painter) const;

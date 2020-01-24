@@ -16,7 +16,8 @@ SOURCES += \
     figurerectangle.cpp \
     figurepath.cpp \
     math.cpp \
-    linenumbers.cpp
+    linenumbers.cpp \
+    mathwriter.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -37,4 +38,5 @@ HEADERS += \
     figurerectangle.h \
     figurepath.h \
     math.h \
-    linenumbers.h
+    linenumbers.h \
+    mathwriter.h

@@ -13,6 +13,12 @@ void Figure::update(QPointF point, bool, StrokeModifier strokeModifier)
     _strokeModifier = strokeModifier;
 }
 
+void Figure::shift(qreal shiftX, qreal shiftY)
+{
+    Math::shift(_start, shiftX, shiftY);
+    Math::shift(_end, shiftX, shiftY);
+}
+
 void Figure::release()
 { }
 

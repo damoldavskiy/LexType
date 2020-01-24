@@ -8,13 +8,14 @@
 
 #include "text.h"
 #include "linenumbers.h"
+#include "styler.h"
 
 class Editor : public QWidget
 {
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
+    Editor(QWidget *parent = 0, LineNumbers *numbers = 0, QColor background = Styler::editorBack(), QColor foreground = Styler::editorFore());
     QString text() const;
     void setText(const QString &text);
     void insert(const QString &text);
@@ -63,6 +64,9 @@ private:
     bool _caret = true;
 
     int _timerInterval = 600;
+
+    QColor _background;
+    QColor _foreground;
 };
 
 #endif // EDITOR_H

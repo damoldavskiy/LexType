@@ -19,7 +19,7 @@ protected:
 
 private:
     QVector<QPair<qreal, int>> _values;
-    int _leftShift = 20;
+    int _leftShift = 10;
     int _rightShift = 10;
     int _maxWidth = 0;
 };

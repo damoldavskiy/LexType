@@ -10,6 +10,12 @@ void FigurePath::update(QPointF point, bool modifier, StrokeModifier strokeModif
     _path.append(point);
 }
 
+void FigurePath::shift(qreal shiftX, qreal shiftY)
+{
+    for (auto &point : _path)
+        Math::shift(point, shiftX, shiftY);
+}
+
 void FigurePath::release()
 {
     QVector<QPointF> filtered { _path[0] };

@@ -9,6 +9,7 @@ SOURCES += \
     ..\..\src\editor\memorydata.cpp \
     ..\..\src\editor\editor.cpp \
     ..\..\src\editor\styler.cpp \
+    ..\..\src\editor\mathwriter.cpp \
     main.cpp
 
 HEADERS += \
@@ -18,5 +19,7 @@ HEADERS += \
     ..\..\src\editor\memorydata.h \
     ..\..\src\editor\editor.h \
     ..\..\src\editor\styler.h \
+    ..\..\src\editor\mathwriter.h \
     tst_editor.h \
-    tst_text.h
+    tst_text.h \
+    tst_mathwriter.h

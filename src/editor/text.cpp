@@ -21,7 +21,6 @@ void Text::insert(int pos, const QString &text)
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= _data.size());
-    Q_ASSERT(text.size() > 0);
 
     _data.insert(pos, text);
     insertLinesAdjust(pos, text);
@@ -29,6 +28,9 @@ void Text::insert(int pos, const QString &text)
 
 void Text::insertLinesAdjust(int pos, const QString &text)
 {
+    if (text == "")
+        return;
+
     int line = _tracker.find(pos);
     int start = _tracker[line].start;
     int end = start + _tracker[line].size;

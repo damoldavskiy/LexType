@@ -10,6 +10,8 @@ public:
     static QString widgetStyle();
     static QString menuStyle();
     static QString scrollStyle();
+    static QString statusStyle();
+    static QString statusLabelStyle();
 
     static QColor editorBack();
     static QColor editorFore();

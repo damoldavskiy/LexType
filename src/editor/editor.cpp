@@ -18,8 +18,8 @@ void limit(T& value, T min, T max)
         value = max;
 }
 
-Editor::Editor(QWidget *parent, LineNumbers *numbers)
-    : QWidget(parent), _numbers(numbers)
+Editor::Editor(QWidget *parent, LineNumbers *numbers, QColor background, QColor foreground)
+    : QWidget(parent), _numbers(numbers), _background(background), _foreground(foreground)
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -124,8 +124,8 @@ void Editor::paintEvent(QPaintEvent *)
 
     int line = _text.findLine(_pos);
 
-    painter.fillRect(0, 0, width, height, Styler::editorBack());
-    painter.setPen(Styler::editorFore());
+    painter.fillRect(0, 0, width, height, _background);
+    painter.setPen(_foreground);
 
     if (_numbers != nullptr) {
         _numbers->clear();
@@ -180,7 +180,8 @@ void Editor::paintEvent(QPaintEvent *)
         top += _text.fontHeight();
     }
 
-    _numbers->update();
+    if (_numbers != nullptr)
+        _numbers->update();
 }
 
 void Editor::keyPressEvent(QKeyEvent *event)
