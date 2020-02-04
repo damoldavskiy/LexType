@@ -42,7 +42,6 @@ private:
     LineNumbers *_numbers;
     Editor *_editor;
     Editor *_console;
-    QLabel *_status;
 
     QAction *_openAction;
     QAction *_saveAction;

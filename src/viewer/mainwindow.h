@@ -30,9 +30,6 @@ private:
     void createMenus();
     void loadDocument();
 
-    QColor _background = { 50, 50, 50 };
-    QColor _foreground = { 240, 240, 240 };
-
     QScrollArea *_scroll;
     QWidget *_parent;
     QVBoxLayout *_layout;

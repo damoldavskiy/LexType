@@ -10,6 +10,7 @@ LineNumbers::LineNumbers(QWidget *parent)
 void LineNumbers::clear()
 {
     _values.clear();
+    _current = -1;
     _maxWidth = 0;
 }
 
@@ -17,6 +18,11 @@ void LineNumbers::setMax(int value)
 {
     _maxWidth = fontMetrics().width(QString::number(value));
     setMaximumWidth(_leftShift + _maxWidth + _rightShift);
+}
+
+void LineNumbers::setCurrent(int value)
+{
+    _current = value;
 }
 
 void LineNumbers::add(qreal shift, int value)
@@ -35,6 +41,12 @@ void LineNumbers::paintEvent(QPaintEvent *)
         QString text = QString::number(pair.second);
         int textWidth = fontMetrics().width(text);
 
+        if (pair.second == _current)
+            painter.setPen(Styler::numberCurrent());
+
         painter.drawText(_leftShift + _maxWidth - textWidth, pair.first, text);
+
+        if (pair.second == _current)
+            painter.setPen(Styler::numbersFore());
     }
 }

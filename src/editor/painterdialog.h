@@ -14,17 +14,23 @@ public:
     QString latex() const;
 
 public slots:
-    void cancel();
+    void accept();
     void line();
     void ellipse();
     void rectangle();
     void path();
-    void solid();
-    void dashes();
+    void text();
+    void lineSolid();
+    void lineDash();
+    void tipSoft();
+    void tipArrow();
+    void tipDouble();
+    void fillSolid();
+    void fillEmpty();
 
 private:
     Painter *_painter;
-    bool _canceled = false;
+    bool _accepted = false;
 };
 
 #endif // PAINTERDIALOG_H

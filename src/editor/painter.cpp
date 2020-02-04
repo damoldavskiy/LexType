@@ -5,6 +5,7 @@
 #include "figureellipse.h"
 #include "figurerectangle.h"
 #include "figurepath.h"
+#include "figuretext.h"
 
 Painter::Painter(QWidget *parent)
     : QWidget(parent)
@@ -15,11 +16,16 @@ Painter::Painter(QWidget *parent)
 
 Painter::~Painter()
 {
+    bool deleteCurrent = _figures.isEmpty() || _figures.last() != _current;
+
     // TODO Deal with figure and painter destructors
-    for (auto& figure : _figures)
+    for (auto figure : _figures)
         delete figure;
-    for (auto& figure : _afterFigures)
+    for (auto figure : _afterFigures)
         delete figure;
+
+    if (deleteCurrent)
+        delete _current;
 }
 
 QString Painter::latex() const
@@ -28,26 +34,28 @@ QString Painter::latex() const
         return "";
 
     QString result;
-    for (const auto& figure : _figures)
+    for (auto figure : _figures)
         result += "\t" + figure->latex() + "\n";
 
     return "\\begin{picture}\n" + result + "\\end{picture}\n";
 }
 
-void Painter::setType(Figure::Type type)
+Figure* Painter::figure() const
 {
-    _type = type;
+    return _current;
 }
 
-void Painter::setStrokeModifier(Figure::StrokeModifier modifier)
+void Painter::setFigure(Figure* value)
 {
-    _strokeModifier = modifier;
+    if (!_figures.empty() && _figures.last() == _current)
+        _figures.last() = value;
+
+    delete _current;
+    _current = value;
 }
 
 void Painter::undo()
 {
-    if (_edit)
-        return;
     if (!_figures.isEmpty())
         _afterFigures.push(_figures.pop());
     update();
@@ -55,8 +63,6 @@ void Painter::undo()
 
 void Painter::redo()
 {
-    if (_edit)
-        return;
     if (!_afterFigures.isEmpty())
         _figures.push(_afterFigures.pop());
     update();
@@ -72,43 +78,34 @@ void Painter::paintEvent(QPaintEvent *)
 
     painter.fillRect(0, 0, width, height, Styler::painterBack());
     painter.setPen(Styler::painterFore());
+//    painter.setBrush(Styler::painterFore());
 
-    for (const auto &figure : _figures)
+    for (auto figure : _figures)
         figure->paint(&painter);
 }
 
 void Painter::keyPressEvent(QKeyEvent *event)
 {
-    if (_edit)
-        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
+    _current->setEnd(_mouse, event->modifiers() & Qt::ShiftModifier);
     update();
 }
 
 void Painter::keyReleaseEvent(QKeyEvent *event)
 {
-    if (_edit)
-        _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
+    _current->setEnd(_mouse, event->modifiers() & Qt::ShiftModifier);
     update();
 }
 
 void Painter::mousePressEvent(QMouseEvent *event)
 {
     _mouse = event->pos();
-    _edit = true;
 
-    switch (_type) {
-    case Figure::Line:
-        _figures.append(new FigureLine(_mouse));
-        break;
-    case Figure::Ellipse:
-        _figures.append(new FigureEllipse(_mouse));
-        break;
-    case Figure::Rectangle:
-        _figures.append(new FigureRectangle(_mouse));
-        break;
-    case Figure::Path:
-        _figures.append(new FigurePath(_mouse));
-    }
+    _figures.append(_current);
+    _current->setStart(_mouse);
+    _current->setEnd(_mouse);
+
+    for (auto figure : _afterFigures)
+        delete figure;
     _afterFigures.clear();
 
     update();
@@ -116,15 +113,17 @@ void Painter::mousePressEvent(QMouseEvent *event)
 
 void Painter::mouseReleaseEvent(QMouseEvent *)
 {
-    _edit = false;
-    _figures.last()->release();
+    _current->release();
+    _current = _current->copy();
+    _current->clear();
+
     update();
 }
 
 void Painter::mouseMoveEvent(QMouseEvent *event)
 {
     _mouse = event->pos();
-    _figures.last()->update(_mouse, event->modifiers() & Qt::ShiftModifier, _strokeModifier);
+    _current->setEnd(event->pos(), event->modifiers() & Qt::ShiftModifier);
     update();
 }
 

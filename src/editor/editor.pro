@@ -17,7 +17,11 @@ SOURCES += \
     figurepath.cpp \
     math.cpp \
     linenumbers.cpp \
-    mathwriter.cpp
+    mathwriter.cpp \
+    figuretext.cpp \
+    figurecontour.cpp \
+    figurefillable.cpp \
+    figurearrow.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -39,4 +43,8 @@ HEADERS += \
     figurepath.h \
     math.h \
     linenumbers.h \
-    mathwriter.h
+    mathwriter.h \
+    figuretext.h \
+    figurecontour.h \
+    figurefillable.h \
+    figurearrow.h

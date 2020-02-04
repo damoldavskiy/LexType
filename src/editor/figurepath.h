@@ -1,18 +1,23 @@
 #ifndef FIGUREPATH_H
 #define FIGUREPATH_H
 
-#include "figure.h"
+#include "figurearrow.h"
+#include "figurefillable.h"
 
-class FigurePath : public Figure
+class FigurePath : public FigureArrow, public FigureFillable
 {
 public:
-    FigurePath(QPointF start);
-
-    void update(QPointF point, bool, StrokeModifier strokeModifier);
-    void shift(qreal shiftX, qreal shiftY);
+    void setStart(QPointF point);
+    void setEnd(QPointF point, bool modifier = false);
     void release();
+    void shift(qreal shiftX, qreal shiftY);
     void paint(QPainter *painter) const;
     QString latex() const;
+    Figure* copy() const;
+    void clear();
+    const QVector<QPointF>& path() const;
+    void setPath(const QVector<QPointF>& value);
+    QStringList modifiers() const;
 
 private:
     QVector<QPointF> getPoints() const;

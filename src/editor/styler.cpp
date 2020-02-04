@@ -28,14 +28,8 @@ QString Styler::scrollStyle()
 
 QString Styler::statusStyle()
 {
-    return "QWidget { background: rgb(50, 50, 50); }";
+    return "QWidget { background: rgb(50, 50, 50); color: rgb(150, 150, 150); }";
 }
-
-QString Styler::statusLabelStyle()
-{
-    return "QWidget { color: rgb(150, 150, 150); }";
-}
-
 
 QColor Styler::editorBack()
 {
@@ -49,7 +43,7 @@ QColor Styler::editorFore()
 
 QColor Styler::editorLine()
 {
-    return { 60, 60, 60 };
+    return { 55, 55, 55 };
 }
 
 QColor Styler::editorSelection()
@@ -67,12 +61,27 @@ QColor Styler::numbersFore()
     return { 100, 100, 100 };
 }
 
+QColor Styler::numberCurrent()
+{
+    return { 150, 150, 150 };
+}
+
 QColor Styler::painterBack()
 {
     return { 50, 50, 50 };
 }
 
 QColor Styler::painterFore()
+{
+    return { 240, 240, 240 };
+}
+
+QColor Styler::viewerBack()
+{
+    return { 50, 50, 50 };
+}
+
+QColor Styler::viewerFore()
 {
     return { 240, 240, 240 };
 }

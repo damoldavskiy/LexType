@@ -1,31 +1,34 @@
 #include "figurerectangle.h"
 
-FigureRectangle::FigureRectangle(QPointF start)
-    : Figure(start)
-{ }
-
-void FigureRectangle::update(QPointF point, bool modifier, StrokeModifier strokeModifier)
+void FigureRectangle::setEnd(QPointF point, bool modifier/*, StrokeModifier strokeModifier*/)
 {
-    Figure::update(point, modifier, strokeModifier);
+    Figure::setEnd(point);
 
     if (modifier) {
         if (abs(dx()) > abs(dy()))
-            _end.setX(_start.x() + dy() * (Math::sign(dx()) == Math::sign(dy()) ? 1 : -1));
+            _end.setX(start().x() + dy() * (Math::sign(dx()) == Math::sign(dy()) ? 1 : -1));
         else
-            _end.setY(_start.y() + dx() * (Math::sign(dx()) == Math::sign(dy()) ? 1 : -1));
+            _end.setY(start().y() + dx() * (Math::sign(dx()) == Math::sign(dy()) ? 1 : -1));
     }
 }
 
-void FigureRectangle::release()
-{ }
-
 void FigureRectangle::paint(QPainter *painter) const
 {
-    Figure::paint(painter);
-    painter->drawRect({ _start, _end });
+    FigureFillable::paint(painter);
+    painter->drawRect({ start(), end() });
 }
 
 QString FigureRectangle::latex() const
 {
-    return "\\draw " + latexModifier() + pair(_start) + " rectangle " + pair(_end) + ";";
+    return "\\draw " + modifier() + pair(start()) + " rectangle " + pair(end()) + ";";
+}
+
+Figure* FigureRectangle::copy() const
+{
+    FigureRectangle *figure = new FigureRectangle;
+    figure->setStart(start());
+    figure->setEnd(end());
+    figure->setStroke(stroke());
+    figure->setFill(fill());
+    return figure;
 }

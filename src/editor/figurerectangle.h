@@ -1,17 +1,15 @@
 #ifndef FIGURERECTANGLE_H
 #define FIGURERECTANGLE_H
 
-#include "figure.h"
+#include "figurefillable.h"
 
-class FigureRectangle : public Figure
+class FigureRectangle : public FigureFillable
 {
 public:
-    FigureRectangle(QPointF start);
-
-    void update(QPointF point, bool modifier, StrokeModifier strokeModifier);
-    void release();
+    void setEnd(QPointF point, bool modifier = false);
     void paint(QPainter *painter) const;
     QString latex() const;
+    Figure* copy() const;
 };
 
 #endif // FIGURERECTANGLE_H

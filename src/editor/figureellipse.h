@@ -1,16 +1,15 @@
 #ifndef FIGUREELLIPSE_H
 #define FIGUREELLIPSE_H
 
-#include "figure.h"
+#include "figurefillable.h"
 
-class FigureEllipse : public Figure
+class FigureEllipse : public FigureFillable
 {
 public:
-    FigureEllipse(QPointF start);
-
-    void update(QPointF point, bool modifier, StrokeModifier strokeModifier);
+    void setEnd(QPointF point, bool modifier = false);
     void paint(QPainter *painter) const;
     QString latex() const;
+    Figure* copy() const;
 };
 
 #endif // FIGUREELLIPSE_H

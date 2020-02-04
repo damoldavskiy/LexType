@@ -7,6 +7,7 @@
 #include <QStack>
 
 #include "figure.h"
+#include "figurepath.h"
 
 class Painter : public QWidget
 {
@@ -16,8 +17,8 @@ public:
     Painter(QWidget *parent = 0);
     ~Painter();
     QString latex() const;
-    void setType(Figure::Type type);
-    void setStrokeModifier(Figure::StrokeModifier modifier);
+    Figure* figure() const;
+    void setFigure(Figure* value);
 
 public slots:
     void undo();
@@ -34,12 +35,10 @@ protected:
 
 private:
     QPoint _mouse;
-    bool _edit = false;
 
     QStack<Figure*> _figures;
     QStack<Figure*> _afterFigures;
-    Figure::Type _type = Figure::Path;
-    Figure::StrokeModifier _strokeModifier = Figure::Solid;
+    Figure* _current = new FigurePath;
 };
 
 #endif // PAINTER_H

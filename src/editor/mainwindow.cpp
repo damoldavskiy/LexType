@@ -26,20 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("LexType");
     resize(640, 480);
 
-//    QWidget *window = new QWidget;
-//    setCentralWidget(window);
-
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
-//    window->setLayout(layout);
 
     _numbers = new LineNumbers;
     _editor = new Editor(0, _numbers);
     layout->addWidget(_numbers);
     layout->addWidget(_editor);
 
-    _console = new Editor(0, 0, { 60, 60, 60 });
+    _console = new Editor(0, 0, Styler::editorLine());
 
     QWidget *editorWidget = new QWidget;
     editorWidget->setLayout(layout);
@@ -58,11 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     menuBar()->setStyleSheet(Styler::menuStyle());
-
-    _status = new QLabel();
-    _status->setStyleSheet(Styler::statusLabelStyle());
-
-    statusBar()->addWidget(_status);
     statusBar()->setStyleSheet(Styler::statusStyle());
 }
 
@@ -75,6 +66,7 @@ void MainWindow::open()
         QTextStream in(&file);
         _editor->setText(in.readAll());
         updateFileName(path);
+        statusBar()->showMessage("Opened file: " + path);
     }
 }
 
@@ -95,8 +87,10 @@ void MainWindow::quit()
 
 void MainWindow::compile()
 {
-    if (!_fileInfo.isReadable())
+    if (!_fileInfo.isReadable()) {
+        statusBar()->showMessage("To perform compilation, save file");
         return;
+    }
 
     save();
 
@@ -123,27 +117,28 @@ void MainWindow::painter()
     dialog->exec();
     QString latex = dialog->latex();
     if (latex == "")
-        _status->setText("Figure insertion canceled");
+        statusBar()->showMessage("Figure insertion canceled");
     else
-        _status->setText("Figure inserted");
+        statusBar()->showMessage("Figure inserted");
     _editor->insert(dialog->latex());
 }
 
 void MainWindow::output()
 {
     _console->insert(QString(_compilation->readAll()));
-    _status->setText("Compiling...");
+    statusBar()->showMessage("Compiling...");
 }
 
 void MainWindow::compiled(int exitCode, QProcess::ExitStatus)
 {
     _console->insert("Process finished with exit code " + QString::number(exitCode));
-    _splitter->setSizes({ 1, 0 });
 
-    if (exitCode == 0)
-        _status->setText("Compilation succesful");
-    else
-        _status->setText("Compilation failed");
+    if (exitCode == 0) {
+        _splitter->setSizes({ 1, 0 });
+        statusBar()->showMessage("Compilation successful");
+    } else {
+        statusBar()->showMessage("Compilation failed");
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -221,11 +216,14 @@ void MainWindow::createMenus()
 
 void MainWindow::saveFile(const QString &path)
 {
-    if (path == "")
+    if (path == "") {
+        statusBar()->showMessage("File not saved (empty path)");
         return;
+    }
 
     writeText(path, _editor->text());
     updateFileName(path);
+    statusBar()->showMessage("Saved file " + path);
 }
 
 void MainWindow::updateFileName(const QString &path)

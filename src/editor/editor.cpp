@@ -112,6 +112,7 @@ void Editor::selectAll()
 void Editor::tick()
 {
     update();
+    // TODO Do not repaint whole widget
     _caret = !_caret;
 }
 
@@ -130,6 +131,7 @@ void Editor::paintEvent(QPaintEvent *)
     if (_numbers != nullptr) {
         _numbers->clear();
         _numbers->setMax(_text.lineCount());
+        _numbers->setCurrent(line + 1);
     }
 
     qreal left, cwidth, top;

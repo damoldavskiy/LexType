@@ -1,17 +1,7 @@
 #include "figure.h"
 
-Figure::Figure(QPointF start)
-    : _start(start), _end(start)
-{ }
-
 Figure::~Figure()
 { }
-
-void Figure::update(QPointF point, bool, StrokeModifier strokeModifier)
-{
-    _end = point;
-    _strokeModifier = strokeModifier;
-}
 
 void Figure::shift(qreal shiftX, qreal shiftY)
 {
@@ -22,11 +12,33 @@ void Figure::shift(qreal shiftX, qreal shiftY)
 void Figure::release()
 { }
 
-void Figure::paint(QPainter *painter) const
+void Figure::paint(QPainter *) const
+{ }
+
+void Figure::setStart(QPointF point)
 {
-    QPen pen = painter->pen();
-    applyPenModifier(pen);
-    painter->setPen(pen);
+    _start = point;
+}
+
+QPointF Figure::start() const
+{
+    return _start;
+}
+
+void Figure::setEnd(QPointF point, bool)
+{
+    _end = point;
+}
+
+QPointF Figure::end() const
+{
+    return _end;
+}
+
+void Figure::clear()
+{
+    _start = { 0, 0 };
+    _end = { 0, 0 };
 }
 
 QString Figure::num(qreal n)
@@ -39,28 +51,18 @@ QString Figure::pair(QPointF point)
     return "(" + num(point.x()) + "," + num(-point.y()) + ")";
 }
 
-void Figure::applyPenModifier(QPen& pen) const
+QStringList Figure::modifiers() const
 {
-    switch (_strokeModifier) {
-    case Solid:
-        pen.setStyle(Qt::SolidLine);
-        break;
-    case Dashes:
-        pen.setStyle(Qt::DashLine);
-        break;
-    }
+    return { };
 }
 
-QString Figure::latexModifier() const
+QString Figure::modifier() const
 {
-    switch (_strokeModifier) {
-    case Solid:
-        return "";
-    case Dashes:
-        return "[dashed] ";
-    }
+    QStringList list = modifiers();
 
-    return "";
+    if (list.size() == 0)
+        return "";
+    return "[" + list.join(',') + "] ";
 }
 
 qreal Figure::dx() const

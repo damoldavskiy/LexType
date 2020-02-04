@@ -11,7 +11,6 @@ public:
     static QString menuStyle();
     static QString scrollStyle();
     static QString statusStyle();
-    static QString statusLabelStyle();
 
     static QColor editorBack();
     static QColor editorFore();
@@ -20,9 +19,13 @@ public:
 
     static QColor numbersBack();
     static QColor numbersFore();
+    static QColor numberCurrent();
 
     static QColor painterBack();
     static QColor painterFore();
+
+    static QColor viewerBack();
+    static QColor viewerFore();
 };
 
 #endif // STYLER_H

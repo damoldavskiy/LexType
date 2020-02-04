@@ -8,6 +8,7 @@ class MathWriter
 public:
     static QString pass(const QString &source);
     static QString applyFractions(QString source);
+    static QString applyParameters(QString source);
     static QString apply(QString source);
 };
 

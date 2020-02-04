@@ -1,16 +1,15 @@
 #ifndef FIGURELINE_H
 #define FIGURELINE_H
 
-#include "figure.h"
+#include "figurearrow.h"
 
-class FigureLine : public Figure
+class FigureLine : public FigureArrow
 {
 public:
-    FigureLine(QPointF start);
-
-    void update(QPointF point, bool modifier, StrokeModifier strokeModifier);
+    void setEnd(QPointF point, bool modifier = false);
     void paint(QPainter *painter) const;
     QString latex() const;
+    Figure* copy() const;
 };
 
 #endif // FIGURELINE_H

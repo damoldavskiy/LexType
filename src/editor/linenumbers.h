@@ -12,6 +12,7 @@ public:
     LineNumbers(QWidget *parent = 0);
     void clear();
     void setMax(int value);
+    void setCurrent(int value);
     void add(qreal shift, int value);
 
 protected:
@@ -19,8 +20,9 @@ protected:
 
 private:
     QVector<QPair<qreal, int>> _values;
+    int _current = -1;
     int _leftShift = 10;
-    int _rightShift = 10;
+    int _rightShift = 5;
     int _maxWidth = 0;
 };
 

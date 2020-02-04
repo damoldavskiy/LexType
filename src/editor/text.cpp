@@ -13,6 +13,7 @@ QVector<QStaticText> cacheText(int start, int end, QFontMetricsF fm)
 Text::Text(const QFont &font)
     : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 4)
 {
+    // TODO Cache in static context
     _cachedText.add(0x0000, cacheText(0x0000, 0x00FF, _fm)); // ASCII
     _cachedText.add(0x0400, cacheText(0x0400, 0x04FF, _fm)); // Cyrillic
 }

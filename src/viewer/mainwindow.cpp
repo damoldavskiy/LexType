@@ -3,13 +3,18 @@
 #include <QFileDialog>
 #include <QShortcut>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QLabel>
+#include <QDebug>
 
 #include "../editor/styler.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    setWindowTitle("LexType Viewer");
+    resize(640, 480);
+
     _scroll = new QScrollArea;
     _scroll->setWidgetResizable(true);
     setCentralWidget(_scroll);
@@ -105,8 +110,10 @@ void MainWindow::loadDocument()
     while (_layout->count() > 0)
         delete _layout->takeAt(0)->widget();
 
-    uchar back[4] = { static_cast<uchar>(_background.blue()), static_cast<uchar>(_background.green()), static_cast<uchar>(_background.red()), 0 };
-    uchar fore[4] = { static_cast<uchar>(_foreground.blue()), static_cast<uchar>(_foreground.green()), static_cast<uchar>(_foreground.red()), 0 };
+    QColor back = Styler::viewerBack();
+    QColor fore = Styler::viewerFore();
+    uchar backArray[4] = { static_cast<uchar>(back.blue()), static_cast<uchar>(back.green()), static_cast<uchar>(back.red()), 0 };
+    uchar foreArray[4] = { static_cast<uchar>(fore.blue()), static_cast<uchar>(fore.green()), static_cast<uchar>(fore.red()), 0 };
 
     for (int i = 0; i < document->numPages(); ++i) {
         QLabel *widget = new QLabel;
@@ -117,9 +124,10 @@ void MainWindow::loadDocument()
 
         int size = image.byteCount();
         uchar *begin = image.bits();
+        // TODO Parallel
         for (int i = 0; i < size; ++i) {
             uchar cur = begin[i];
-            begin[i] = back[i % 4] * cur / 255 + fore[i % 4] * (255 - cur) / 255;
+            begin[i] = backArray[i % 4] * cur / 255 + foreArray[i % 4] * (255 - cur) / 255;
         }
 
         widget->setPixmap(QPixmap::fromImage(image));
