@@ -36,9 +36,24 @@ QColor Styler::editorBack()
     return { 50, 50, 50 };
 }
 
-QColor Styler::editorFore()
+QColor Styler::editorRegular()
 {
     return { 240, 240, 240 };
+}
+
+QColor Styler::editorMathematics()
+{
+    return { 180, 180, 240 };
+}
+
+QColor Styler::editorCommand()
+{
+    return { 220, 120, 120 };
+}
+
+QColor Styler::editorSpecial()
+{
+    return { 230, 160, 90 };
 }
 
 QColor Styler::editorLine()
@@ -51,6 +66,11 @@ QColor Styler::editorSelection()
     return { 40, 60, 130, 90 };
 }
 
+QColor Styler::editorCursor()
+{
+    return { 240, 240, 240 };
+}
+
 QColor Styler::numbersBack()
 {
     return { 50, 50, 50 };
@@ -61,7 +81,7 @@ QColor Styler::numbersFore()
     return { 100, 100, 100 };
 }
 
-QColor Styler::numberCurrent()
+QColor Styler::numbersCurrent()
 {
     return { 150, 150, 150 };
 }

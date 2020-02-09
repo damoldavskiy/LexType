@@ -10,6 +10,7 @@
 #include "maxvector.h"
 #include "multirange.h"
 #include "memorydata.h"
+#include "markupmodel.h"
 
 class Text
 {
@@ -45,9 +46,13 @@ public:
     QString text() const;
     QStaticText text(int pos) const;
 
+    void updateMarkup(int pos);
+    Interval markup(int pos) const;
+
 private:
     MemoryData _data;
     LineTracker _tracker;
+    MarkupModel _markup;
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;
     qreal _tabWidth;

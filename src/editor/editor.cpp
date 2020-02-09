@@ -6,6 +6,7 @@
 #include <QStaticText>
 #include <QMenu>
 #include <QStyle>
+#include <QDebug>
 
 #include "styler.h"
 
@@ -18,8 +19,8 @@ void limit(T& value, T min, T max)
         value = max;
 }
 
-Editor::Editor(QWidget *parent, LineNumbers *numbers, QColor background, QColor foreground)
-    : QWidget(parent), _numbers(numbers), _background(background), _foreground(foreground)
+Editor::Editor(QWidget *parent, LineNumbers *numbers)
+    : QWidget(parent), _numbers(numbers), _text(font()) // TODO Pass font parameter
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -37,19 +38,43 @@ void Editor::setText(const QString &text)
 {
     if (_text.size() > 0)
         _text.remove(0, _text.size());
-    _text.insert(0, text);
+    insertText(0, text);
     _pos = 0;
     _spos = -1;
-    updateGui(true);
+    updateUi(true);
 }
 
-void Editor::insert(const QString &text)
+int Editor::caret() const
 {
-    _spos = -1;
+    return _pos;
+}
 
-    _text.insert(_pos, text);
-    _pos += text.size();
-    updateGui(true);
+void Editor::setCaret(int value)
+{
+    Q_ASSERT(value >= 0);
+    Q_ASSERT(value <= _text.size());
+    _pos = value;
+}
+
+void Editor::insert(int pos, const QString &text)
+{
+    insertText(pos, text);
+    _pos = pos + text.size();
+    _spos = -1;
+    updateUi(true);
+}
+
+void Editor::remove(int pos, int count)
+{
+    _pos = pos;
+    _spos = -1;
+    removeText(pos, count);
+    updateUi(true);
+}
+
+Interval Editor::markup(int pos) const
+{
+    return _text.markup(pos);
 }
 
 void Editor::undo()
@@ -59,7 +84,7 @@ void Editor::undo()
 
     _pos = _text.undo();
     _spos = -1;
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::redo()
@@ -69,7 +94,7 @@ void Editor::redo()
 
     _pos = _text.redo();
     _spos = -1;
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::cut()
@@ -81,7 +106,7 @@ void Editor::cut()
     int length = qMax(_pos, _spos) - start;
     QApplication::clipboard()->setText(_text.mid(start, length));
     removeSelection();
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::copy()
@@ -96,8 +121,8 @@ void Editor::copy()
 
 void Editor::paste()
 {
-    insertData(QApplication::clipboard()->text());
-    updateGui(false);
+    type(QApplication::clipboard()->text());
+    updateUi(false);
 }
 
 void Editor::selectAll()
@@ -106,7 +131,7 @@ void Editor::selectAll()
         return;
     _spos = 0;
     _pos = _text.size();
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::tick()
@@ -125,8 +150,7 @@ void Editor::paintEvent(QPaintEvent *)
 
     int line = _text.findLine(_pos);
 
-    painter.fillRect(0, 0, width, height, _background);
-    painter.setPen(_foreground);
+    painter.fillRect(0, 0, width, height, Styler::editorBack());
 
     if (_numbers != nullptr) {
         _numbers->clear();
@@ -151,28 +175,41 @@ void Editor::paintEvent(QPaintEvent *)
             painter.fillRect(0, top, width, _text.fontHeight(), Styler::editorLine());
 
         left = 0;
+        cwidth = 0;
         do {
-            // TODO if wordwrap is enabled, continue writing to next line instead
+            // TODO If wordwrap is enabled, continue writing to next line instead
             if (left - _xshift > width)
                 break;
 
-            if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
-                painter.drawLine(QPointF { left - _xshift, top }, QPointF { left - _xshift, top + _text.fontHeight() - 1 });
-
-            // It should be possible to draw the caret on empty line
-            if (pos == end)
-                break;
-
-            cwidth = _text.advanceWidth(left, pos);
-            if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
-                painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
-
-            // TODO replace with style range
-            if (_spos != -1)
-                if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
-                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::editorSelection());
-
             left += cwidth;
+            if (pos < end) {
+                switch (_text.markup(pos)) {
+                case Interval::Regular:
+                    painter.setPen(Styler::editorRegular());
+                    break;
+                case Interval::Mathematics:
+                    painter.setPen(Styler::editorMathematics());
+                    break;
+                case Interval::Command:
+                    painter.setPen(Styler::editorCommand());
+                    break;
+                case Interval::Special:
+                    painter.setPen(Styler::editorSpecial());
+                    break;
+                }
+
+                cwidth = _text.advanceWidth(left, pos);
+                if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
+                    painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
+
+                // TODO replace with style range
+                if (_spos != -1)
+                    if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
+                        painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::editorSelection());
+            }
+
+            if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
+                painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight()} }, Styler::editorCursor());
         } while (pos++ < end);
 
         if (_spos != -1)
@@ -195,13 +232,13 @@ void Editor::keyPressEvent(QKeyEvent *event)
         if (_spos != -1)
             removeSelection();
         else if (_pos > 0)
-            _text.remove(--_pos, 1);
+            removeText(--_pos, 1);
         break;
     case Qt::Key_Delete:
         if (_spos != -1)
             removeSelection();
         else if (_pos < _text.size())
-            _text.remove(_pos, 1);
+            removeText(_pos, 1);
         break;
     case Qt::Key_Left:
         if (event->modifiers() & Qt::ShiftModifier) {
@@ -258,17 +295,20 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Return:
-        insertData("\n");
+        type("\n");
+        emit typed(_pos - 1, '\n');
         break;
     case Qt::Key_Escape:
         break;
     default:
         QString text = event->text();
-        if (text.size() > 0)
-            insertData(text);
+        if (text.size() > 0) {
+            type(text);
+            emit typed(_pos - 1, text[0]);
+        }
     }
 
-    updateGui(true);
+    updateUi(true);
 }
 
 void Editor::mousePressEvent(QMouseEvent *event)
@@ -277,7 +317,7 @@ void Editor::mousePressEvent(QMouseEvent *event)
         return;
     _pos = findPos(event->x(), event->y());
     _spos = _pos;
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::mouseReleaseEvent(QMouseEvent *)
@@ -291,7 +331,7 @@ void Editor::mouseMoveEvent(QMouseEvent *event)
     if ((event->buttons() & Qt::MouseButton::LeftButton) == 0)
         return;
     _pos = findPos(event->x(), event->y());
-    updateGui(false);
+    updateUi(false);
 }
 
 void Editor::wheelEvent(QWheelEvent *event)
@@ -347,7 +387,7 @@ void Editor::removeSelection()
         _pos = _spos;
     _spos = -1;
 
-    _text.remove(_pos, length);
+    removeText(_pos, length);
 }
 
 // Shifts window to the caret
@@ -365,7 +405,7 @@ void Editor::updateShift()
     Q_ASSERT(_xshift >= 0);
 }
 
-void Editor::updateGui(bool resetCaret)
+void Editor::updateUi(bool resetCaret)
 {
     if (resetCaret) {
         _timer->start(_timerInterval);
@@ -375,14 +415,28 @@ void Editor::updateGui(bool resetCaret)
     update();
 }
 
-void Editor::insertData(const QString &text)
+void Editor::type(const QString &text)
 {
     if (_spos != -1 && _spos != _pos) // _spos == _pos possible only if mouse button is pressed
         removeSelection();
     _spos = -1;
 
-    _text.insert(_pos, text);
+    // TODO Maybe more elegant?
+    int pos = _pos;
     _pos += text.size();
+    insertText(pos, text);
+}
+
+void Editor::insertText(int pos, const QString &text)
+{
+    _text.insert(pos, text);
+//    emit inserted(pos, text);
+}
+
+void Editor::removeText(int pos, int count)
+{
+    _text.remove(pos, count);
+//    emit removed(pos, count);
 }
 
 int Editor::findPos(qreal x, qreal y) const
@@ -435,3 +489,4 @@ QPair<qreal, qreal> Editor::findShift(int pos) const
 
     return { x, y };
 }
+

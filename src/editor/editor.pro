@@ -21,7 +21,9 @@ SOURCES += \
     figuretext.cpp \
     figurecontour.cpp \
     figurefillable.cpp \
-    figurearrow.cpp
+    figurearrow.cpp \
+    snippet.cpp \
+    markupmodel.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -47,4 +49,7 @@ HEADERS += \
     figuretext.h \
     figurecontour.h \
     figurefillable.h \
-    figurearrow.h
+    figurearrow.h \
+    snippet.h \
+    markupmodel.h \
+    interval.h

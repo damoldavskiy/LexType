@@ -13,13 +13,17 @@ public:
     static QString statusStyle();
 
     static QColor editorBack();
-    static QColor editorFore();
+    static QColor editorRegular();
+    static QColor editorMathematics();
+    static QColor editorCommand();
+    static QColor editorSpecial();
     static QColor editorLine();
     static QColor editorSelection();
+    static QColor editorCursor();
 
     static QColor numbersBack();
     static QColor numbersFore();
-    static QColor numberCurrent();
+    static QColor numbersCurrent();
 
     static QColor painterBack();
     static QColor painterFore();

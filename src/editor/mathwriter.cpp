@@ -3,7 +3,7 @@
 #include <QVector>
 #include <QStack>
 
-QVector<QChar> delimeters = { ' ', '\n', ',', ';' };
+QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
 QVector<QChar> openBraces = { '(', '{', '[' };
 QVector<QChar> closeBraces = { ')', '}', ']' };
 
@@ -150,17 +150,20 @@ QString MathWriter::apply(QString source)
 
     dict.append({ "(", "\\left(" });
     dict.append({ ")", "\\right)" });
+    dict.append({ "⟨", "\\left\\langle" });
+    dict.append({ "⟩", "\\right\\rangle" });
 
     dict.append({ "...", "\\dots" });
-    dict.append({ "***", "\\mdots" });
-    dict.append({ "..-", "\\cdots" });
-    dict.append({ "..|", "\\vdots" });
-    dict.append({ "..\\", "\\ddots" });
+    dict.append({ "⋅⋅⋅", "\\mdots" });
+    dict.append({ "⋯", "\\cdots" });
+    dict.append({ "⋮", "\\vdots" });
+    dict.append({ "⋱", "\\ddots" });
 
-    dict.append({ "**", "*" });
-    dict.append({ "*", "\\cdot" });
-    dict.append({ "@", "\\circ" });
-    dict.append({ "o+", "\\oplus" });
+    dict.append({ "×", "\\times" });
+    dict.append({ "⋅", "\\cdot" });
+    dict.append({ "∘", "\\circ" });
+    dict.append({ "⊕", "\\oplus" });
+    dict.append({ "⊗", "\\otimes" });
 
     dict.append({ "sin", "\\sin" });
     dict.append({ "cos", "\\cos" });
@@ -168,80 +171,87 @@ QString MathWriter::apply(QString source)
     dict.append({ "exp", "\\exp" });
 
     dict.append({ "lim", "\\lim" });
-    dict.append({ "sum", "\\sum" });
+    dict.append({ "∑", "\\sum" });
+    dict.append({ "∏", "\\prod" });
+    dict.append({ "∫", "\\int" });
+
     dict.append({ "oline", "\\overline" });
     dict.append({ "uline", "\\underline" });
 
     dict.append({ "matrix", "\\matrix" });
     dict.append({ "system", "\\system" });
 
-    dict.append({ "<=>", "\\iff" });
-    dict.append({ "<->", "\\leftrightarrow" });
-    dict.append({ "=>", "\\implies" });
-    dict.append({ "<=", "\\impliedby" });
-    dict.append({ "->", "\\to" });
-    dict.append({ "<-", "\\leftarrow" });
+    dict.append({ "⇔", "\\iff" });
+    dict.append({ "↔", "\\leftrightarrow" });
+    dict.append({ "⇒", "\\implies" });
+    dict.append({ "⇐", "\\impliedby" });
+    dict.append({ "→", "\\to" });
+    dict.append({ "←", "\\leftarrow" });
 
-    dict.append({ "forall", "\\forall" });
-    dict.append({ "in", "\\in" });
-    dict.append({ "exists", "\\exists" });
+    dict.append({ "∀", "\\forall" });
+    dict.append({ "∈", "\\in" });
+    dict.append({ "∃", "\\exists" });
     dict.append({ "not", "\\not" });
 
-    dict.append({ "!=", "\\ne" });
-    dict.append({ "+-", "\\pm" });
-    dict.append({ "~~", "\\approx" });
-    dict.append({ "==", "\\equiv" });
+    dict.append({ "≠", "\\ne" });
+    dict.append({ "±", "\\pm" });
+    dict.append({ "≈", "\\approx" });
+    dict.append({ "≡", "\\equiv" });
+    dict.append({ "≅", "\\cong" });
 
-    dict.append({ "le", "\\le" });
-    dict.append({ "ge", "\\ge" });
-    dict.append({ "ll", "\\ll" });
-    dict.append({ "gg", "\\gg" });
+    dict.append({ "≤", "\\le" });
+    dict.append({ "≥", "\\ge" });
+    dict.append({ "≪", "\\ll" });
+    dict.append({ "≫", "\\gg" });
 
-    dict.append({ "<<", "\\langle" });
-    dict.append({ ">>", "\\rangle" });
+    dict.append({ "ℕ", "\\mathbb{N}" });
+    dict.append({ "ℤ", "\\mathbb{Z}" });
+    dict.append({ "ℚ", "\\mathbb{Q}" });
+    dict.append({ "ℝ", "\\mathbb{R}" });
+    dict.append({ "ℂ", "\\mathbb{C}" });
+    dict.append({ "ℙ", "\\mathbb{P}" });
 
-    dict.append({ "NN", "\\mathbb{N}" });
-    dict.append({ "ZZ", "\\mathbb{Z}" });
-    dict.append({ "RR", "\\mathbb{R}" });
-    dict.append({ "CC", "\\mathbb{C}" });
-
-    dict.append({ "!O", "\\varnothing" });
+    dict.append({ "∅", "{\\varnothing}" });
+    dict.append({ "∞", "{\\infty}" });
+    dict.append({ "∂", "{\\partial}" });
 
     dict.append({ "bar", "\\bar" });
     dict.append({ "hat", "\\hat" });
+    dict.append({ "vec", "\\vec" });
 
-    dict.append({ "Alpha", "\\Alpha" });
-    dict.append({ "alpha", "\\alpha" });
-    dict.append({ "Beta", "\\Beta" });
-    dict.append({ "beta", "\\beta" });
-    dict.append({ "Gamma", "\\Gamma" });
-    dict.append({ "gamma", "\\gamma" });
-    dict.append({ "Delta", "\\Delta" });
-    dict.append({ "delta", "\\delta" });
-    dict.append({ "Epsilon", "\\Epsilon" });
-    dict.append({ "epsilon", "\\epsilon" });
-    dict.append({ "Zeta", "\\Zeta" });
-    dict.append({ "zeta", "\\zeta" });
-    dict.append({ "Eta", "\\Eta" });
-    dict.append({ "eta", "\\eta" });
-    dict.append({ "Theta", "\\Theta" });
-    dict.append({ "theta", "\\theta" });
-    dict.append({ "Iota", "\\Iota" });
-    dict.append({ "iota", "\\iota" });
-    dict.append({ "Kappa", "\\Kappa" });
-    dict.append({ "kappa", "\\kappa" });
-    dict.append({ "Lambda", "\\Lambda" });
-    dict.append({ "lambda", "\\lambda" });
-    dict.append({ "Mu", "\\Mu" });
-    dict.append({ "mu", "\\mu" });
-    dict.append({ "Nu", "\\Nu" });
-    dict.append({ "nu", "\\nu" });
-    dict.append({ "Xi", "\\Xi" });
-    dict.append({ "xi", "\\xi" });
-    dict.append({ "Omicron", "\\Omicron" });
-    dict.append({ "omicron", "\\omicron" });
-    dict.append({ "Pi", "\\Pi" });
-    dict.append({ "pi", "\\pi" });
+    dict.append({ "α", "{\\alpha}" });
+    dict.append({ "β", "{\\beta}" });
+    dict.append({ "Γ", "{\\Gamma}" });
+    dict.append({ "γ", "{\\gamma}" });
+    dict.append({ "Δ", "{Delta}" });
+    dict.append({ "δ", "{\\delta}" });
+    dict.append({ "ɛ", "{\\epsilon}" }); // varepsilon
+    dict.append({ "ζ", "{\\zeta}" });
+    dict.append({ "η", "{\\eta}" });
+    dict.append({ "Θ", "{\\Theta}" });
+    dict.append({ "ϑ", "{\\theta}" }); // vartheta
+    dict.append({ "ι", "{\\iota}" });
+    dict.append({ "κ", "{\\kappa}" });
+    dict.append({ "Λ", "{\\Lambda}" });
+    dict.append({ "λ", "{\\lambda}" });
+    dict.append({ "μ", "{\\mu}" });
+    dict.append({ "ν", "{\\nu}" });
+    dict.append({ "Ξ", "{\\Xi}" });
+    dict.append({ "ξ", "{\\xi}" });
+    dict.append({ "Π", "{\\Pi}" });
+    dict.append({ "π", "{\\pi}" });
+    dict.append({ "ρ", "{\\rho}" });
+    dict.append({ "Σ", "{\\Sigma}" });
+    dict.append({ "σ", "{\\sigma}" });
+    dict.append({ "τ", "{\\tau}" });
+    dict.append({ "υ", "{\\upsilon}" });
+    dict.append({ "Φ", "{\\Phi}" });
+    dict.append({ "φ", "{\\phi}" }); // varphi
+    dict.append({ "χ", "{\\chi}" });
+    dict.append({ "Ψ", "{\\Psi}" });
+    dict.append({ "ψ", "{\\psi}" });
+    dict.append({ "Ω", "{\\Omega}" });
+    dict.append({ "ω", "{\\omega}" });
 
     // TODO More effective
     source = applyFractions(source);

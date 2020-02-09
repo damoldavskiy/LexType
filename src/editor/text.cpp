@@ -24,6 +24,7 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(pos <= _data.size());
 
     _data.insert(pos, text);
+    updateMarkup(pos);
     insertLinesAdjust(pos, text);
 }
 
@@ -61,6 +62,7 @@ void Text::remove(int pos, int count)
     Q_ASSERT(pos + count <= _data.size());
 
     _data.remove(pos, count);
+    updateMarkup(pos);
     removeLinesAdjust(pos, count);
 }
 
@@ -79,6 +81,7 @@ void Text::removeLinesAdjust(int pos, int count)
 int Text::undo()
 {
     Action action = _data.undo();
+    updateMarkup(action.index);
 
     if (action.type == Action::Insert) {
         removeLinesAdjust(action.index, action.text.size());
@@ -92,6 +95,7 @@ int Text::undo()
 int Text::redo()
 {
     Action action = _data.redo();
+    updateMarkup(action.index);
 
     if (action.type == Action::Insert) {
         insertLinesAdjust(action.index, action.text);
@@ -217,4 +221,41 @@ QStaticText Text::text(int pos) const
     }
 
     return _cachedText.get(index, code);
+}
+
+void Text::updateMarkup(int) // TODO Unused parameter
+{
+    Interval interval = Interval::Regular;
+    bool math = false;
+
+    // TODO Extremely inefficiently
+    for (int i = 0; i < _data.size(); ++i) {
+        if (_data[i] == '`')
+            math = !math;
+
+        if (_data[i] == '`' || math)
+            interval = Interval::Mathematics;
+        else
+            interval = Interval::Regular;
+
+        if ((interval == Interval::Regular && _data[i] == '\\') || (i > 0 && _markup.interval(i - 1) == Interval::Command))
+            interval = Interval::Command;
+
+        if (i > 0 && _markup.interval(i - 1) == Interval::Command) {
+            if (_data[i].isLetter())
+                interval = Interval::Command;
+            else if (_data[i] != '\\') // \\ should be colored both
+                interval = Interval::Regular;
+        }
+
+        if (interval == Interval::Regular && (_data[i] == '{' || _data[i] == '}' || _data[i] == '$'))
+            interval = Interval::Special;
+
+        _markup.setInterval(i, i + 1, interval);
+    }
+}
+
+Interval Text::markup(int pos) const
+{
+    return _markup.interval(pos);
 }

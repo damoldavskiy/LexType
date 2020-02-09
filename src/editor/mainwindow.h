@@ -24,6 +24,7 @@ public slots:
     void quit();
     void compile();
     void painter();
+    void typed(int pos, QChar symbol);
 
 private slots:
     void output();

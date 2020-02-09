@@ -5,6 +5,7 @@ CONFIG += testcase
 SOURCES += \
     ..\..\src\editor\linenumbers.cpp \
     ..\..\src\editor\linetracker.cpp \
+    ..\..\src\editor\markupmodel.cpp \
     ..\..\src\editor\text.cpp \
     ..\..\src\editor\memorydata.cpp \
     ..\..\src\editor\editor.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
 HEADERS += \
     ..\..\src\editor\linenumbers.h \
     ..\..\src\editor\linetracker.h \
+    ..\..\src\editor\markupmodel.h \
     ..\..\src\editor\text.h \
     ..\..\src\editor\memorydata.h \
     ..\..\src\editor\editor.h \

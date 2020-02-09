@@ -42,7 +42,7 @@ void LineNumbers::paintEvent(QPaintEvent *)
         int textWidth = fontMetrics().width(text);
 
         if (pair.second == _current)
-            painter.setPen(Styler::numberCurrent());
+            painter.setPen(Styler::numbersCurrent());
 
         painter.drawText(_leftShift + _maxWidth - textWidth, pair.first, text);
 

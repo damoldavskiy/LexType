@@ -9,7 +9,8 @@ void FigureText::setEnd(QPointF end, bool)
 void FigureText::paint(QPainter *painter) const
 {
     qreal shift = painter->fontMetrics().ascent() - painter->fontMetrics().height();
-    painter->drawText(QPointF { _end.x(), _end.y() + shift }, _text);
+    // These constants repeat shift, that TikZ places with [above right]
+    painter->drawText(QPointF { _end.x() + 2, _end.y() + shift - 6 }, _text);
 }
 
 QString FigureText::latex() const
@@ -28,6 +29,7 @@ Figure* FigureText::copy() const
 
 void FigureText::clear()
 {
+    Figure::clear();
     setText("");
 }
 

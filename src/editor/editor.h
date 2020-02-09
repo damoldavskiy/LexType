@@ -15,10 +15,17 @@ class Editor : public QWidget
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = 0, LineNumbers *numbers = 0, QColor background = Styler::editorBack(), QColor foreground = Styler::editorFore());
+    Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
     QString text() const;
     void setText(const QString &text);
-    void insert(const QString &text);
+    int caret() const;
+    void setCaret(int value);
+    void insert(int pos, const QString &text);
+    void remove(int pos, int count);
+    Interval markup(int pos) const;
+
+signals:
+    void typed(int pos, QChar symbol);
 
 public slots:
     void undo();
@@ -43,16 +50,19 @@ protected:
 
     void removeSelection();
     void updateShift();
-    void updateGui(bool resetCaret);
-    void insertData(const QString &text);
+    void updateUi(bool resetCaret);
+    void type(const QString &text);
+
+    void insertText(int pos, const QString &text);
+    void removeText(int pos, int count);
 
     int findPos(qreal x, qreal y) const;
     QPair<qreal, qreal> findShift(int pos) const;
-    qreal advanceWidth(qreal left, int pos) const;
-    qreal lineWidth(int line) const;
+//    qreal advanceWidth(qreal left, int pos) const;
+//    qreal lineWidth(int line) const;
 
 private:
-    Text _text = Text(font());
+    Text _text;
     LineNumbers *_numbers;
 
     int _pos = 0;
@@ -64,9 +74,6 @@ private:
     bool _caret = true;
 
     int _timerInterval = 600;
-
-    QColor _background;
-    QColor _foreground;
 };
 
 #endif // EDITOR_H

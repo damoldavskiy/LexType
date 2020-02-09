@@ -9,6 +9,8 @@
 #include "figurepath.h"
 #include "figuretext.h"
 
+#include "editor.h"
+
 PainterDialog::PainterDialog()
 {
     setLayout(new QVBoxLayout);
