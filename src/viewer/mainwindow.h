@@ -9,6 +9,8 @@
 #include <QFileSystemWatcher>
 #include <poppler-qt5.h>
 
+#include "../editor/pathwatcher.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -39,8 +41,9 @@ private:
     QAction *_zoomInAction;
     QAction *_zoomOutAction;
 
-    QFileInfo _fileInfo;
     qreal _res = 300;
+
+    PathWatcher _path = PathWatcher("LexType Viewer");
 
     QFileSystemWatcher _watcher;
 };

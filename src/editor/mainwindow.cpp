@@ -1,12 +1,11 @@
 #include "mainwindow.h"
 
-#include <QFileDialog>
+#include <QFileDialog> // TODO For FileInfo::ctor(QString, QString)
 #include <QTextStream>
 #include <QMessageBox>
 #include <QEventLoop>
 #include <QLayout>
 #include <QStatusBar>
-#include <QLabel>
 
 #include "styler.h"
 #include "painterdialog.h"
@@ -19,6 +18,14 @@ void writeText(const QString &path, const QString &text)
     file.open(QIODevice::WriteOnly);
     QTextStream out(&file);
     out << text << endl;
+}
+
+QString readText(const QString &path)
+{
+    QFile file(path);
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    return in.readAll();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -62,25 +69,32 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::open()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open", "", "LexType (*.lex);;TeX (*.tex)");
-    if (path != "") {
-        QFile file(path);
-        file.open(QIODevice::ReadOnly);
-        QTextStream in(&file);
-        _editor->setText(in.readAll());
-        updateFileName(path);
-        statusBar()->showMessage("Opened file: " + path);
+    if (_path.open("LexType (*.lex);;TeX (*tex)")) {
+        _editor->setText(readText(_path.path()));
+        setWindowTitle(_path.title());
+        statusBar()->showMessage("Opened file: " + _path.path());
     }
 }
 
 void MainWindow::save()
 {
-    saveFile(_fileInfo.filePath());
+    if (_path.exists()) {
+        _path.setEdited(false);
+        writeText(_path.path(), _editor->text());
+        setWindowTitle(_path.title());
+        statusBar()->showMessage("Saved file: " + _path.path());
+    } else {
+        statusBar()->showMessage("File not opened");
+    }
 }
 
 void MainWindow::saveAs()
 {
-    saveFile(QFileDialog::getSaveFileName(this, "Save", "", "LexType (*.lex);;TeX (*.tex)"));
+    if (_path.save("LexType (*.lex);;TeX (*tex)")) {
+        writeText(_path.path(), _editor->text());
+        setWindowTitle(_path.title());
+        statusBar()->showMessage("Saved file: " + _path.path());
+    }
 }
 
 void MainWindow::quit()
@@ -90,14 +104,14 @@ void MainWindow::quit()
 
 void MainWindow::compile()
 {
-    if (!_fileInfo.isReadable()) {
+    if (!_path.exists()) {
         statusBar()->showMessage("To perform compilation, save file");
         return;
     }
 
     save();
 
-    QFileInfo fileInfo(_fileInfo.dir(), _fileInfo.baseName() + ".tex");
+    QFileInfo fileInfo(_path.dir(), _path.baseName() + ".tex");
     writeText(fileInfo.filePath(), MathWriter::pass(_editor->text()));
 
     if (_compilation != nullptr)
@@ -128,6 +142,10 @@ void MainWindow::painter()
 
 void MainWindow::typed(int pos, QChar)
 {
+    // TODO Insert from clipborad doesn't emit Editor::typed
+    _path.setEdited(true);
+    setWindowTitle(_path.title());
+
     QVector<Snippet> snippets;
 
     if (_editor->markup(pos) == Interval::Mathematics) {
@@ -284,8 +302,7 @@ void MainWindow::compiled(int exitCode, QProcess::ExitStatus)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    int res = QMessageBox::question(this, "Quit", "Do you really want to exit the program?");
-    if (res != QMessageBox::Yes)
+    if (_path.edited() && QMessageBox::question(this, "Quit", "Do you really want to exit the program?") != QMessageBox::Yes)
         event->ignore();
 }
 
@@ -353,22 +370,4 @@ void MainWindow::createMenus()
 
     menu = menuBar()->addMenu("Tools");
     menu->addActions({ _compileAction, _painterAction });
-}
-
-void MainWindow::saveFile(const QString &path)
-{
-    if (path == "") {
-        statusBar()->showMessage("File not saved (empty path)");
-        return;
-    }
-
-    writeText(path, _editor->text());
-    updateFileName(path);
-    statusBar()->showMessage("Saved file " + path);
-}
-
-void MainWindow::updateFileName(const QString &path)
-{
-    _fileInfo.setFile(path);
-    setWindowTitle(_fileInfo.fileName() + " - LexType");
 }

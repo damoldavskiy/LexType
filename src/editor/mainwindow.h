@@ -3,12 +3,13 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
-#include <QFileInfo>
+//#include <QFileInfo>
 #include <QSplitter>
 #include <QProcess>
-#include <QLabel>
+//#include <QLabel>
 
 #include "editor.h"
+#include "pathwatcher.h"
 
 class MainWindow : public QMainWindow
 {
@@ -36,8 +37,6 @@ protected:
 private:
     void createActions();
     void createMenus();
-    void saveFile(const QString &path);
-    void updateFileName(const QString &path);
 
     QSplitter *_splitter;
     LineNumbers *_numbers;
@@ -57,7 +56,7 @@ private:
     QAction *_compileAction;
     QAction *_painterAction;
 
-    QFileInfo _fileInfo;
+    PathWatcher _path = PathWatcher("LexType");
     QProcess *_compilation = nullptr;
 };
 

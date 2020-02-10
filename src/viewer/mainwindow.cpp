@@ -40,11 +40,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::open()
 {
-    if (_fileInfo.isReadable())
-        _watcher.removePath(_fileInfo.filePath());
-    _fileInfo.setFile(QFileDialog::getOpenFileName(this, "Open", "", "PDF (*.pdf)"));
-    _watcher.addPath(_fileInfo.filePath());
-    loadDocument();
+    if (_path.exists())
+        _watcher.removePath(_path.path());
+
+    if (_path.open("PDF (*.pdf)")) {
+        _watcher.addPath(_path.path());
+        loadDocument();
+        setWindowTitle(_path.title());
+    }
 }
 
 void MainWindow::quit()
@@ -100,10 +103,10 @@ void MainWindow::createMenus()
 
 void MainWindow::loadDocument()
 {
-    if (!_fileInfo.isReadable())
+    if (!_path.exists())
         return;
 
-    Poppler::Document *document = Poppler::Document::load(_fileInfo.filePath());
+    Poppler::Document *document = Poppler::Document::load(_path.path());
     if (document == nullptr)
         return;
 

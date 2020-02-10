@@ -23,7 +23,8 @@ SOURCES += \
     figurefillable.cpp \
     figurearrow.cpp \
     snippet.cpp \
-    markupmodel.cpp
+    markupmodel.cpp \
+    pathwatcher.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -52,4 +53,5 @@ HEADERS += \
     figurearrow.h \
     snippet.h \
     markupmodel.h \
-    interval.h
+    interval.h \
+    pathwatcher.h
