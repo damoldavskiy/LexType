@@ -10,7 +10,7 @@ class PainterDialog : public QDialog
     Q_OBJECT
 
 public:
-    PainterDialog();
+    PainterDialog(QWidget *parent = 0);
     QString latex() const;
 
 public slots:

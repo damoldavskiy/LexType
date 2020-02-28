@@ -8,6 +8,7 @@ SOURCES += \
     ..\..\src\editor\markupmodel.cpp \
     ..\..\src\editor\text.cpp \
     ..\..\src\editor\memorydata.cpp \
+    ..\..\src\editor\keyboardlayout.cpp \
     ..\..\src\editor\editor.cpp \
     ..\..\src\editor\styler.cpp \
     ..\..\src\editor\mathwriter.cpp \
@@ -19,6 +20,7 @@ HEADERS += \
     ..\..\src\editor\markupmodel.h \
     ..\..\src\editor\text.h \
     ..\..\src\editor\memorydata.h \
+    ..\..\src\editor\keyboardlayout.h \
     ..\..\src\editor\editor.h \
     ..\..\src\editor\styler.h \
     ..\..\src\editor\mathwriter.h \

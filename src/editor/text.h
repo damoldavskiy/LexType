@@ -17,6 +17,9 @@ class Text
 public:
     Text(const QFont &font);
 
+    void setFont(const QFont &font);
+    void cache();
+
     void insert(int pos, const QString &text);
     void insertLinesAdjust(int pos, const QString &text);
     void remove(int pos, int count);

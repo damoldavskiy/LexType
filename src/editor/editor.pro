@@ -24,7 +24,9 @@ SOURCES += \
     figurearrow.cpp \
     snippet.cpp \
     markupmodel.cpp \
-    pathwatcher.cpp
+    pathwatcher.cpp \
+    keyboardlayout.cpp \
+    settingsdialog.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -54,4 +56,6 @@ HEADERS += \
     snippet.h \
     markupmodel.h \
     interval.h \
-    pathwatcher.h
+    pathwatcher.h \
+    keyboardlayout.h \
+    settingsdialog.h

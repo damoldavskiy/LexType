@@ -76,8 +76,8 @@ void Painter::paintEvent(QPaintEvent *)
 
     painter.setRenderHint(QPainter::Antialiasing);
 
-    painter.fillRect(0, 0, width, height, Styler::painterBack());
-    painter.setPen(Styler::painterFore());
+    painter.fillRect(0, 0, width, height, Styler::get<QColor>("painter-back"));
+    painter.setPen(Styler::get<QColor>("painter-fore"));
     painter.setFont(QFont("Cambria Math", 14));
 
     for (auto figure : _figures)

@@ -12,6 +12,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    Styler::reset(); // TODO Should we do it in main.cpp?
     setWindowTitle("LexType Viewer");
     resize(640, 480);
 
@@ -33,9 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    window->setStyleSheet(Styler::widgetStyle());
-    menuBar()->setStyleSheet(Styler::menuStyle());
-    _scroll->setStyleSheet(Styler::scrollStyle());
+    window->setStyleSheet(Styler::get<QString>("widget-style"));
+    menuBar()->setStyleSheet(Styler::get<QString>("menu-style"));
+    _scroll->setStyleSheet(Styler::get<QString>("scroll-style"));
 }
 
 void MainWindow::open()
@@ -113,8 +114,8 @@ void MainWindow::loadDocument()
     while (_layout->count() > 0)
         delete _layout->takeAt(0)->widget();
 
-    QColor back = Styler::viewerBack();
-    QColor fore = Styler::viewerFore();
+    QColor back = Styler::get<QColor>("viewer-back");
+    QColor fore = Styler::get<QColor>("viewer-fore");
     uchar backArray[4] = { static_cast<uchar>(back.blue()), static_cast<uchar>(back.green()), static_cast<uchar>(back.red()), 0 };
     uchar foreArray[4] = { static_cast<uchar>(fore.blue()), static_cast<uchar>(fore.green()), static_cast<uchar>(fore.red()), 0 };
 

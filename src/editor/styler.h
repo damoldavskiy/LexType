@@ -1,35 +1,28 @@
 #ifndef STYLER_H
 #define STYLER_H
 
-#include <QString>
-#include <QColor>
+#include <QMap>
+#include <QVariant>
 
 class Styler
 {
 public:
-    static QString widgetStyle();
-    static QString menuStyle();
-    static QString scrollStyle();
-    static QString statusStyle();
+    static void reset();
 
-    static QColor editorBack();
-    static QColor editorRegular();
-    static QColor editorMathematics();
-    static QColor editorCommand();
-    static QColor editorSpecial();
-    static QColor editorLine();
-    static QColor editorSelection();
-    static QColor editorCursor();
+    template <typename T>
+    static T get(const QString &key)
+    {
+        return _values[key].value<T>();
+    }
 
-    static QColor numbersBack();
-    static QColor numbersFore();
-    static QColor numbersCurrent();
+    template <typename T>
+    static void set(const QString &key, const T &value)
+    {
+        _values[key] = value;
+    }
 
-    static QColor painterBack();
-    static QColor painterFore();
-
-    static QColor viewerBack();
-    static QColor viewerFore();
+private:
+    static QMap<QString, QVariant> _values;
 };
 
 #endif // STYLER_H

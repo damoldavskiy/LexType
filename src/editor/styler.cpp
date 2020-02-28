@@ -1,107 +1,54 @@
 #include "styler.h"
 
-QString Styler::widgetStyle()
+#include <QColor>
+#include <QFont>
+
+void Styler::reset()
 {
-    return "QWidget { background: rgb(50, 50, 50); }";
+    set("widget-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
+    set("menu-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
+                      "QMenuBar::item { background: rgb(50, 50, 50); }"
+                      "QMenuBar::item:selected { background: rgb(60, 60, 60); }"
+                      "QMenuBar::item:pressed { background: rgb(70, 70, 70); }"
+                      "QMenu::item:disabled { color: rgb(150, 150, 150); }"
+                      "QMenu::item:selected { background: rgb(60, 60, 60); }"
+                      "QMenu::item:pressed { background: rgb(70, 70, 70); }"
+                      "QMenu::separator { background: rgb(70, 70, 70); height: 1px; }");
+    set("scroll-style", "QScrollArea { border: none; }"
+                        "QAbstractScrollArea::corner { background: rgb(50, 50, 50); }"
+                        "QScrollBar { background: rgb(50, 50, 50); margin: 0; }"
+                        "QScrollBar::add-line, QScrollBar::sub-line { background: rgb(50, 50, 50); width: 0px; height: 0px; }"
+                        "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }");
+    set("status-style", "QWidget { background: rgb(50, 50, 50); color: rgb(150, 150, 150); }");
+
+    set("editor-back", QColor { 50, 50, 50 });
+    set("editor-regular", QColor { 240, 240, 240 });
+    set("editor-mathematics", QColor { 180, 180, 240 });
+    set("editor-command", QColor { 220, 120, 120 });
+    set("editor-special", QColor { 230, 160, 90 });
+    set("editor-line", QColor { 55, 55, 55 });
+    set("editor-selection", QColor { 40, 60, 130, 90 });
+    set("editor-caret", QColor { 240, 240, 240 });
+
+    set("numbers-back", QColor { 50, 50, 50 });
+    set("numbers-fore", QColor { 100, 100, 100 });
+    set("numbers-current", QColor { 150, 150, 150 });
+
+    set("painter-back", QColor { 50, 50, 50 });
+    set("painter-fore", QColor { 240, 240, 240 });
+
+    set("viewer-back", QColor { 50, 50, 50 });
+    set("viewer-fore", QColor { 240, 240, 240 });
+
+    set("editor-font", QFont("Ubuntu"));
+
+    set("editor-flag-line", true);
+    set("editor-flag-numbers", true);
+    set("editor-flag-keyboard", true);
+    set("editor-flag-snippets", true);
+    set("editor-flag-autocompile", false);
+
+    set("window-flag-askexit", true);
 }
 
-QString Styler::menuStyle()
-{
-    return "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
-           "QMenuBar::item { background: rgb(50, 50, 50); }"
-           "QMenuBar::item:selected { background: rgb(60, 60, 60); }"
-           "QMenuBar::item:pressed { background: rgb(70, 70, 70); }"
-           "QMenu::item:disabled { color: rgb(150, 150, 150); }"
-           "QMenu::item:selected { background: rgb(60, 60, 60); }"
-           "QMenu::item:pressed { background: rgb(70, 70, 70); }"
-           "QMenu::separator { background: rgb(70, 70, 70); height: 1px; }";
-}
-
-QString Styler::scrollStyle()
-{
-    return "QScrollArea { border: none; }"
-           "QAbstractScrollArea::corner { background: rgb(50, 50, 50); }"
-           "QScrollBar { background: rgb(50, 50, 50); margin: 0; }"
-           "QScrollBar::add-line, QScrollBar::sub-line { background: rgb(50, 50, 50); width: 0px; height: 0px; }"
-           "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }";
-}
-
-QString Styler::statusStyle()
-{
-    return "QWidget { background: rgb(50, 50, 50); color: rgb(150, 150, 150); }";
-}
-
-QColor Styler::editorBack()
-{
-    return { 50, 50, 50 };
-}
-
-QColor Styler::editorRegular()
-{
-    return { 240, 240, 240 };
-}
-
-QColor Styler::editorMathematics()
-{
-    return { 180, 180, 240 };
-}
-
-QColor Styler::editorCommand()
-{
-    return { 220, 120, 120 };
-}
-
-QColor Styler::editorSpecial()
-{
-    return { 230, 160, 90 };
-}
-
-QColor Styler::editorLine()
-{
-    return { 55, 55, 55 };
-}
-
-QColor Styler::editorSelection()
-{
-    return { 40, 60, 130, 90 };
-}
-
-QColor Styler::editorCursor()
-{
-    return { 240, 240, 240 };
-}
-
-QColor Styler::numbersBack()
-{
-    return { 50, 50, 50 };
-}
-
-QColor Styler::numbersFore()
-{
-    return { 100, 100, 100 };
-}
-
-QColor Styler::numbersCurrent()
-{
-    return { 150, 150, 150 };
-}
-
-QColor Styler::painterBack()
-{
-    return { 50, 50, 50 };
-}
-
-QColor Styler::painterFore()
-{
-    return { 240, 240, 240 };
-}
-
-QColor Styler::viewerBack()
-{
-    return { 50, 50, 50 };
-}
-
-QColor Styler::viewerFore()
-{
-    return { 240, 240, 240 };
-}
+QMap<QString, QVariant> Styler::_values;

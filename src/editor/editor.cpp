@@ -6,9 +6,9 @@
 #include <QStaticText>
 #include <QMenu>
 #include <QStyle>
-#include <QDebug>
 
 #include "styler.h"
+#include "keyboardlayout.h"
 
 template <typename T>
 void limit(T& value, T min, T max)
@@ -20,7 +20,7 @@ void limit(T& value, T min, T max)
 }
 
 Editor::Editor(QWidget *parent, LineNumbers *numbers)
-    : QWidget(parent), _numbers(numbers), _text(font()) // TODO Pass font parameter
+    : QWidget(parent), _text(font()), _numbers(numbers) // TODO Pass font parameter
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -75,6 +75,16 @@ void Editor::remove(int pos, int count)
 Interval Editor::markup(int pos) const
 {
     return _text.markup(pos);
+}
+
+void Editor::updateSettings()
+{
+    setFont(Styler::get<QFont>("editor-font"));
+    _text.setFont(font());
+    if (_numbers != nullptr) {
+        _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));
+        _numbers->setFont(font());
+    }
 }
 
 void Editor::undo()
@@ -143,14 +153,13 @@ void Editor::tick()
 
 void Editor::paintEvent(QPaintEvent *)
 {
-    // TODO the font is default, not from Text
     QPainter painter(this);
     int width = size().width();
     int height = size().height();
 
     int line = _text.findLine(_pos);
 
-    painter.fillRect(0, 0, width, height, Styler::editorBack());
+    painter.fillRect(0, 0, width, height, Styler::get<QColor>("editor-back"));
 
     if (_numbers != nullptr) {
         _numbers->clear();
@@ -171,8 +180,8 @@ void Editor::paintEvent(QPaintEvent *)
         if (_numbers != nullptr)
             _numbers->add(top + _text.fontAscent(), i + 1);
 
-        if (i == line)
-            painter.fillRect(0, top, width, _text.fontHeight(), Styler::editorLine());
+        if (i == line && Styler::get<bool>("editor-flag-line"))
+            painter.fillRect(0, top, width, _text.fontHeight(), Styler::get<QColor>("editor-line"));
 
         left = 0;
         cwidth = 0;
@@ -185,16 +194,16 @@ void Editor::paintEvent(QPaintEvent *)
             if (pos < end) {
                 switch (_text.markup(pos)) {
                 case Interval::Regular:
-                    painter.setPen(Styler::editorRegular());
+                    painter.setPen(Styler::get<QColor>("editor-regular"));
                     break;
                 case Interval::Mathematics:
-                    painter.setPen(Styler::editorMathematics());
+                    painter.setPen(Styler::get<QColor>("editor-mathematics"));
                     break;
                 case Interval::Command:
-                    painter.setPen(Styler::editorCommand());
+                    painter.setPen(Styler::get<QColor>("editor-command"));
                     break;
                 case Interval::Special:
-                    painter.setPen(Styler::editorSpecial());
+                    painter.setPen(Styler::get<QColor>("editor-special"));
                     break;
                 }
 
@@ -205,16 +214,16 @@ void Editor::paintEvent(QPaintEvent *)
                 // TODO replace with style range
                 if (_spos != -1)
                     if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
-                        painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::editorSelection());
+                        painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
             }
 
             if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
-                painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight()} }, Styler::editorCursor());
+                painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight()} }, Styler::get<QColor>("editor-caret"));
         } while (pos++ < end);
 
         if (_spos != -1)
             if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
-                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::editorSelection());
+                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
 
         top += _text.fontHeight();
     }
@@ -303,6 +312,10 @@ void Editor::keyPressEvent(QKeyEvent *event)
     default:
         QString text = event->text();
         if (text.size() > 0) {
+            // TODO Refactor
+            // TODO Symbol just after mathematics is reversed
+            if (Styler::get<bool>("editor-flag-keyboard") && (text == "ё" || (_pos > 0 && _text.markup(_pos - 1) == Interval::Mathematics)))
+                text = KeyboardLayout::pass(text[0]);
             type(text);
             emit typed(_pos - 1, text[0]);
         }
@@ -352,10 +365,17 @@ void Editor::focusInEvent(QFocusEvent *)
     update();
 }
 
+void Editor::focusOutEvent(QFocusEvent *)
+{
+    _timer->stop();
+    _caret = false;
+    update();
+}
+
 void Editor::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    menu.setStyleSheet(Styler::menuStyle());
+    menu.setStyleSheet(Styler::get<QString>("menu-style"));
 
     QAction *cutAction, *copyAction, *pasteAction, *selectAllAction;
 

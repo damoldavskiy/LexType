@@ -23,6 +23,7 @@ public:
     void insert(int pos, const QString &text);
     void remove(int pos, int count);
     Interval markup(int pos) const;
+    void updateSettings();
 
 signals:
     void typed(int pos, QChar symbol);
@@ -46,6 +47,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void focusInEvent(QFocusEvent *event);
+    void focusOutEvent(QFocusEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
 
     void removeSelection();

@@ -34,19 +34,19 @@ void LineNumbers::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 
-    painter.fillRect(0, 0, size().width(), size().height(), Styler::numbersBack());
-    painter.setPen(Styler::numbersFore());
+    painter.fillRect(0, 0, size().width(), size().height(), Styler::get<QColor>("numbers-back"));
+    painter.setPen(Styler::get<QColor>("numbers-fore"));
 
     for (const auto& pair : _values) {
         QString text = QString::number(pair.second);
         int textWidth = fontMetrics().width(text);
 
         if (pair.second == _current)
-            painter.setPen(Styler::numbersCurrent());
+            painter.setPen(Styler::get<QColor>("numbers-current"));
 
         painter.drawText(_leftShift + _maxWidth - textWidth, pair.first, text);
 
         if (pair.second == _current)
-            painter.setPen(Styler::numbersFore());
+            painter.setPen(Styler::get<QColor>("numbers-fore"));
     }
 }

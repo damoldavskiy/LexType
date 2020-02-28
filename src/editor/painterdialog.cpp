@@ -11,7 +11,8 @@
 
 #include "editor.h"
 
-PainterDialog::PainterDialog()
+PainterDialog::PainterDialog(QWidget *parent)
+    : QDialog(parent)
 {
     setLayout(new QVBoxLayout);
     resize(480, 480);

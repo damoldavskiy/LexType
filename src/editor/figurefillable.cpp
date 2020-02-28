@@ -21,7 +21,7 @@ void FigureFillable::paint(QPainter *painter) const
         brush.setStyle(Qt::SolidPattern);
     else if (_fill == Fill::Empty)
         brush.setStyle(Qt::NoBrush);
-    brush.setColor(Styler::painterFore());
+    brush.setColor(Styler::get<QColor>("painter-fore")); // TODO Move it to painter.cpp?
 
     painter->setBrush(brush);
 }
