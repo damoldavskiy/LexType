@@ -1,0 +1,16 @@
+<RCC>
+    <qresource>
+        <file alias="line.png">../../res/line.png</file>
+        <file alias="rectangle.png">../../res/rectangle.png</file>
+        <file alias="ellipse.png">../../res/ellipse.png</file>
+        <file alias="path.png">../../res/path.png</file>
+        <file alias="text.png">../../res/text.png</file>
+        <file alias="lineSolid.png">../../res/lineSolid.png</file>
+        <file alias="lineDash.png">../../res/lineDash.png</file>
+        <file alias="tipSoft.png">../../res/tipSoft.png</file>
+        <file alias="tipArrow.png">../../res/tipArrow.png</file>
+        <file alias="tipDouble.png">../../res/tipDouble.png</file>
+        <file alias="fillSolid.png">../../res/fillSolid.png</file>
+        <file alias="fillEmpty.png">../../res/fillEmpty.png</file>
+    </qresource>
+</RCC>

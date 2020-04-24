@@ -26,7 +26,8 @@ SOURCES += \
     markupmodel.cpp \
     pathwatcher.cpp \
     keyboardlayout.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    paintertoolkit.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -58,4 +59,8 @@ HEADERS += \
     interval.h \
     pathwatcher.h \
     keyboardlayout.h \
-    settingsdialog.h
+    settingsdialog.h \
+    paintertoolkit.h
+
+RESOURCES += \
+    images.qrc

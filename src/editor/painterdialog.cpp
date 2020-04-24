@@ -8,36 +8,42 @@
 #include "figureellipse.h"
 #include "figurepath.h"
 #include "figuretext.h"
-
-#include "editor.h"
+#include "paintertoolkit.h"
+#include "styler.h"
 
 PainterDialog::PainterDialog(QWidget *parent)
     : QDialog(parent)
 {
-    setLayout(new QVBoxLayout);
+    setWindowTitle("Painter");
+    setStyleSheet(Styler::get<QString>("widget-style"));
+    setLayout(new QHBoxLayout);
     resize(480, 480);
 
+    _toolkit = new PainterToolkit;
     _painter = new Painter;
 
     layout()->setMargin(0);
+    layout()->setSpacing(0);
+    layout()->addWidget(_toolkit);
     layout()->addWidget(_painter);
+
+    connect(_toolkit, SIGNAL(line()), this, SLOT(line()));
+    connect(_toolkit, SIGNAL(rectangle()), this, SLOT(rectangle()));
+    connect(_toolkit, SIGNAL(ellipse()), this, SLOT(ellipse()));
+    connect(_toolkit, SIGNAL(path()), this, SLOT(path()));
+    connect(_toolkit, SIGNAL(text()), this, SLOT(text()));
+    connect(_toolkit, SIGNAL(lineSolid()), this, SLOT(lineSolid()));
+    connect(_toolkit, SIGNAL(lineDash()), this, SLOT(lineDash()));
+    connect(_toolkit, SIGNAL(tipSoft()), this, SLOT(tipSoft()));
+    connect(_toolkit, SIGNAL(tipArrow()), this, SLOT(tipArrow()));
+    connect(_toolkit, SIGNAL(tipDouble()), this, SLOT(tipDouble()));
+    connect(_toolkit, SIGNAL(fillSolid()), this, SLOT(fillSolid()));
+    connect(_toolkit, SIGNAL(fillEmpty()), this, SLOT(fillEmpty()));
 
     new QShortcut(QKeySequence("Ctrl+D"), this, SLOT(accept()));
     new QShortcut(QKeySequence("Ctrl+Shift+D"), this, SLOT(close()));
     new QShortcut(QKeySequence("Ctrl+Z"), _painter, SLOT(undo()));
     new QShortcut(QKeySequence("Ctrl+Shift+Z"), _painter, SLOT(redo()));
-    new QShortcut(QKeySequence("L"), this, SLOT(line()));
-    new QShortcut(QKeySequence("E"), this, SLOT(ellipse()));
-    new QShortcut(QKeySequence("R"), this, SLOT(rectangle()));
-    new QShortcut(QKeySequence("P"), this, SLOT(path()));
-    new QShortcut(QKeySequence("T"), this, SLOT(text()));
-    new QShortcut(QKeySequence("S"), this, SLOT(lineSolid()));
-    new QShortcut(QKeySequence("D"), this, SLOT(lineDash()));
-    new QShortcut(QKeySequence("Q"), this, SLOT(tipSoft()));
-    new QShortcut(QKeySequence("A"), this, SLOT(tipArrow()));
-    new QShortcut(QKeySequence("W"), this, SLOT(tipDouble()));
-    new QShortcut(QKeySequence("F"), this, SLOT(fillSolid()));
-    new QShortcut(QKeySequence("G"), this, SLOT(fillEmpty()));
 }
 
 QString PainterDialog::latex() const

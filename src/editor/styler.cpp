@@ -14,6 +14,7 @@ void Styler::reset()
                       "QMenu::item:selected { background: rgb(60, 60, 60); }"
                       "QMenu::item:pressed { background: rgb(70, 70, 70); }"
                       "QMenu::separator { background: rgb(70, 70, 70); height: 1px; }");
+    set("toolbar-style", "QToolBar::separator { height: 10px; width: 10px; border: none; }");
     set("scroll-style", "QScrollArea { border: none; }"
                         "QAbstractScrollArea::corner { background: rgb(50, 50, 50); }"
                         "QScrollBar { background: rgb(50, 50, 50); margin: 0; }"

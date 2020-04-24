@@ -13,7 +13,7 @@ private slots:
 
 void tst_MathWriter::basic()
 {
-    QCOMPARE(MathWriter::apply("f: x -> y"), QString("f \\colon x \\to y"));
+    QCOMPARE(MathWriter::apply("f: x → y"), QString("f \\colon x \\to y"));
     QCOMPARE(MathWriter::apply("f : x > y"), QString("f : x > y"));
 }
 

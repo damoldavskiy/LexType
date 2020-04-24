@@ -3,13 +3,13 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
-//#include <QFileInfo>
 #include <QSplitter>
 #include <QProcess>
-//#include <QLabel>
+
 
 #include "editor.h"
 #include "pathwatcher.h"
+#include "snippet.h"
 
 class MainWindow : public QMainWindow
 {
@@ -36,6 +36,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
+    void createSnippets();
     void createActions();
     void createMenus();
 
@@ -43,6 +44,9 @@ private:
     LineNumbers *_numbers;
     Editor *_editor;
     Editor *_console;
+
+    QVector<Snippet> _snippetsRegular;
+    QVector<Snippet> _snippetsMath;
 
     QAction *_openAction;
     QAction *_saveAction;

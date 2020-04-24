@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     _editor->setFocus();
 
+    createSnippets();
     createActions();
     createMenus();
 
@@ -140,8 +141,10 @@ void MainWindow::painter()
     QString latex = dialog->latex();
     if (latex == "")
         statusBar()->showMessage("Figure insertion canceled");
-    else
+    else {
         statusBar()->showMessage("Figure inserted");
+        _path.setEdited(true);
+    }
     _editor->insert(_editor->caret(), latex);
     delete dialog;
 }
@@ -162,140 +165,13 @@ void MainWindow::typed(int pos, QChar)
     setWindowTitle(_path.title());
 
     if (Styler::get<bool>("editor-flag-snippets")) {
+        QVector<Snippet> *snippets;
+        if (_editor->markup(pos) == Interval::Mathematics)
+            snippets = &_snippetsMath;
+        else
+            snippets = &_snippetsRegular;
 
-        QVector<Snippet> snippets;
-
-        if (_editor->markup(pos) == Interval::Mathematics) {
-            snippets.append(Snippet("<<", "⟨"));
-            snippets.append(Snippet(">>", "⟩"));
-
-            snippets.append(Snippet("NN", "ℕ"));
-            snippets.append(Snippet("ZZ", "ℤ"));
-            snippets.append(Snippet("QQ", "ℚ"));
-            snippets.append(Snippet("RR", "ℝ"));
-            snippets.append(Snippet("CC", "ℂ"));
-            snippets.append(Snippet("PP", "ℙ"));
-
-            snippets.append(Snippet("..-", "⋯"));
-            snippets.append(Snippet("..|", "⋮"));
-            snippets.append(Snippet("..\\", "⋱"));
-
-            snippets.append(Snippet("for", "∀"));
-            snippets.append(Snippet("exi", "∃"));
-            snippets.append(Snippet("nn", "∩"));
-            snippets.append(Snippet("uu", "∪"));
-            snippets.append(Snippet("⊂=", "⊆"));
-            snippets.append(Snippet("cc", "⊂"));
-            snippets.append(Snippet("⊃=", "⊇"));
-            snippets.append(Snippet("pp", "⊃"));
-
-            snippets.append(Snippet("ll", "≪"));
-            snippets.append(Snippet("gg", "≫"));
-            snippets.append(Snippet("le", "≤"));
-            snippets.append(Snippet("ge", "≥"));
-
-            snippets.append(Snippet("⇐>", "⇔"));
-            snippets.append(Snippet("=>", "⇒"));
-            snippets.append(Snippet("<=", "⇐"));
-            snippets.append(Snippet("←>", "↔"));
-            snippets.append(Snippet("->", "→"));
-            snippets.append(Snippet("<-", "←"));
-
-            snippets.append(Snippet("xx", "×"));
-            snippets.append(Snippet("∘@", "@"));
-            snippets.append(Snippet("@", "∘"));
-            snippets.append(Snippet("+-", "±"));
-            snippets.append(Snippet("⋅*", "*"));
-            snippets.append(Snippet("**", "⋅⋅⋅"));
-            snippets.append(Snippet("*", "⋅"));
-            snippets.append(Snippet("o.", "⊙"));
-            snippets.append(Snippet("o+", "⊕"));
-            snippets.append(Snippet("ox", "⊗"));
-
-            snippets.append(Snippet("par", "∂"));
-            snippets.append(Snippet("oo", "∞"));
-
-            snippets.append(Snippet("sin", "sin")); // sin is not s\in
-            snippets.append(Snippet("!ni", "∌"));
-            snippets.append(Snippet("!in", "∉"));
-            snippets.append(Snippet("in", "∈"));
-            snippets.append(Snippet("ni", "∋"));
-
-            snippets.append(Snippet("==", "≡"));
-            snippets.append(Snippet("!=", "≠"));
-            snippets.append(Snippet("~~", "≈"));
-            snippets.append(Snippet("~=", "≅"));
-
-            snippets.append(Snippet("sum", "∑"));
-            snippets.append(Snippet("prod", "∏"));
-            snippets.append(Snippet("∈t", "∫"));
-            snippets.append(Snippet("∫i", "∫_{-∞}^{+∞}"));
-
-            snippets.append(Snippet("!O", "∅"));
-
-            snippets.append(Snippet("alp", "α"));
-            snippets.append(Snippet("bet", "β"));
-            snippets.append(Snippet("Gam", "Γ"));
-            snippets.append(Snippet("gam", "γ"));
-            snippets.append(Snippet("Del", "Δ"));
-            snippets.append(Snippet("del", "δ"));
-            snippets.append(Snippet("eps", "ɛ")); // varepsilon
-            snippets.append(Snippet("zet", "ζ"));
-            snippets.append(Snippet("eta", "η"));
-            snippets.append(Snippet("The", "Θ"));
-            snippets.append(Snippet("the", "ϑ")); // vartheta
-            snippets.append(Snippet("iot", "ι"));
-            snippets.append(Snippet("kap", "κ"));
-            snippets.append(Snippet("Lam", "Λ"));
-            snippets.append(Snippet("lam", "λ"));
-            snippets.append(Snippet("mu", "μ"));
-            snippets.append(Snippet("nu", "ν"));
-            snippets.append(Snippet("Xi", "Ξ"));
-            snippets.append(Snippet("xi", "ξ"));
-            snippets.append(Snippet("Pi", "Π"));
-            snippets.append(Snippet("pi", "π"));
-            snippets.append(Snippet("rho", "ρ"));
-            snippets.append(Snippet("Sig", "Σ"));
-            snippets.append(Snippet("sig", "σ"));
-            snippets.append(Snippet("tau", "τ"));
-            snippets.append(Snippet("ups", "υ"));
-            snippets.append(Snippet("Phi", "Φ"));
-            snippets.append(Snippet("phi", "φ")); // varphi
-            snippets.append(Snippet("chi", "χ"));
-            snippets.append(Snippet("Psi", "Ψ"));
-            snippets.append(Snippet("psi", "ψ"));
-            snippets.append(Snippet("Ome", "Ω"));
-            snippets.append(Snippet("ome", "ω"));
-        } else {
-            snippets.append(Snippet("sssec", "\\subsubsection{}", 15, true));
-            snippets.append(Snippet("ssec", "\\subsection{}", 12, true));
-            snippets.append(Snippet("sec", "\\section{}", 9, true));
-
-            snippets.append(Snippet("section*{", "section{", true));
-            snippets.append(Snippet("section{", "section*{", true));
-
-            snippets.append(Snippet("thm", "\\begin{theorem}\n\t\n\\end{theorem}\n", 17, true));
-            snippets.append(Snippet("def", "\\begin{definition}\n\t\n\\end{definition}\n", 20, true));
-            snippets.append(Snippet("prf", "\\begin{proof}\n\t\n\\end{proof}\n", 15, true));
-            snippets.append(Snippet("cor", "\\begin{corollary}\n\t\n\\end{corollary}\n", 19, true));
-            snippets.append(Snippet("rmk", "\\begin{remark}\n\t\n\\end{remark}\n", 16, true));
-            snippets.append(Snippet("lem", "\\begin{lemma}\n\t\n\\end{lemma}\n", 15, true));
-            snippets.append(Snippet("exm", "\\begin{example}\n\t\n\\end{example}\n", 17, true));
-
-            snippets.append(Snippet("\\begin{theorem}\n\t","\\begin{theorem}[]\n\t", 16, true));
-            snippets.append(Snippet("\\begin{definition}\n\t", "\\begin{definition}[]\n\t", 19, true));
-            snippets.append(Snippet("\\begin{proof}\n\t", "\\begin{proof}[]\n\t", 14, true));
-            snippets.append(Snippet("\\begin{corollary}\n\t", "\\begin{corollary}[]\n\t", 18, true));
-            snippets.append(Snippet("\\begin{remark}\n\t", "\\begin{remark}[]\n\t", 15, true));
-            snippets.append(Snippet("\\begin{lemma}\n\t", "\\begin{lemma}[]\n\t", 14, true));
-            snippets.append(Snippet("\\begin{example}\n\t", "\\begin{example}[]\n\t", 16, true));
-
-            snippets.append(Snippet("doc", "\\documentclass{article}\n\\usepackage{lexpack}\n\n\\begin{document}\n\n\n\n\\end{document}\n", 64, true));
-            snippets.append(Snippet("item", "\\begin{itemize}\n\t\\item \n\\end{itemize}\n", 23, true));
-            snippets.append(Snippet("enum", "\\begin{enumerate}\n\t\\item \n\\end{enumerate}\n", 25, true));
-        }
-
-        for (const auto &snippet : snippets)
+        for (const auto &snippet : *snippets)
             if (snippet.apply(_editor))
                 break;
     }
@@ -326,6 +202,137 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (Styler::get<bool>("window-flag-askexit") && _path.edited() && QMessageBox::question(this, "Quit", "Changes unsaved. Do you really want to exit the program?") != QMessageBox::Yes)
         event->ignore();
+}
+
+void MainWindow::createSnippets()
+{
+    _snippetsMath.append(Snippet("<<", "⟨"));
+    _snippetsMath.append(Snippet(">>", "⟩"));
+
+    _snippetsMath.append(Snippet("NN", "ℕ"));
+    _snippetsMath.append(Snippet("ZZ", "ℤ"));
+    _snippetsMath.append(Snippet("QQ", "ℚ"));
+    _snippetsMath.append(Snippet("RR", "ℝ"));
+    _snippetsMath.append(Snippet("CC", "ℂ"));
+    _snippetsMath.append(Snippet("PP", "ℙ"));
+
+    _snippetsMath.append(Snippet("..-", "⋯"));
+    _snippetsMath.append(Snippet("..|", "⋮"));
+    _snippetsMath.append(Snippet("..\\", "⋱"));
+
+    _snippetsMath.append(Snippet("for", "∀"));
+    _snippetsMath.append(Snippet("exi", "∃"));
+    _snippetsMath.append(Snippet("nn", "∩"));
+    _snippetsMath.append(Snippet("uu", "∪"));
+    _snippetsMath.append(Snippet("⊂=", "⊆"));
+    _snippetsMath.append(Snippet("cc", "⊂"));
+    _snippetsMath.append(Snippet("⊃=", "⊇"));
+    _snippetsMath.append(Snippet("pp", "⊃"));
+
+    _snippetsMath.append(Snippet("ll", "≪"));
+    _snippetsMath.append(Snippet("gg", "≫"));
+    _snippetsMath.append(Snippet("le", "≤"));
+    _snippetsMath.append(Snippet("ge", "≥"));
+
+    _snippetsMath.append(Snippet("⇐>", "⇔"));
+    _snippetsMath.append(Snippet("=>", "⇒"));
+    _snippetsMath.append(Snippet("<=", "⇐"));
+    _snippetsMath.append(Snippet("←>", "↔"));
+    _snippetsMath.append(Snippet("->", "→"));
+    _snippetsMath.append(Snippet("<-", "←"));
+
+    _snippetsMath.append(Snippet("xx", "×"));
+    _snippetsMath.append(Snippet("∘@", "@"));
+    _snippetsMath.append(Snippet("@", "∘"));
+    _snippetsMath.append(Snippet("+-", "±"));
+    _snippetsMath.append(Snippet("⋅*", "*"));
+    _snippetsMath.append(Snippet("**", "⋅⋅⋅"));
+    _snippetsMath.append(Snippet("*", "⋅"));
+    _snippetsMath.append(Snippet("o.", "⊙"));
+    _snippetsMath.append(Snippet("o+", "⊕"));
+    _snippetsMath.append(Snippet("ox", "⊗"));
+
+    _snippetsMath.append(Snippet("par", "∂"));
+    _snippetsMath.append(Snippet("oo", "∞"));
+
+    _snippetsMath.append(Snippet("sin", "sin")); // sin is not s\in
+    _snippetsMath.append(Snippet("!ni", "∌"));
+    _snippetsMath.append(Snippet("!in", "∉"));
+    _snippetsMath.append(Snippet("in", "∈"));
+    _snippetsMath.append(Snippet("ni", "∋"));
+
+    _snippetsMath.append(Snippet("==", "≡"));
+    _snippetsMath.append(Snippet("!=", "≠"));
+    _snippetsMath.append(Snippet("~~", "≈"));
+    _snippetsMath.append(Snippet("~=", "≅"));
+
+    _snippetsMath.append(Snippet("sum", "∑"));
+    _snippetsMath.append(Snippet("prod", "∏"));
+    _snippetsMath.append(Snippet("∈t", "∫"));
+    _snippetsMath.append(Snippet("∫i", "∫_{-∞}^{+∞}"));
+
+    _snippetsMath.append(Snippet("!O", "∅"));
+
+    _snippetsMath.append(Snippet("alp", "α"));
+    _snippetsMath.append(Snippet("bet", "β"));
+    _snippetsMath.append(Snippet("Gam", "Γ"));
+    _snippetsMath.append(Snippet("gam", "γ"));
+    _snippetsMath.append(Snippet("Del", "Δ"));
+    _snippetsMath.append(Snippet("del", "δ"));
+    _snippetsMath.append(Snippet("eps", "ɛ")); // varepsilon
+    _snippetsMath.append(Snippet("zet", "ζ"));
+    _snippetsMath.append(Snippet("eta", "η"));
+    _snippetsMath.append(Snippet("The", "Θ"));
+    _snippetsMath.append(Snippet("the", "ϑ")); // vartheta
+    _snippetsMath.append(Snippet("iot", "ι"));
+    _snippetsMath.append(Snippet("kap", "κ"));
+    _snippetsMath.append(Snippet("Lam", "Λ"));
+    _snippetsMath.append(Snippet("lam", "λ"));
+    _snippetsMath.append(Snippet("mu", "μ"));
+    _snippetsMath.append(Snippet("nu", "ν"));
+    _snippetsMath.append(Snippet("Xi", "Ξ"));
+    _snippetsMath.append(Snippet("xi", "ξ"));
+    _snippetsMath.append(Snippet("Pi", "Π"));
+    _snippetsMath.append(Snippet("pi", "π"));
+    _snippetsMath.append(Snippet("rho", "ρ"));
+    _snippetsMath.append(Snippet("Sig", "Σ"));
+    _snippetsMath.append(Snippet("sig", "σ"));
+    _snippetsMath.append(Snippet("tau", "τ"));
+    _snippetsMath.append(Snippet("ups", "υ"));
+    _snippetsMath.append(Snippet("Phi", "Φ"));
+    _snippetsMath.append(Snippet("phi", "φ")); // varphi
+    _snippetsMath.append(Snippet("chi", "χ"));
+    _snippetsMath.append(Snippet("Psi", "Ψ"));
+    _snippetsMath.append(Snippet("psi", "ψ"));
+    _snippetsMath.append(Snippet("Ome", "Ω"));
+    _snippetsMath.append(Snippet("ome", "ω"));
+
+    _snippetsRegular.append(Snippet("sssec", "\\subsubsection{}", 15, true));
+    _snippetsRegular.append(Snippet("ssec", "\\subsection{}", 12, true));
+    _snippetsRegular.append(Snippet("sec", "\\section{}", 9, true));
+
+    _snippetsRegular.append(Snippet("section*{", "section{", true));
+    _snippetsRegular.append(Snippet("section{", "section*{", true));
+
+    _snippetsRegular.append(Snippet("thm", "\\begin{theorem}\n\t\n\\end{theorem}\n", 17, true));
+    _snippetsRegular.append(Snippet("def", "\\begin{definition}\n\t\n\\end{definition}\n", 20, true));
+    _snippetsRegular.append(Snippet("prf", "\\begin{proof}\n\t\n\\end{proof}\n", 15, true));
+    _snippetsRegular.append(Snippet("cor", "\\begin{corollary}\n\t\n\\end{corollary}\n", 19, true));
+    _snippetsRegular.append(Snippet("rmk", "\\begin{remark}\n\t\n\\end{remark}\n", 16, true));
+    _snippetsRegular.append(Snippet("lem", "\\begin{lemma}\n\t\n\\end{lemma}\n", 15, true));
+    _snippetsRegular.append(Snippet("exm", "\\begin{example}\n\t\n\\end{example}\n", 17, true));
+
+    _snippetsRegular.append(Snippet("\\begin{theorem}\n\t","\\begin{theorem}[]\n\t", 16, true));
+    _snippetsRegular.append(Snippet("\\begin{definition}\n\t", "\\begin{definition}[]\n\t", 19, true));
+    _snippetsRegular.append(Snippet("\\begin{proof}\n\t", "\\begin{proof}[]\n\t", 14, true));
+    _snippetsRegular.append(Snippet("\\begin{corollary}\n\t", "\\begin{corollary}[]\n\t", 18, true));
+    _snippetsRegular.append(Snippet("\\begin{remark}\n\t", "\\begin{remark}[]\n\t", 15, true));
+    _snippetsRegular.append(Snippet("\\begin{lemma}\n\t", "\\begin{lemma}[]\n\t", 14, true));
+    _snippetsRegular.append(Snippet("\\begin{example}\n\t", "\\begin{example}[]\n\t", 16, true));
+
+    _snippetsRegular.append(Snippet("doc", "\\documentclass{article}\n\\usepackage{lexpack}\n\n\\begin{document}\n\n\n\n\\end{document}\n", 64, true));
+    _snippetsRegular.append(Snippet("item", "\\begin{itemize}\n\t\\item \n\\end{itemize}\n", 23, true));
+    _snippetsRegular.append(Snippet("enum", "\\begin{enumerate}\n\t\\item \n\\end{enumerate}\n", 25, true));
 }
 
 void MainWindow::createActions()

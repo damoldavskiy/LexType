@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+#include "paintertoolkit.h"
 #include "painter.h"
 
 class PainterDialog : public QDialog
@@ -29,6 +30,7 @@ public slots:
     void fillEmpty();
 
 private:
+    PainterToolkit *_toolkit;
     Painter *_painter;
     bool _accepted = false;
 };
