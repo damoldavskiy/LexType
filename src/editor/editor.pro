@@ -27,7 +27,8 @@ SOURCES += \
     pathwatcher.cpp \
     keyboardlayout.cpp \
     settingsdialog.cpp \
-    paintertoolkit.cpp
+    paintertoolkit.cpp \
+    gapbuffer.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -60,7 +61,8 @@ HEADERS += \
     pathwatcher.h \
     keyboardlayout.h \
     settingsdialog.h \
-    paintertoolkit.h
+    paintertoolkit.h \
+    gapbuffer.h
 
 RESOURCES += \
     images.qrc

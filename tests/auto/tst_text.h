@@ -22,12 +22,14 @@ void tst_Text::basic()
     QCOMPARE(text.lineCount(), 1);
 
     text.insert(0, "Hello, world!\nThere is something");
+    QCOMPARE(text.text(), QString("Hello, world!\nThere is something"));
 
     QVERIFY(text.width() > 0);
     QCOMPARE(text.size(), 32);
     QCOMPARE(text.lineCount(), 2);
 
     text.insert(0, "\n\n");
+    QCOMPARE(text.text(), QString("\n\nHello, world!\nThere is something"));
 
     QCOMPARE(text.lineCount(), 4);
 

@@ -4,6 +4,7 @@
 #include <QStack>
 
 #include "action.h"
+#include "gapbuffer.h"
 
 class MemoryData
 {
@@ -15,12 +16,12 @@ public:
     int size() const;
     QString text() const;
     QString mid(int pos, int count) const;
-    QChar operator [](int index) const;
+    QChar operator [](int pos) const;
     bool canUndo() const;
     bool canRedo() const;
 
 private:
-    QString _data;
+    GapBuffer _data;
     QStack<Action> _before;
     QStack<Action> _after;
 };

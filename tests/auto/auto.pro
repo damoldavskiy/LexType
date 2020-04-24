@@ -3,6 +3,7 @@ QT += testlib widgets
 CONFIG += testcase
 
 SOURCES += \
+    ..\..\src\editor\gapbuffer.cpp \
     ..\..\src\editor\linenumbers.cpp \
     ..\..\src\editor\linetracker.cpp \
     ..\..\src\editor\markupmodel.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    ..\..\src\editor\gapbuffer.h \
     ..\..\src\editor\linenumbers.h \
     ..\..\src\editor\linetracker.h \
     ..\..\src\editor\markupmodel.h \

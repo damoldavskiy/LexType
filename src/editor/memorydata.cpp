@@ -51,7 +51,7 @@ int MemoryData::size() const
 
 QString MemoryData::text() const
 {
-    return _data;
+    return _data.toString();
 }
 
 QString MemoryData::mid(int pos, int count) const
@@ -59,9 +59,9 @@ QString MemoryData::mid(int pos, int count) const
     return _data.mid(pos, count);
 }
 
-QChar MemoryData::operator [](int index) const
+QChar MemoryData::operator [](int pos) const
 {
-    return _data[index];
+    return _data[pos];
 }
 
 bool MemoryData::canUndo() const
