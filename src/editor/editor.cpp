@@ -72,6 +72,11 @@ void Editor::remove(int pos, int count)
     updateUi(true);
 }
 
+QChar Editor::operator [](int pos) const
+{
+    return _text[pos];
+}
+
 Interval Editor::markup(int pos) const
 {
     return _text.markup(pos);

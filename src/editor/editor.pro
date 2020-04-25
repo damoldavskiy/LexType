@@ -28,7 +28,8 @@ SOURCES += \
     keyboardlayout.cpp \
     settingsdialog.cpp \
     paintertoolkit.cpp \
-    gapbuffer.cpp
+    gapbuffer.cpp \
+    snippetmanager.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -62,7 +63,8 @@ HEADERS += \
     keyboardlayout.h \
     settingsdialog.h \
     paintertoolkit.h \
-    gapbuffer.h
+    gapbuffer.h \
+    snippetmanager.h
 
 RESOURCES += \
     images.qrc

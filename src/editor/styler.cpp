@@ -46,8 +46,11 @@ void Styler::reset()
     set("editor-flag-line", true);
     set("editor-flag-numbers", true);
     set("editor-flag-keyboard", true);
-    set("editor-flag-snippets", true);
+    set("editor-flag-snippets-regular", true);
+    set("editor-flag-snippets-math", true);
     set("editor-flag-autocompile", false);
+
+    set("painter-flag-snippets", true);
 
     set("window-flag-askexit", true);
 }

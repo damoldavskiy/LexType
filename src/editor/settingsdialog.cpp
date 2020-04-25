@@ -78,7 +78,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             });
         } else if (item == snippetsItem) {
             appendCheckBoxes(Properties {
-                { "editor-flag-snippets", "Enable snippets" }
+                { "editor-flag-snippets-regular", "Enable regular snippets in editor" },
+                { "editor-flag-snippets-math", "Enable math snippets in editor" },
+                { "painter-flag-snippets", "Enable snippets in painter (math only)" }
             });
         } else if (item == mathItem) {
             appendCheckBoxes(Properties {

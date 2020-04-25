@@ -8,7 +8,6 @@
 
 #include "text.h"
 #include "linenumbers.h"
-#include "styler.h"
 
 class Editor : public QWidget
 {
@@ -22,6 +21,7 @@ public:
     void setCaret(int value);
     void insert(int pos, const QString &text);
     void remove(int pos, int count);
+    QChar operator [](int pos) const;
     Interval markup(int pos) const;
     void updateSettings();
 

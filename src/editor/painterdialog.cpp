@@ -29,6 +29,8 @@ PainterDialog::PainterDialog(QWidget *parent)
             _toolkit->reset();
             return;
         }
+        _snippets.apply(_editor, false, Styler::get<bool>("painter-flag-snippets"));
+
         FigureText *figure = dynamic_cast<FigureText*>(_painter->figure());
         figure->setText(_editor->text());
     });

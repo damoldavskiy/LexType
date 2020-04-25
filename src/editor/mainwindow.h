@@ -6,10 +6,9 @@
 #include <QSplitter>
 #include <QProcess>
 
-
 #include "editor.h"
 #include "pathwatcher.h"
-#include "snippet.h"
+#include "snippetmanager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -36,7 +35,6 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    void createSnippets();
     void createActions();
     void createMenus();
 
@@ -45,8 +43,7 @@ private:
     Editor *_editor;
     Editor *_console;
 
-    QVector<Snippet> _snippetsRegular;
-    QVector<Snippet> _snippetsMath;
+    SnippetManager _snippets;
 
     QAction *_openAction;
     QAction *_saveAction;

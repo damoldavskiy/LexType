@@ -28,9 +28,8 @@ bool Snippet::apply(Editor *editor) const
     if (pos < 0)
         return false;
 
-    // TODO Not effective (copying of entire text)
     for (int i = 0; i < _pattern.size(); ++i)
-        if (editor->text()[pos + i] != _pattern[i])
+        if ((*editor)[pos + i] != _pattern[i])
             return false;
 
     editor->remove(pos, _pattern.size());

@@ -1,5 +1,6 @@
 #include <QApplication>
 
+#include "styler.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

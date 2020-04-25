@@ -11,7 +11,6 @@
 #include "painterdialog.h"
 #include "settingsdialog.h"
 #include "mathwriter.h"
-#include "snippet.h"
 
 void writeText(const QString &path, const QString &text)
 {
@@ -32,7 +31,7 @@ QString readText(const QString &path)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    Styler::reset(); // TODO Should we do it in main.cpp?
+    Styler::reset();
     setWindowTitle("LexType");
     resize(640, 480);
 
@@ -60,7 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     _editor->setFocus();
 
-    createSnippets();
     createActions();
     createMenus();
 
@@ -158,23 +156,13 @@ void MainWindow::options()
     delete dialog;
 }
 
-void MainWindow::typed(int pos, QChar)
+void MainWindow::typed(int, QChar)
 {
     // TODO Insert from clipborad doesn't emit Editor::typed
     _path.setEdited(true);
     setWindowTitle(_path.title());
 
-    if (Styler::get<bool>("editor-flag-snippets")) {
-        QVector<Snippet> *snippets;
-        if (_editor->markup(pos) == Interval::Mathematics)
-            snippets = &_snippetsMath;
-        else
-            snippets = &_snippetsRegular;
-
-        for (const auto &snippet : *snippets)
-            if (snippet.apply(_editor))
-                break;
-    }
+    _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
 
     if (Styler::get<bool>("editor-flag-autocompile"))
         compile();
@@ -203,7 +191,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (Styler::get<bool>("window-flag-askexit") && _path.edited() && QMessageBox::question(this, "Quit", "Changes unsaved. Do you really want to exit the program?") != QMessageBox::Yes)
         event->ignore();
 }
-
+/*
 void MainWindow::createSnippets()
 {
     _snippetsMath.append(Snippet("<<", "⟨"));
@@ -334,7 +322,7 @@ void MainWindow::createSnippets()
     _snippetsRegular.append(Snippet("item", "\\begin{itemize}\n\t\\item \n\\end{itemize}\n", 23, true));
     _snippetsRegular.append(Snippet("enum", "\\begin{enumerate}\n\t\\item \n\\end{enumerate}\n", 25, true));
 }
-
+*/
 void MainWindow::createActions()
 {
     _openAction = new QAction("Open", this);

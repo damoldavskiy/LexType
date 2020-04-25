@@ -6,6 +6,7 @@
 #include "paintertoolkit.h"
 #include "painter.h"
 #include "editor.h"
+#include "snippetmanager.h"
 
 class PainterDialog : public QDialog
 {
@@ -34,6 +35,7 @@ private:
     PainterToolkit *_toolkit;
     Painter *_painter;
     Editor *_editor;
+    SnippetManager _snippets;
     bool _accepted = false;
 };
 
