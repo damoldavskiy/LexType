@@ -5,6 +5,7 @@
 
 #include "paintertoolkit.h"
 #include "painter.h"
+#include "editor.h"
 
 class PainterDialog : public QDialog
 {
@@ -32,6 +33,7 @@ public slots:
 private:
     PainterToolkit *_toolkit;
     Painter *_painter;
+    Editor *_editor;
     bool _accepted = false;
 };
 

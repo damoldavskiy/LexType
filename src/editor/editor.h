@@ -49,6 +49,7 @@ protected:
     void focusInEvent(QFocusEvent *event);
     void focusOutEvent(QFocusEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    bool event(QEvent *event);
 
     void removeSelection();
     void updateShift();

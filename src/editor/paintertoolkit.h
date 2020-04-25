@@ -9,6 +9,7 @@ class PainterToolkit : public QToolBar
 
 public:
     PainterToolkit(QWidget* parent = 0);
+    void reset();
 
 signals:
     void line();

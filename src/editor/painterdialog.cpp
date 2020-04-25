@@ -16,16 +16,34 @@ PainterDialog::PainterDialog(QWidget *parent)
 {
     setWindowTitle("Painter");
     setStyleSheet(Styler::get<QString>("widget-style"));
-    setLayout(new QHBoxLayout);
+    setLayout(new QVBoxLayout);
     resize(480, 480);
 
     _toolkit = new PainterToolkit;
     _painter = new Painter;
+    _editor = new Editor;
+    _editor->setVisible(false);
+    _editor->setMaximumHeight(_editor->fontMetrics().height());
+    connect(_editor, &Editor::typed, this, [this] (int, QChar symbol) {
+        if (symbol == '\n') {
+            _toolkit->reset();
+            return;
+        }
+        FigureText *figure = dynamic_cast<FigureText*>(_painter->figure());
+        figure->setText(_editor->text());
+    });
+    connect(_painter, &Painter::placed, this, [this] () {
+        if (dynamic_cast<FigureText*>(_painter->figure()) == nullptr)
+            return;
+        _editor->setText("");
+        _editor->setFocus();
+    });
 
     layout()->setMargin(0);
     layout()->setSpacing(0);
     layout()->addWidget(_toolkit);
     layout()->addWidget(_painter);
+    layout()->addWidget(_editor);
 
     connect(_toolkit, SIGNAL(line()), this, SLOT(line()));
     connect(_toolkit, SIGNAL(rectangle()), this, SLOT(rectangle()));
@@ -59,26 +77,37 @@ void PainterDialog::accept()
 
 void PainterDialog::line()
 {
+    _editor->setVisible(false);
+    _editor->setEnabled(false);
     _painter->setFigure(new FigureLine);
 }
 
 void PainterDialog::ellipse()
 {
+    _editor->setVisible(false);
+    _editor->setEnabled(false);
     _painter->setFigure(new FigureEllipse);
 }
 
 void PainterDialog::rectangle()
 {
+    _editor->setVisible(false);
+    _editor->setEnabled(false);
     _painter->setFigure(new FigureRectangle);
 }
 
 void PainterDialog::path()
 {
+    _editor->setVisible(false);
+    _editor->setEnabled(false);
     _painter->setFigure(new FigurePath);
 }
 
 void PainterDialog::text()
 {
+    _editor->setVisible(true);
+    _editor->setEnabled(true);
+    _editor->setFocus();
     _painter->setFigure(new FigureText);
 }
 

@@ -308,7 +308,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         emit typed(_pos - 1, '\n');
         break;
     case Qt::Key_Escape:
-        break;
+        return;
     default:
         QString text = event->text();
         if (text.size() > 0) {
@@ -321,6 +321,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
     }
 
+    event->setAccepted(true);
     updateUi(true);
 }
 
@@ -395,6 +396,19 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addActions({ cutAction, copyAction, pasteAction, selectAllAction });
     menu.exec(event->globalPos());
+}
+
+bool Editor::event(QEvent *event)
+{
+    if (event->type() == QEvent::ShortcutOverride) {
+        QKeyEvent *keyEvent = dynamic_cast<QKeyEvent*>(event);
+        if (keyEvent != nullptr && (keyEvent->modifiers() & Qt::ControlModifier) == 0 && keyEvent->text().size() > 0) {
+            event->setAccepted(true);
+            return true;
+        }
+    }
+
+    return QWidget::event(event);
 }
 
 void Editor::removeSelection()

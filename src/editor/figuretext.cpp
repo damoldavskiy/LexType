@@ -3,7 +3,6 @@
 void FigureText::setEnd(QPointF end, bool)
 {
     Figure::setEnd(end);
-    _text = pair(end);
 }
 
 void FigureText::paint(QPainter *painter) const

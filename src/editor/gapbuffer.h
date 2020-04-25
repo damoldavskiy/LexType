@@ -10,7 +10,7 @@ public:
     void insert(int pos, const QString &text);
     void remove(int pos, int count);
     QString mid(int pos, int count) const;
-    const QChar operator [](int pos) const;
+    QChar operator [](int pos) const;
     int size() const;
     QString toString() const;
 

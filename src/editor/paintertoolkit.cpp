@@ -6,11 +6,14 @@ PainterToolkit::PainterToolkit(QWidget* parent)
     : QToolBar(parent)
 {
     setStyleSheet(Styler::get<QString>("toolbar-style"));
-    setOrientation(Qt::Vertical);
 
     createActions();
     createMenus();
+    reset();
+}
 
+void PainterToolkit::reset()
+{
     _path->activate({ });
 }
 

@@ -49,7 +49,7 @@ QString GapBuffer::mid(int pos, int count) const
     return result;
 }
 
-const QChar GapBuffer::operator [](int pos) const
+QChar GapBuffer::operator [](int pos) const
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());

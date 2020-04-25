@@ -20,6 +20,9 @@ public:
     Figure* figure() const;
     void setFigure(Figure* value);
 
+signals:
+    void placed();
+
 public slots:
     void undo();
     void redo();

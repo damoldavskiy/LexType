@@ -114,6 +114,7 @@ void Painter::mousePressEvent(QMouseEvent *event)
 void Painter::mouseReleaseEvent(QMouseEvent *)
 {
     _current->release();
+    emit placed();
     _current = _current->copy();
     _current->clear();
 
