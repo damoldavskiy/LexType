@@ -1,5 +1,10 @@
 #include "figuretext.h"
 
+bool FigureText::release()
+{
+    return !_text.isEmpty();
+}
+
 void FigureText::setEnd(QPointF end, bool)
 {
     Figure::setEnd(end);

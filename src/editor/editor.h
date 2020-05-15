@@ -1,7 +1,6 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include <QWidget>
 #include <QPainter>
 #include <QKeyEvent>
 #include <QTimer>

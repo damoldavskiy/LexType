@@ -15,7 +15,7 @@ public:
     QString toString() const;
 
 private:
-    void copy(QChar* target, int from, int to) const;
+    void copy(QChar *target, int from, int to) const;
     void ensureGap(int pos, int size);
 
     QChar* _data = new QChar[8];

@@ -21,7 +21,7 @@ public:
     void setFigure(Figure* value);
 
 signals:
-    void placed();
+    void released();
 
 public slots:
     void undo();

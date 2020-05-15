@@ -69,7 +69,7 @@ QString GapBuffer::toString() const
     return mid(0, size());
 }
 
-void GapBuffer::copy(QChar* target, int from, int to) const
+void GapBuffer::copy(QChar *target, int from, int to) const
 {
     if (from < _gap)
         for (int i = from; i < Math::min(to, _gap); ++i)

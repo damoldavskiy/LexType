@@ -9,8 +9,10 @@ void Figure::shift(qreal shiftX, qreal shiftY)
     Math::shift(_end, shiftX, shiftY);
 }
 
-void Figure::release()
-{ }
+bool Figure::release()
+{
+    return Math::dist(_start, _end) > 0;
+}
 
 void Figure::paint(QPainter *) const
 { }

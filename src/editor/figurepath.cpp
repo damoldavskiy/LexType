@@ -11,7 +11,8 @@ void FigurePath::setEnd(QPointF point, bool)
 {
     Figure::setEnd(point);
 
-    _path.append(point);
+    if (_path.isEmpty() || Math::dist(_path.back(), point) > 4)
+        _path.append(point);
 }
 
 void FigurePath::shift(qreal shiftX, qreal shiftY)
@@ -21,8 +22,12 @@ void FigurePath::shift(qreal shiftX, qreal shiftY)
         Math::shift(point, shiftX, shiftY);
 }
 
-void FigurePath::release()
+bool FigurePath::release()
 {
+    if (_path.size() == 1) {
+        return false;
+    }
+
     QVector<QPointF> filtered { _path[0] };
 
     for (int i = 1; i < _path.size(); ++i)
@@ -40,6 +45,8 @@ void FigurePath::release()
         _path = filtered;
         _cycle = isCycle(_path);
     }
+
+    return true;
 }
 
 void FigurePath::paint(QPainter *painter) const

@@ -24,6 +24,7 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
+    updateSettings();
 
     connect(_timer, SIGNAL(timeout()), this, SLOT(tick()));
     _timer->start(_timerInterval);

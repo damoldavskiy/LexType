@@ -9,7 +9,7 @@ class FigurePath : public FigureArrow, public FigureFillable
 public:
     void setStart(QPointF point);
     void setEnd(QPointF point, bool modifier = false);
-    void release();
+    bool release();
     void shift(qreal shiftX, qreal shiftY);
     void paint(QPainter *painter) const;
     QString latex() const;

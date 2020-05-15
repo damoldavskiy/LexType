@@ -34,7 +34,7 @@ PainterDialog::PainterDialog(QWidget *parent)
         FigureText *figure = dynamic_cast<FigureText*>(_painter->figure());
         figure->setText(_editor->text());
     });
-    connect(_painter, &Painter::placed, this, [this] () {
+    connect(_painter, &Painter::released, this, [this] () {
         if (dynamic_cast<FigureText*>(_painter->figure()) == nullptr)
             return;
         _editor->setText("");

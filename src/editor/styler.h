@@ -1,28 +1,27 @@
 #ifndef STYLER_H
 #define STYLER_H
 
-#include <QMap>
-#include <QVariant>
+#include <QSettings>
 
 class Styler
 {
 public:
-    static void reset();
+    static void init();
 
     template <typename T>
     static T get(const QString &key)
     {
-        return _values[key].value<T>();
+        return _settings.value(key).value<T>();
     }
 
     template <typename T>
     static void set(const QString &key, const T &value)
     {
-        _values[key] = value;
+        _settings.setValue(key, value);
     }
 
 private:
-    static QMap<QString, QVariant> _values;
+    static QSettings _settings;
 };
 
 #endif // STYLER_H

@@ -11,7 +11,7 @@ public:
     virtual ~Figure();
 
     virtual void shift(qreal shiftX, qreal shiftY);
-    virtual void release();
+    virtual bool release();
 
     virtual void paint(QPainter *painter) const;
     virtual QString latex() const = 0;

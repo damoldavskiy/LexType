@@ -3,8 +3,11 @@
 #include <QColor>
 #include <QFont>
 
-void Styler::reset()
+void Styler::init()
 {
+    if (_settings.allKeys().size() > 0)
+        return;
+
     set("widget-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
     set("menu-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
                       "QMenuBar::item { background: rgb(50, 50, 50); }"
@@ -41,7 +44,7 @@ void Styler::reset()
     set("viewer-back", QColor { 50, 50, 50 });
     set("viewer-fore", QColor { 240, 240, 240 });
 
-    set("editor-font", QFont("Ubuntu"));
+    set("editor-font", QFont("Ubuntu", 11));
 
     set("editor-flag-line", true);
     set("editor-flag-numbers", true);
@@ -55,4 +58,4 @@ void Styler::reset()
     set("window-flag-askexit", true);
 }
 
-QMap<QString, QVariant> Styler::_values;
+QSettings Styler::_settings("DMSoft", "LexType");

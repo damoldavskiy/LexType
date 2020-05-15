@@ -6,6 +6,7 @@
 class FigureText : public Figure
 {
 public:
+    bool release();
     void setEnd(QPointF end, bool modifier = false);
     void paint(QPainter *painter) const;
     QString latex() const;

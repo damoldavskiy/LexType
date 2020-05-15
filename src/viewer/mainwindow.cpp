@@ -12,7 +12,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    Styler::reset(); // TODO Should we do it in main.cpp?
+    Styler::init(); // TODO Should we do it in main.cpp?
     setWindowTitle("LexType Viewer");
     resize(640, 480);
 
