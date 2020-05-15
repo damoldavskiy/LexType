@@ -11,6 +11,7 @@ class MemoryData
 public:
     void insert(int pos, const QString &text);
     void remove(int pos, int count);
+    int find(int pos, const QString &substring, bool matchCase) const;
     Action undo();
     Action redo();
     int size() const;

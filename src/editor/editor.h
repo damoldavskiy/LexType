@@ -28,6 +28,8 @@ signals:
     void typed(int pos, QChar symbol);
 
 public slots:
+    void find(const QString &substring, bool matchCase);
+    void replace(const QString &before, const QString &after, bool all, bool matchCase);
     void undo();
     void redo();
     void cut();
@@ -52,6 +54,7 @@ protected:
 
     void removeSelection();
     void updateShift();
+    void updateShift(QPointF point);
     void updateUi(bool resetCaret);
     void type(const QString &text);
 
@@ -59,7 +62,7 @@ protected:
     void removeText(int pos, int count);
 
     int findPos(qreal x, qreal y) const;
-    QPair<qreal, qreal> findShift(int pos) const;
+    QPointF findShift(int pos) const;
 //    qreal advanceWidth(qreal left, int pos) const;
 //    qreal lineWidth(int line) const;
 

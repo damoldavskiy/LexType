@@ -33,6 +33,14 @@ void GapBuffer::remove(int pos, int count)
     _gapSize += count;
 }
 
+int GapBuffer::find(int pos, const QString &substring, bool matchCase) const
+{
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= size());
+
+    return toString().indexOf(substring, pos, matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive);
+}
+
 QString GapBuffer::mid(int pos, int count) const
 {
     Q_ASSERT(pos >= 0);

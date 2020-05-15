@@ -93,6 +93,35 @@ void Editor::updateSettings()
     }
 }
 
+void Editor::find(const QString &substring, bool matchCase)
+{
+    if (substring.size() == 0)
+        return; // Don't update _spos
+
+    int pos = _text.find(_spos == -1 ? _pos : _spos, substring, matchCase);
+    if (pos == -1)
+        return;
+
+    _pos = pos;
+    _spos = pos + substring.size();
+    updateUi(true);
+}
+
+void Editor::replace(const QString &before, const QString &after, bool all, bool matchCase)
+{
+    if (before.size() == 0)
+        return;
+
+    do {
+        int pos = _text.find(_spos == -1 ? _pos : _spos, before, matchCase);
+        if (pos == -1)
+            return;
+
+        remove(pos, before.size());
+        insert(pos, after);
+    } while (all);
+}
+
 void Editor::undo()
 {
     if (!_text.canUndo())
@@ -433,13 +462,15 @@ void Editor::removeSelection()
 // Shifts window to the caret
 void Editor::updateShift()
 {
-    qreal x, y;
-    QPair<qreal, qreal> pair = findShift(_pos);
-    x = pair.first;
-    y = pair.second;
+    if (_spos != -1)
+        updateShift(findShift(_spos)); // TODO We can find this point faster, based on _pos point
+    updateShift(findShift(_pos));
+}
 
-    limit(_yshift, y - size().height() + _text.fontHeight(), y);
-    limit(_xshift, x - size().width() + 1, qMin(x, qMax(static_cast<qreal>(0), _text.width() - size().width() + 1)));
+void Editor::updateShift(QPointF point)
+{
+    limit(_yshift, point.y() - size().height() + _text.fontHeight(), point.y());
+    limit(_xshift, point.x() - size().width() + 1, qMin(point.x(), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1)));
 
     Q_ASSERT(_yshift >= 0);
     Q_ASSERT(_xshift >= 0);
@@ -515,7 +546,7 @@ int Editor::findPos(qreal x, qreal y) const
     }
 }
 
-QPair<qreal, qreal> Editor::findShift(int pos) const
+QPointF Editor::findShift(int pos) const
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= _text.size());

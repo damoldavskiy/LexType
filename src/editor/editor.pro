@@ -29,7 +29,8 @@ SOURCES += \
     settingsdialog.cpp \
     paintertoolkit.cpp \
     gapbuffer.cpp \
-    snippetmanager.cpp
+    snippetmanager.cpp \
+    finddialog.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -64,7 +65,8 @@ HEADERS += \
     settingsdialog.h \
     paintertoolkit.h \
     gapbuffer.h \
-    snippetmanager.h
+    snippetmanager.h \
+    finddialog.h
 
 RESOURCES += \
     images.qrc

@@ -8,6 +8,7 @@
 #include <QStatusBar>
 
 #include "styler.h"
+#include "finddialog.h"
 #include "painterdialog.h"
 #include "settingsdialog.h"
 #include "mathwriter.h"
@@ -104,6 +105,15 @@ void MainWindow::saveAs()
 void MainWindow::quit()
 {
     close();
+}
+
+void MainWindow::find()
+{
+    FindDialog *dialog = new FindDialog;
+    connect(dialog, &FindDialog::find, _editor, &Editor::find);
+    connect(dialog, &FindDialog::replace, _editor, &Editor::replace);
+    dialog->exec();
+    delete dialog; // TODO Is it ok with connects?
 }
 
 void MainWindow::compile()
@@ -217,6 +227,10 @@ void MainWindow::createActions()
     _redoAction->setShortcut(QKeySequence("Ctrl+Shift+Z"));
     connect(_redoAction, &QAction::triggered, _editor, &Editor::redo);
 
+    _findAction = new QAction("Find", this);
+    _findAction->setShortcut(QKeySequence("Ctrl+F"));
+    connect(_findAction, &QAction::triggered, this, &MainWindow::find);
+
     _cutAction = new QAction("Cut", this);
     _cutAction->setShortcut(QKeySequence("Ctrl+X"));
     connect(_cutAction, &QAction::triggered, _editor, &Editor::cut);
@@ -256,6 +270,8 @@ void MainWindow::createMenus()
 
     menu = menuBar()->addMenu("Edit");
     menu->addActions({ _undoAction, _redoAction });
+    menu->addSeparator();
+    menu->addActions({ _findAction });
     menu->addSeparator();
     menu->addActions({ _cutAction, _copyAction, _pasteAction, _selectAllAction });
 

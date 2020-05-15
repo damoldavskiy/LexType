@@ -14,6 +14,11 @@ void MemoryData::remove(int pos, int count)
     _data.remove(pos, count);
 }
 
+int MemoryData::find(int pos, const QString &substring, bool matchCase) const
+{
+    return _data.find(pos, substring, matchCase);
+}
+
 Action MemoryData::undo()
 {
     Q_ASSERT(canUndo());

@@ -9,6 +9,7 @@ public:
     ~GapBuffer();
     void insert(int pos, const QString &text);
     void remove(int pos, int count);
+    int find(int pos, const QString &substring, bool matchCase) const;
     QString mid(int pos, int count) const;
     QChar operator [](int pos) const;
     int size() const;

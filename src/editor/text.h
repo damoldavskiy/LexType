@@ -24,6 +24,7 @@ public:
     void insertLinesAdjust(int pos, const QString &text);
     void remove(int pos, int count);
     void removeLinesAdjust(int pos, int count);
+    int find(int pos, const QString &substring, bool matchCase) const;
     int undo();
     int redo();
     bool canUndo() const;
