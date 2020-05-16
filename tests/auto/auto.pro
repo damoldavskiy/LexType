@@ -12,6 +12,8 @@ SOURCES += \
     ..\..\src\editor\keyboardlayout.cpp \
     ..\..\src\editor\editor.cpp \
     ..\..\src\editor\styler.cpp \
+    ..\..\src\editor\snippet.cpp \
+    ..\..\src\editor\snippetmanager.cpp \
     ..\..\src\editor\mathwriter.cpp \
     main.cpp
 
@@ -25,6 +27,8 @@ HEADERS += \
     ..\..\src\editor\keyboardlayout.h \
     ..\..\src\editor\editor.h \
     ..\..\src\editor\styler.h \
+    ..\..\src\editor\snippet.h \
+    ..\..\src\editor\snippetmanager.h \
     ..\..\src\editor\mathwriter.h \
     tst_editor.h \
     tst_text.h \

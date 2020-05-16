@@ -6,7 +6,7 @@
 class Styler
 {
 public:
-    static void init();
+    static bool init();
 
     template <typename T>
     static T get(const QString &key)

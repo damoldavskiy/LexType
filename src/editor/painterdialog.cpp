@@ -19,6 +19,8 @@ PainterDialog::PainterDialog(QWidget *parent)
     setLayout(new QVBoxLayout);
     resize(480, 480);
 
+    _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
+
     _toolkit = new PainterToolkit;
     _painter = new Painter;
     _editor = new Editor;

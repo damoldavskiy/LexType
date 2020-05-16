@@ -3,10 +3,12 @@
 #include <QColor>
 #include <QFont>
 
-void Styler::init()
+#include "snippetmanager.h"
+
+bool Styler::init()
 {
     if (_settings.allKeys().size() > 0)
-        return;
+        return false;
 
     set("widget-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
     set("menu-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
@@ -56,6 +58,8 @@ void Styler::init()
     set("painter-flag-snippets", true);
 
     set("window-flag-askexit", true);
+
+    return true;
 }
 
 QSettings Styler::_settings("DMSoft", "LexType");

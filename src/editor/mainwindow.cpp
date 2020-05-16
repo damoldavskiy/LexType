@@ -32,7 +32,13 @@ QString readText(const QString &path)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    Styler::init();
+    // TODO Terrible approach
+    if (Styler::init()) {
+        _snippets.reset();
+        Styler::set("snippets", QVariant::fromValue(_snippets));
+    } else
+        _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
+
     setWindowTitle("LexType");
     resize(640, 480);
 
@@ -162,6 +168,7 @@ void MainWindow::options()
     SettingsDialog *dialog = new SettingsDialog;
     dialog->exec();
     _editor->updateSettings();
+    _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
     statusBar()->showMessage("Settings applied");
     delete dialog;
 }

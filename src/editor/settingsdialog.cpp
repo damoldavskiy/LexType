@@ -7,8 +7,13 @@
 #include <QFontDialog>
 #include <QColorDialog>
 #include <QAction>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <QMessageBox>
 
 #include "styler.h"
+#include "snippetmanager.h"
 
 QString fontToString(const QFont &font)
 {
@@ -22,12 +27,15 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     setStyleSheet(Styler::get<QString>("widget-style"));
 
     setMinimumWidth(700);
+    setMaximumWidth(700);
     setMinimumHeight(500);
+    setMaximumHeight(500);
 
     _list = new QListWidget;
     _form = new QFormLayout;
     _layout = new QHBoxLayout;
 
+    _list->setMinimumWidth(200);
     _list->setMaximumWidth(200);
 
     _form->setMargin(20);
@@ -82,6 +90,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-snippets-math", "Enable math snippets in editor" },
                 { "painter-flag-snippets", "Enable snippets in painter (math only)" }
             });
+            appendSnippetsList();
         } else if (item == mathItem) {
             appendCheckBoxes(Properties {
                 { "editor-flag-keyboard", "Inverse keyboard layout in math mode" },
@@ -115,8 +124,11 @@ void SettingsDialog::appendColorButtons(const Properties &pairs)
         QPushButton *button = new QPushButton(Styler::get<QColor>(pair.first).name());
         button->setMaximumWidth(200);
         connect(button, &QPushButton::pressed, this, [button, pair] () {
-            Styler::set(pair.first, QColorDialog::getColor(Styler::get<QColor>(pair.first)));
-            button->setText(Styler::get<QColor>(pair.first).name());
+            QColor color = QColorDialog::getColor(Styler::get<QColor>(pair.first));
+            if (color.isValid()) {
+                Styler::set(pair.first, color);
+                button->setText(Styler::get<QColor>(pair.first).name());
+            }
         });
         _form->addRow(pair.second, button);
     }
@@ -134,3 +146,78 @@ void SettingsDialog::appendCheckBoxes(const Properties &pairs)
     }
 }
 
+void SettingsDialog::appendSnippetsList()
+{
+    QGroupBox *box = new QGroupBox("Snippets list");
+
+    QHBoxLayout *layout = new QHBoxLayout;
+
+    QListWidget *list = new QListWidget;
+    list->setMinimumWidth(150);
+    list->setMaximumWidth(150);
+
+    SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
+    QVector<Snippet> snippets = manager.snippets();
+
+    for (const Snippet &snippet : snippets)
+        list->addItem(snippet.pattern().replace("\n", " "));
+
+    QCheckBox *math = new QCheckBox;
+    QLineEdit *position = new QLineEdit;
+    QTextEdit *pattern = new QTextEdit;
+    QTextEdit *value = new QTextEdit;
+    QPushButton *accept = new QPushButton("Accept");
+
+    QFormLayout *info = new QFormLayout;
+    info->addRow("Math", math);
+    info->addRow("Caret index", position);
+    info->addRow("Pattern", pattern);
+    info->addRow("Value", value);
+    info->addWidget(accept);
+
+    // TODO Better to save indices of all snippets
+    connect(list, &QListWidget::currentItemChanged, this, [list, info, layout, math, position, pattern, value] (QListWidgetItem *) {
+        SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
+        QVector<Snippet> snippets = manager.snippets();
+        int index = list->currentRow();
+        Snippet &snippet = snippets[index];
+
+        if (info->parent() == nullptr)
+            layout->addLayout(info);
+
+        math->setChecked(!snippet.regular());
+        position->setText(QString::number(snippet.position()));
+        pattern->setText(snippet.pattern());
+        value->setText(snippet.value());
+    });
+
+    connect(accept, &QPushButton::clicked, this, [list, math, position, pattern, value] () {
+        SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
+        QVector<Snippet> &snippets = manager.snippets();
+        int index = list->currentRow();
+        Snippet &snippet = snippets[index];
+
+        bool ok;
+        int pos = position->text().toInt(&ok);
+        if (pos < 0 || pos > value->toPlainText().size())
+            ok = false;
+
+        if (!ok) {
+            QMessageBox(QMessageBox::Warning, "Warning", "Incorrect final caret index").exec();
+            return;
+        }
+
+        snippet.setRegular(!math->isChecked());
+        snippet.setPosition(pos);
+        snippet.setPattern(pattern->toPlainText());
+        snippet.setValue(value->toPlainText());
+
+        Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
+    });
+
+    layout->addWidget(list, 0, Qt::AlignLeft);
+
+    box->setLayout(layout);
+
+    _form->addRow(box);
+}

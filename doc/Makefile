@@ -5,13 +5,15 @@ all:
 	rm -f $(OUTDIR)*
 	mkdir -p $(OUTDIR)
 	cp * $(OUTDIR)
+	cp -r img $(OUTDIR)
 	cd $(OUTDIR)
-	pdflatex *.tex
-	bibtex *.aux
-	pdflatex *.tex
-	pdflatex *.tex
+	for f in *.tex; do pdflatex $$f; done
+	for f in *.aux; do bibtex $$f; done
+	for f in *.tex; do pdflatex $$f; done
+	for f in *.tex; do pdflatex $$f; done
 	make clean
 	rm Makefile
+	rm -r img
 	rm *.tex
 	rm *.bib
 
