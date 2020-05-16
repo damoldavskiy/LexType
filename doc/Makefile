@@ -2,10 +2,12 @@ OUTDIR = ../../build-lextype-Documentation/
 
 .ONESHELL:
 all:
+	python3 listing.py
 	rm -f $(OUTDIR)*
 	mkdir -p $(OUTDIR)
 	cp * $(OUTDIR)
 	cp -r img $(OUTDIR)
+	rm listing.tex
 	cd $(OUTDIR)
 	for f in *.tex; do pdflatex $$f; done
 	for f in *.aux; do bibtex $$f; done
@@ -16,6 +18,7 @@ all:
 	rm -r img
 	rm *.tex
 	rm *.bib
+	rm *.py
 
 clean:
 	rm -f *\(busy\)
