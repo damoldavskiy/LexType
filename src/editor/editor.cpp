@@ -112,14 +112,23 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
     if (before.size() == 0)
         return;
 
-    do {
-        int pos = _text.find(_spos == -1 ? _pos : _spos, before, matchCase);
-        if (pos == -1)
-            return;
+    int pos = all ? 0 : _pos;
 
-        remove(pos, before.size());
-        insert(pos, after);
+    do {
+        pos = _text.find(pos, before, matchCase);
+        if (pos == -1)
+            break;
+
+        removeText(pos, before.size());
+        insertText(pos, after);
+
+        pos += after.size();
     } while (all);
+
+    limit(_pos, 0, _text.size());
+    limit(_spos, -1, _text.size());
+
+    updateUi(true);
 }
 
 void Editor::undo()
@@ -549,6 +558,7 @@ int Editor::findPos(qreal x, qreal y) const
 QPointF Editor::findShift(int pos) const
 {
     Q_ASSERT(pos >= 0);
+    int s = _text.size();
     Q_ASSERT(pos <= _text.size());
 
     int line = _text.findLine(pos);
