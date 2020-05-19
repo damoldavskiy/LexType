@@ -3,6 +3,9 @@
 
 #include "figurefillable.h"
 
+/**
+ * @brief Rectangle figure
+ */
 class FigureRectangle : public FigureFillable
 {
 public:

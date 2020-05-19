@@ -3,6 +3,9 @@
 
 #include <QToolBar>
 
+/**
+ * @brief Toolbar widget for painter dialog
+ */
 class PainterToolkit : public QToolBar
 {
     Q_OBJECT

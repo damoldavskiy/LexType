@@ -6,6 +6,9 @@
 #include "action.h"
 #include "gapbuffer.h"
 
+/**
+ * @brief Abstraction over internal data that saves changes and has undo/redo operations
+ */
 class MemoryData
 {
 public:

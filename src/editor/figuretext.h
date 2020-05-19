@@ -3,6 +3,9 @@
 
 #include "figure.h"
 
+/**
+ * @brief Text figure
+ */
 class FigureText : public Figure
 {
 public:

@@ -3,6 +3,9 @@
 
 #include "figurecontour.h"
 
+/**
+ * @brief Represents figure which can be single or double directional arrow
+ */
 class FigureArrow : public virtual FigureContour
 {
 public:

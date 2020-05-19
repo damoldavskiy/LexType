@@ -7,6 +7,9 @@
 
 typedef QVector<QPair<QString, QString>> Properties;
 
+/**
+ * @brief Settings dialog for updating general application preferences
+ */
 class SettingsDialog : public QDialog
 {
     Q_OBJECT

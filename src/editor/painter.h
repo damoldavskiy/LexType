@@ -9,6 +9,9 @@
 #include "figure.h"
 #include "figurepath.h"
 
+/**
+ * @brief Main painter widget
+ */
 class Painter : public QWidget
 {
     Q_OBJECT

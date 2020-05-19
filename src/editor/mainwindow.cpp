@@ -101,8 +101,9 @@ void MainWindow::save()
 
 void MainWindow::saveAs()
 {
-    if (_path.save("LexType (*.lex);;TeX (*tex)")) {
-        writeText(_path.path(), _editor->text());
+    QString selected;
+    if (_path.save("LexType (*.lex);;TeX (*tex)"), &selected) {
+        writeText(_path.path(), _path.path().endsWith(".tex") ? MathWriter::pass(_editor->text()) : _editor->text());
         setWindowTitle(_path.title());
         statusBar()->showMessage("Saved file: " + _path.path());
     }

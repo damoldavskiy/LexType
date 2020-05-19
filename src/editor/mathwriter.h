@@ -3,6 +3,9 @@
 
 #include <QString>
 
+/**
+ * @brief LexType preprocessor (advanced math mode, fractions, etc.)
+ */
 class MathWriter
 {
 public:

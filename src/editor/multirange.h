@@ -6,6 +6,9 @@
 #include "range.h"
 
 template <typename T>
+/**
+ * @brief Class is used for storaging cache (fast indexation over ranges)
+ */
 class MultiRange
 {
 public:

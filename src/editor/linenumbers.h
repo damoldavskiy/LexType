@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QPainter>
 
+/**
+ * @brief Line numbers widget
+ */
 class LineNumbers : public QWidget
 {
     Q_OBJECT

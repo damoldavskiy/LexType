@@ -4,6 +4,9 @@
 #include <QVector>
 
 template <typename T>
+/**
+ * @brief Vector that storages max element in it
+ */
 class MaxVector
 {
 public:

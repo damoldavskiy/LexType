@@ -3,6 +3,9 @@
 
 #include "figurecontour.h"
 
+/**
+ * @brief Represents a figure which has internal area
+ */
 class FigureFillable : public virtual FigureContour
 {
 public:

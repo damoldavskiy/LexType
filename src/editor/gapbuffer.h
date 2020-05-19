@@ -3,6 +3,9 @@
 
 #include <QString>
 
+/**
+ * @brief Gap buffer implementation
+ */
 class GapBuffer
 {
 public:

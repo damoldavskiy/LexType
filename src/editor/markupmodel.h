@@ -6,6 +6,9 @@
 
 #include "interval.h"
 
+/**
+ * @brief Storage for markup model in editor
+ */
 class MarkupModel
 {
 public:

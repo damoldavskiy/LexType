@@ -3,6 +3,9 @@
 
 #include "figure.h"
 
+/**
+ * @brief Represents a figure which has a contour
+ */
 class FigureContour : public virtual Figure
 {
 public:

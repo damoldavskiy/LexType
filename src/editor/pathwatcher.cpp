@@ -8,12 +8,12 @@ PathWatcher::PathWatcher(const QString &app)
 
 bool PathWatcher::open(const QString &filter)
 {
-    return update(QFileDialog::getOpenFileName(0, "Open", "", filter));
+    return update(QFileDialog::getOpenFileName(nullptr, "Open", "", filter));
 }
 
 bool PathWatcher::save(const QString &filter)
 {
-    return update(QFileDialog::getSaveFileName(0, "Save", "", filter));
+    return update(QFileDialog::getSaveFileName(nullptr, "Save", "", filter));
 }
 
 bool PathWatcher::exists() const

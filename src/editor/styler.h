@@ -3,6 +3,9 @@
 
 #include <QSettings>
 
+/**
+ * @brief Storages applications settings
+ */
 class Styler
 {
 public:

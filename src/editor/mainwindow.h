@@ -10,6 +10,9 @@
 #include "pathwatcher.h"
 #include "snippetmanager.h"
 
+/**
+ * @brief Application main window class
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

@@ -12,6 +12,9 @@
 #include "memorydata.h"
 #include "markupmodel.h"
 
+/**
+ * @brief Includes all algorithms for editor implementation except GUI part
+ */
 class Text
 {
 public:

@@ -4,6 +4,9 @@
 #include "figurearrow.h"
 #include "figurefillable.h"
 
+/**
+ * @brief Curve path figure (Bezie curves are used)
+ */
 class FigurePath : public FigureArrow, public FigureFillable
 {
 public:

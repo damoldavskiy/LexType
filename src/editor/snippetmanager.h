@@ -4,6 +4,9 @@
 #include "snippet.h"
 #include "editor.h"
 
+/**
+ * @brief Manager for snippets range
+ */
 class SnippetManager
 {
 public:

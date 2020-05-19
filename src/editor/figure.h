@@ -5,6 +5,9 @@
 
 #include "math.h"
 
+/**
+ * @brief Base class for all figures
+ */
 class Figure
 {
 public:

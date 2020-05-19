@@ -8,6 +8,9 @@
 #include "text.h"
 #include "linenumbers.h"
 
+/**
+ * @brief Editor widget
+ */
 class Editor : public QWidget
 {
     Q_OBJECT

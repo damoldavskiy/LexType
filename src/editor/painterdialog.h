@@ -8,6 +8,9 @@
 #include "editor.h"
 #include "snippetmanager.h"
 
+/**
+ * @brief Painter dialog. Used for getting TikZ picture from user
+ */
 class PainterDialog : public QDialog
 {
     Q_OBJECT

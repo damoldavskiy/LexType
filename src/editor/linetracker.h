@@ -7,6 +7,9 @@
 
 #include "range.h"
 
+/**
+ * @brief Structure for tracking lines in text
+ */
 class LineTracker
 {
 public:

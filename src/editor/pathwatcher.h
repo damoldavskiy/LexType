@@ -3,6 +3,9 @@
 
 #include <QFileInfo>
 
+/**
+ * @brief Class for storaging and updating current opened file path
+ */
 class PathWatcher
 {
 public:

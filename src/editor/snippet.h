@@ -5,6 +5,9 @@
 
 #include "editor.h"
 
+/**
+ * @brief Snippet structure (used with Editor)
+ */
 class Snippet
 {
 public:

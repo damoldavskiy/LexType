@@ -6,6 +6,9 @@
 #include <QCheckBox>
 #include <QPushButton>
 
+/**
+ * @brief Find and replace dialog
+ */
 class FindDialog : public QDialog
 {
     Q_OBJECT

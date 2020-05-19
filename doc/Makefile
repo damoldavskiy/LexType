@@ -10,7 +10,7 @@ all:
 	rm listing.tex
 	cd $(OUTDIR)
 	for f in *.tex; do pdflatex $$f; done
-	for f in *.aux; do bibtex $$f; done
+	for f in *.aux; do bibtexu $$f; done
 	for f in *.tex; do pdflatex $$f; done
 	for f in *.tex; do pdflatex $$f; done
 	make clean

@@ -3,6 +3,9 @@
 
 #include <QString>
 
+/**
+ * @brief Used for switching user's keyboard layout
+ */
 class KeyboardLayout
 {
 public:
