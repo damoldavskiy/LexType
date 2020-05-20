@@ -12,7 +12,19 @@
 class MarkupModel
 {
 public:
+    /**
+     * @brief Returns markup by symbol position
+     * @param Symbol position
+     * @return Symbol markup
+     */
     Interval interval(int pos) const;
+
+    /**
+     * @brief Sets markup of symbol range
+     * @param Start position
+     * @param End position
+     * @param Markup type
+     */
     void setInterval(int start, int end, Interval interval);
 
 private:

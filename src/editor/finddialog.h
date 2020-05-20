@@ -17,7 +17,20 @@ public:
     FindDialog(QWidget *parent = 0);
 
 signals:
+    /**
+     * @brief Called when user initiates searching
+     * @param Substring to find
+     * @param Match case modificator
+     */
     void find(const QString &substring, bool matchCase);
+
+    /**
+     * @brief Called when user initiates replacing
+     * @param Pattern string
+     * @param Replacer string
+     * @param All modificator
+     * @param Match case modificator
+     */
     void replace(const QString &before, const QString &after, bool all, bool matchCase);
 
 private:

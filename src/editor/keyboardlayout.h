@@ -9,6 +9,11 @@
 class KeyboardLayout
 {
 public:
+    /**
+     * @brief Inverses keyboard layout for the symbol
+     * @param Initial symbol
+     * @return Same symbol with reversed layout
+     */
     static QChar pass(QChar symbol);
 
 private:

@@ -167,6 +167,8 @@ void SettingsDialog::appendSnippetsList()
     QTextEdit *pattern = new QTextEdit;
     QTextEdit *value = new QTextEdit;
     QPushButton *accept = new QPushButton("Accept");
+    QPushButton *remove = new QPushButton("Remove");
+    QPushButton *insert = new QPushButton("Insert");
 
     QFormLayout *info = new QFormLayout;
     info->addRow("Math", math);
@@ -174,16 +176,36 @@ void SettingsDialog::appendSnippetsList()
     info->addRow("Pattern", pattern);
     info->addRow("Value", value);
     info->addWidget(accept);
+    info->addWidget(remove);
+    info->addWidget(insert);
+
+    math->setVisible(false);
+    position->setVisible(false);
+    pattern->setVisible(false);
+    value->setVisible(false);
+    accept->setVisible(false);
+    remove->setVisible(false);
+    insert->setVisible(false);
 
     // TODO Better to save indices of all snippets
-    connect(list, &QListWidget::currentItemChanged, this, [list, info, layout, math, position, pattern, value] (QListWidgetItem *) {
+    connect(list, &QListWidget::currentItemChanged, this, [list, info, layout, math, position, pattern, value, accept, remove, insert] (QListWidgetItem *) {
         SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
         QVector<Snippet> snippets = manager.snippets();
         int index = list->currentRow();
+        if (index == -1)
+            return;
         Snippet &snippet = snippets[index];
 
-        if (info->parent() == nullptr)
-            layout->addLayout(info);
+//        if (info->parent() == nullptr)
+//            layout->addLayout(info);
+
+        math->setVisible(true);
+        position->setVisible(true);
+        pattern->setVisible(true);
+        value->setVisible(true);
+        accept->setVisible(true);
+        remove->setVisible(true);
+        insert->setVisible(true);
 
         math->setChecked(!snippet.regular());
         position->setText(QString::number(snippet.position()));
@@ -202,8 +224,11 @@ void SettingsDialog::appendSnippetsList()
         if (pos < 0 || pos > value->toPlainText().size())
             ok = false;
 
+        if (pattern->toPlainText().size() == 0 || value->toPlainText().size() == 0)
+            ok = false;
+
         if (!ok) {
-            QMessageBox(QMessageBox::Warning, "Warning", "Incorrect final caret index").exec();
+            QMessageBox(QMessageBox::Warning, "Warning", "Incorrect snippet data").exec();
             return;
         }
 
@@ -215,7 +240,44 @@ void SettingsDialog::appendSnippetsList()
         Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
     });
 
+    connect(remove, &QPushButton::clicked, this, [list, math, position, pattern, value, accept, remove, insert] () {
+        SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
+        QVector<Snippet> &snippets = manager.snippets();
+        int index = list->currentRow();
+
+        snippets.remove(index);
+        Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
+
+        math->setVisible(false);
+        position->setVisible(false);
+        pattern->setVisible(false);
+        value->setVisible(false);
+        accept->setVisible(false);
+        remove->setVisible(false);
+        insert->setVisible(false);
+
+        list->clear();
+        for (const Snippet &snippet : snippets)
+            list->addItem(snippet.pattern().replace("\n", " "));
+    });
+
+    connect(insert, &QPushButton::clicked, this, [list, math, position, pattern, value, accept, remove, insert] () {
+        SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
+        QVector<Snippet> &snippets = manager.snippets();
+        int index = list->currentRow();
+
+        snippets.insert(index, Snippet(true, "Pattern", "Value"));
+        Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
+
+        list->clear();
+        for (const Snippet &snippet : snippets)
+            list->addItem(snippet.pattern().replace("\n", " "));
+
+        list->setCurrentRow(index);
+    });
+
     layout->addWidget(list, 0, Qt::AlignLeft);
+    layout->addLayout(info);
 
     box->setLayout(layout);
 

@@ -16,7 +16,16 @@ public:
     Figure* copy() const;
     void clear();
 
+    /**
+     * @brief Returns text of figure
+     * @return Text
+     */
     QString text() const;
+
+    /**
+     * @brief Sets text of figure
+     * @param Text
+     */
     void setText(const QString &value);
 
 private:

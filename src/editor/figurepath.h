@@ -18,8 +18,19 @@ public:
     QString latex() const;
     Figure* copy() const;
     void clear();
+
+    /**
+     * @brief Returns vector of points which represent path
+     * @return
+     */
     const QVector<QPointF>& path() const;
+
+    /**
+     * @brief Sets path of figure
+     * @param Path
+     */
     void setPath(const QVector<QPointF>& value);
+
     QStringList modifiers() const;
 
 private:

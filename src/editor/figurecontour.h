@@ -9,6 +9,9 @@
 class FigureContour : public virtual Figure
 {
 public:
+    /**
+     * @brief Enum type
+     */
     enum Stroke
     {
         Solid,
@@ -18,7 +21,16 @@ public:
     void paint(QPainter *painter) const;
     QStringList modifiers() const;
 
+    /**
+     * @brief Sets stroke of figure
+     * @param Stroke
+     */
     void setStroke(Stroke value);
+
+    /**
+     * @brief Returns figure stroke
+     * @return Stroke
+     */
     Stroke stroke() const;
 
 private:

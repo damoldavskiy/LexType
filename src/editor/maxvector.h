@@ -10,12 +10,21 @@ template <typename T>
 class MaxVector
 {
 public:
+    /**
+     * @brief Constructs MaxVector
+     * @param Initial number of elements
+     */
     explicit MaxVector(int n)
         : _values(n), _max(0)
     {
         Q_ASSERT(n > 0);
     }
 
+    /**
+     * @brief Sets element by index
+     * @param Position of element
+     * @param New element
+     */
     void set(int pos, T value)
     {
         Q_ASSERT(pos >= 0);
@@ -31,6 +40,12 @@ public:
         Q_ASSERT(_max < _values.size());
     }
 
+    /**
+     * @brief Inserts specified count of elements (by copying)
+     * @param Position to insert
+     * @param Count of elements inserted
+     * @param Element to insert
+     */
     void insert(int pos, int count, T value)
     {
         Q_ASSERT(pos >= 0);
@@ -43,6 +58,11 @@ public:
         _values.insert(pos, count, value);
     }
 
+    /**
+     * @brief Removes specified count of elements
+     * @param Start position
+     * @param Count of elements
+     */
     void remove(int pos, int count)
     {
         Q_ASSERT(pos >= 0);
@@ -57,6 +77,11 @@ public:
             _max -= count;
     }
 
+    /**
+     * @brief Returns element at index
+     * @param Position
+     * @return Element
+     */
     T operator [](int pos) const
     {
         Q_ASSERT(pos >= 0);
@@ -65,6 +90,10 @@ public:
         return _values[pos];
     }
 
+    /**
+     * @brief Returns maximum element
+     * @return Maximum
+     */
     T max() const
     {
         return _values[_max];

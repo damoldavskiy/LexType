@@ -16,12 +16,31 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *_parent = 0);
+    /**
+     * @brief Constructs main window of viewer
+     * @param Parent widget
+     */
+    MainWindow(QWidget *parent = 0);
 
 public slots:
+    /**
+     * @brief Opens new file
+     */
     void open();
+
+    /**
+     * @brief Quits viewer
+     */
     void quit();
+
+    /**
+     * @brief Zoom in current document
+     */
     void zoomIn();
+
+    /**
+     * @brief Zoom out current document
+     */
     void zoomOut();
 
 private slots:
@@ -33,7 +52,6 @@ private:
     void loadDocument();
 
     QScrollArea *_scroll;
-    QWidget *_parent;
     QVBoxLayout *_layout;
 
     QAction *_openAction;

@@ -9,6 +9,9 @@
 class FigureArrow : public virtual FigureContour
 {
 public:
+    /**
+     * @brief Tip type
+     */
     enum Tip
     {
         Soft,
@@ -16,9 +19,24 @@ public:
         Double
     };
 
+    /**
+     * @brief Draws the arrow
+     * @param Painter
+     * @param Center of arrow
+     * @param Angle from the horizontal axis
+     */
     void drawArrow(QPainter *painter, QPointF point, qreal angle) const;
 
+    /**
+     * @brief Sets figure tip
+     * @param Tip
+     */
     void setTip(Tip value);
+
+    /**
+     * @brief Returns figure tip
+     * @return Tip
+     */
     Tip tip() const;
 
     QStringList modifiers() const;

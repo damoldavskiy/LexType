@@ -18,7 +18,16 @@ public:
     void paint(QPainter *painter) const;
     QStringList modifiers() const;
 
+    /**
+     * @brief Sets fill type of figure
+     * @param Fill
+     */
     void setFill(Fill value);
+
+    /**
+     * @brief Returns fill type of figure
+     * @return Fill
+     */
     Fill fill() const;
 
 private:

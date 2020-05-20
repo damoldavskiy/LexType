@@ -3,8 +3,6 @@
 #include <QColor>
 #include <QFont>
 
-#include "snippetmanager.h"
-
 bool Styler::init()
 {
     if (_settings.allKeys().size() > 0)

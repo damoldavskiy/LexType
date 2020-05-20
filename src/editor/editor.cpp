@@ -126,7 +126,7 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
     } while (all);
 
     limit(_pos, 0, _text.size());
-    limit(_spos, -1, _text.size());
+    _spos = -1;
 
     updateUi(true);
 }
@@ -558,7 +558,6 @@ int Editor::findPos(qreal x, qreal y) const
 QPointF Editor::findShift(int pos) const
 {
     Q_ASSERT(pos >= 0);
-    int s = _text.size();
     Q_ASSERT(pos <= _text.size());
 
     int line = _text.findLine(pos);
