@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->setStyleSheet(Styler::get<QString>("menu-style"));
     statusBar()->setStyleSheet(Styler::get<QString>("status-style"));
 
-    connect(_editor, SIGNAL(typed(int, QChar)), this, SLOT(typed(int, QChar)));
+    connect(_editor, &Editor::typed, this, &MainWindow::typed);
 }
 
 void MainWindow::open()

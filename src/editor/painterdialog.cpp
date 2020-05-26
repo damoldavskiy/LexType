@@ -49,18 +49,18 @@ PainterDialog::PainterDialog(QWidget *parent)
     layout()->addWidget(_painter);
     layout()->addWidget(_editor);
 
-    connect(_toolkit, SIGNAL(line()), this, SLOT(line()));
-    connect(_toolkit, SIGNAL(rectangle()), this, SLOT(rectangle()));
-    connect(_toolkit, SIGNAL(ellipse()), this, SLOT(ellipse()));
-    connect(_toolkit, SIGNAL(path()), this, SLOT(path()));
-    connect(_toolkit, SIGNAL(text()), this, SLOT(text()));
-    connect(_toolkit, SIGNAL(lineSolid()), this, SLOT(lineSolid()));
-    connect(_toolkit, SIGNAL(lineDash()), this, SLOT(lineDash()));
-    connect(_toolkit, SIGNAL(tipSoft()), this, SLOT(tipSoft()));
-    connect(_toolkit, SIGNAL(tipArrow()), this, SLOT(tipArrow()));
-    connect(_toolkit, SIGNAL(tipDouble()), this, SLOT(tipDouble()));
-    connect(_toolkit, SIGNAL(fillSolid()), this, SLOT(fillSolid()));
-    connect(_toolkit, SIGNAL(fillEmpty()), this, SLOT(fillEmpty()));
+    connect(_toolkit, &PainterToolkit::line, this, &PainterDialog::line);
+    connect(_toolkit, &PainterToolkit::rectangle, this, &PainterDialog::rectangle);
+    connect(_toolkit, &PainterToolkit::ellipse, this, &PainterDialog::ellipse);
+    connect(_toolkit, &PainterToolkit::path, this, &PainterDialog::path);
+    connect(_toolkit, &PainterToolkit::text, this, &PainterDialog::text);
+    connect(_toolkit, &PainterToolkit::lineSolid, this, &PainterDialog::lineSolid);
+    connect(_toolkit, &PainterToolkit::lineDash, this, &PainterDialog::lineDash);
+    connect(_toolkit, &PainterToolkit::tipSoft, this, &PainterDialog::tipSoft);
+    connect(_toolkit, &PainterToolkit::tipArrow, this, &PainterDialog::tipArrow);
+    connect(_toolkit, &PainterToolkit::tipDouble, this, &PainterDialog::tipDouble);
+    connect(_toolkit, &PainterToolkit::fillSolid, this, &PainterDialog::fillSolid);
+    connect(_toolkit, &PainterToolkit::fillEmpty, this, &PainterDialog::fillEmpty);
 
     new QShortcut(QKeySequence("Ctrl+D"), this, SLOT(accept()));
     new QShortcut(QKeySequence("Ctrl+Shift+D"), this, SLOT(close()));

@@ -26,7 +26,7 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
     setFocusPolicy(Qt::ClickFocus);
     updateSettings();
 
-    connect(_timer, SIGNAL(timeout()), this, SLOT(tick()));
+    connect(_timer, &QTimer::timeout, this, &Editor::tick);
     _timer->start(_timerInterval);
 }
 
