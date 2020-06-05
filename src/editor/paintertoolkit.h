@@ -3,84 +3,26 @@
 
 #include <QToolBar>
 
-/**
- * @brief Toolbar widget for painter dialog
- */
 class PainterToolkit : public QToolBar
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs painter toolkit (tool bar with painter tools)
-     * @param Parent widget
-     */
     PainterToolkit(QWidget* parent = 0);
-
-    /**
-     * @brief Resets selection
-     */
     void reset();
 
 signals:
-    /**
-     * @brief Line selected
-     */
     void line();
-
-    /**
-     * @brief Rectangle selected
-     */
     void rectangle();
-
-    /**
-     * @brief Ellipse selected
-     */
     void ellipse();
-
-    /**
-     * @brief Path selected
-     */
     void path();
-
-    /**
-     * @brief Text selected
-     */
     void text();
-
-    /**
-     * @brief Solid line selected
-     */
     void lineSolid();
-
-    /**
-     * @brief Dash line selected
-     */
     void lineDash();
-
-    /**
-     * @brief Soft tip selected
-     */
     void tipSoft();
-
-    /**
-     * @brief Single-directional arrow selected
-     */
     void tipArrow();
-
-    /**
-     * @brief Double-directional arrow selected
-     */
     void tipDouble();
-
-    /**
-     * @brief Emtpy fill selected
-     */
     void fillEmpty();
-
-    /**
-     * @brief Solid fill selected
-     */
     void fillSolid();
 
 private:

@@ -3,9 +3,6 @@
 
 #include "figure.h"
 
-/**
- * @brief Text figure
- */
 class FigureText : public Figure
 {
 public:
@@ -16,16 +13,7 @@ public:
     Figure* copy() const;
     void clear();
 
-    /**
-     * @brief Returns text of figure
-     * @return Text
-     */
     QString text() const;
-
-    /**
-     * @brief Sets text of figure
-     * @param Text
-     */
     void setText(const QString &value);
 
 private:

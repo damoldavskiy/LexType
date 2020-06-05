@@ -10,66 +10,22 @@
 #include "pathwatcher.h"
 #include "snippetmanager.h"
 
-/**
- * @brief Application main window class
- */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs main window and application
-     * @param Parent widget
-     */
     MainWindow(QWidget *parent = 0);
 
 public slots:
-    /**
-     * @brief Opens file
-     */
     void open();
-
-    /**
-     * @brief Saves file without dialog
-     */
     void save();
-
-    /**
-     * @brief Saves file with dialog
-     */
     void saveAs();
-
-    /**
-     * @brief Quits the application
-     */
     void quit();
-
-    /**
-     * @brief Opens find dialog
-     */
     void find();
-
-    /**
-     * @brief Tries to compile current text
-     */
     void compile();
-
-    /**
-     * @brief Opens painter dialog
-     */
     void painter();
-
-    /**
-     * @brief Opens options dialog
-     */
     void options();
-
-    /**
-     * @brief Updates application when users types data to editor
-     * @param Position of typing
-     * @param Sybsol typed
-     */
     void typed(int pos, QChar symbol);
 
 private slots:

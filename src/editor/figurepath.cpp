@@ -124,24 +124,6 @@ QString FigurePath::latex() const
     return result + ";";
 }
 
-QVector<QPointF> FigurePath::getPoints() const
-{
-    QVector<QPointF> points { _path[0] };
-
-    for (int i = 1; i < _path.size(); ++i) {
-        points.append(_path[i]);
-        if (i % 2 == 0 && i < _path.size() - 1)
-            points.append((_path[i] + _path[i + 1]) / 2);
-    }
-
-    return points;
-}
-
-bool FigurePath::isCycle(const QVector<QPointF> &points)
-{
-    return Math::dist(points.first(), points.last()) < _cycleDist;
-}
-
 Figure* FigurePath::copy() const
 {
     FigurePath* figure = new FigurePath;
@@ -159,16 +141,6 @@ void FigurePath::clear()
     _path.clear();
 }
 
-const QVector<QPointF>& FigurePath::path() const
-{
-    return _path;
-}
-
-void FigurePath::setPath(const QVector<QPointF> &value)
-{
-    _path = value;
-}
-
 QStringList FigurePath::modifiers() const
 {
     QStringList listArrow = FigureArrow::modifiers();
@@ -179,4 +151,32 @@ QStringList FigurePath::modifiers() const
     }
 
     return listArrow + listFill;
+}
+
+const QVector<QPointF>& FigurePath::path() const
+{
+    return _path;
+}
+
+void FigurePath::setPath(const QVector<QPointF> &value)
+{
+    _path = value;
+}
+
+QVector<QPointF> FigurePath::getPoints() const
+{
+    QVector<QPointF> points { _path[0] };
+
+    for (int i = 1; i < _path.size(); ++i) {
+        points.append(_path[i]);
+        if (i % 2 == 0 && i < _path.size() - 1)
+            points.append((_path[i] + _path[i + 1]) / 2);
+    }
+
+    return points;
+}
+
+bool FigurePath::isCycle(const QVector<QPointF> &points)
+{
+    return Math::dist(points.first(), points.last()) < _cycleDist;
 }

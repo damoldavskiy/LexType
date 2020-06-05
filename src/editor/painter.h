@@ -9,55 +9,24 @@
 #include "figure.h"
 #include "figurepath.h"
 
-/**
- * @brief Main painter widget
- */
 class Painter : public QWidget
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs painter
-     * @param Parent widget
-     */
     Painter(QWidget *parent = 0);
-
     ~Painter();
 
-    /**
-     * @brief Returns LaTeX representation of current painting
-     * @return LaTeX string
-     */
     QString latex() const;
 
-    /**
-     * @brief Returns current figure
-     * @return Figure
-     */
     Figure* figure() const;
-
-    /**
-     * @brief Sets current figure
-     * @param Pointer to new current figure
-     */
     void setFigure(Figure* value);
 
 signals:
-    /**
-     * @brief Called when user releases current figure
-     */
     void released();
 
 public slots:
-    /**
-     * @brief Undo last figure insert
-     */
     void undo();
-
-    /**
-     * @brief Redo last figure insert
-     */
     void redo();
 
 protected:

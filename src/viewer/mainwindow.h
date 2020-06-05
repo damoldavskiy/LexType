@@ -16,31 +16,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs main window of viewer
-     * @param Parent widget
-     */
     MainWindow(QWidget *parent = 0);
 
 public slots:
-    /**
-     * @brief Opens new file
-     */
     void open();
-
-    /**
-     * @brief Quits viewer
-     */
     void quit();
-
-    /**
-     * @brief Zoom in current document
-     */
     void zoomIn();
-
-    /**
-     * @brief Zoom out current document
-     */
     void zoomOut();
 
 private slots:

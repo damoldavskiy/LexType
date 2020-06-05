@@ -3,9 +3,6 @@
 
 #include "QString"
 
-/**
- * @brief Used to save information about user changes in editor
- */
 struct Action
 {
     enum Type

@@ -3,9 +3,6 @@
 
 #include "figurearrow.h"
 
-/**
- * @brief Line figure
- */
 class FigureLine : public FigureArrow
 {
 public:

@@ -2,16 +2,6 @@
 
 #include "styler.h"
 
-void FigureFillable::setFill(Fill value)
-{
-    _fill = value;
-}
-
-FigureFillable::Fill FigureFillable::fill() const
-{
-    return _fill;
-}
-
 void FigureFillable::paint(QPainter *painter) const
 {
     FigureContour::paint(painter);
@@ -34,4 +24,14 @@ QStringList FigureFillable::modifiers() const
         list.append("fill=black");
 
     return list;
+}
+
+void FigureFillable::setFill(Fill value)
+{
+    _fill = value;
+}
+
+FigureFillable::Fill FigureFillable::fill() const
+{
+    return _fill;
 }

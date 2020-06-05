@@ -3,9 +3,6 @@
 
 #include "figurefillable.h"
 
-/**
- * @brief Ellipse figure
- */
 class FigureEllipse : public FigureFillable
 {
 public:

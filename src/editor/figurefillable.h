@@ -3,9 +3,6 @@
 
 #include "figurecontour.h"
 
-/**
- * @brief Represents a figure which has internal area
- */
 class FigureFillable : public virtual FigureContour
 {
 public:
@@ -18,16 +15,7 @@ public:
     void paint(QPainter *painter) const;
     QStringList modifiers() const;
 
-    /**
-     * @brief Sets fill type of figure
-     * @param Fill
-     */
     void setFill(Fill value);
-
-    /**
-     * @brief Returns fill type of figure
-     * @return Fill
-     */
     Fill fill() const;
 
 private:
