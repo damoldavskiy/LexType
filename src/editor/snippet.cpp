@@ -30,7 +30,7 @@ bool Snippet::apply(Editor *editor) const
     if (pos < 0)
         return false;
 
-    if (_regular ^ (editor->markup(editor->caret() - 1) == Interval::Regular))
+    if (_regular ^ (editor->markup(editor->caret() - 1) != Interval::Mathematics))
         return false;
 
     for (int i = 0; i < _pattern.size(); ++i)
