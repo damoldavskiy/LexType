@@ -46,15 +46,17 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     QListWidgetItem *generalItem = new QListWidgetItem("General");
     QListWidgetItem *editorItem = new QListWidgetItem("Editor");
+    QListWidgetItem *viewerItem = new QListWidgetItem("Viewer");
     QListWidgetItem *snippetsItem = new QListWidgetItem("Snippets");
     QListWidgetItem *mathItem = new QListWidgetItem("Math mode");
 
     _list->addItem(generalItem);
     _list->addItem(editorItem);
+    _list->addItem(viewerItem);
     _list->addItem(snippetsItem);
     _list->addItem(mathItem);
 
-    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, editorItem, snippetsItem, mathItem] (QListWidgetItem *item) {
+    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, editorItem, viewerItem, snippetsItem, mathItem] (QListWidgetItem *item) {
         clearForm();
         if (item == generalItem) {
             appendCheckBoxes(Properties {
@@ -71,18 +73,24 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-mathematics", "Editor mathematics" },
                 { "editor-command", "Editor command" },
                 { "editor-special", "Editor special" },
+                { "editor-comment", "Editor comment" },
                 { "editor-line", "Editor line" },
                 { "editor-selection", "Editor selection" },
                 { "editor-caret", "Editor caret" },
                 { "numbers-back", "Numbers background" },
                 { "numbers-fore", "Numbers foreground" },
-                { "numbers-current", "Numbers current" },
+                { "numbers-current", "Numbers current" }
             });
 
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
-                { "editor-flag-autocompile", "Compile on type" },
+                { "editor-flag-autocompile", "Compile on type" }
+            });
+        } else if (item == viewerItem) {
+            appendColorButtons(Properties {
+                { "viewer-back", "Document background" },
+                { "viewer-fore", "Document foreground" }
             });
         } else if (item == snippetsItem) {
             appendCheckBoxes(Properties {
@@ -93,7 +101,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             appendSnippetsList();
         } else if (item == mathItem) {
             appendCheckBoxes(Properties {
-                { "editor-flag-keyboard", "Inverse keyboard layout in math mode" },
+                { "editor-flag-keyboard", "Inverse keyboard layout in math mode" }
             });
         }
     });

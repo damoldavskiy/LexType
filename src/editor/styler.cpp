@@ -30,6 +30,7 @@ bool Styler::init()
     set("editor-mathematics", QColor { 180, 180, 240 });
     set("editor-command", QColor { 220, 120, 120 });
     set("editor-special", QColor { 230, 160, 90 });
+    set("editor-comment", QColor { 220, 70, 70 });
     set("editor-line", QColor { 55, 55, 55 });
     set("editor-selection", QColor { 40, 60, 130, 90 });
     set("editor-caret", QColor { 240, 240, 240 });

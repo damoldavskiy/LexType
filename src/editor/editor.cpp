@@ -249,6 +249,9 @@ void Editor::paintEvent(QPaintEvent *)
                 case Interval::Special:
                     painter.setPen(Styler::get<QColor>("editor-special"));
                     break;
+                case Interval::Comment:
+                    painter.setPen(Styler::get<QColor>("editor-comment"));
+                    break;
                 }
 
                 cwidth = _text.advanceWidth(left, pos);

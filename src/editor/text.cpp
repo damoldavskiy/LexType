@@ -247,26 +247,31 @@ void Text::updateMarkup(int) // TODO Unused parameter
 
     // TODO Extremely inefficient
     for (int i = 0; i < _data.size(); ++i) {
-        if (_data[i] == '`')
-            math = !math;
+        if (_data[i] == '%' || (i > 0 && _markup.interval(i - 1) == Interval::Comment && _data[i] != '\n')) {
+            interval = Interval::Comment;
+            math = false;
+        } else {
+            if (_data[i] == '`')
+                math = !math;
 
-        if (_data[i] == '`' || math)
-            interval = Interval::Mathematics;
-        else
-            interval = Interval::Regular;
-
-        if ((interval == Interval::Regular && _data[i] == '\\') || (i > 0 && _markup.interval(i - 1) == Interval::Command))
-            interval = Interval::Command;
-
-        if (i > 0 && _markup.interval(i - 1) == Interval::Command) {
-            if (_data[i].isLetter())
-                interval = Interval::Command;
-            else if (_data[i] != '\\') // \\ should be colored both
+            if (_data[i] == '`' || math)
+                interval = Interval::Mathematics;
+            else
                 interval = Interval::Regular;
-        }
 
-        if (interval == Interval::Regular && (_data[i] == '{' || _data[i] == '}' || _data[i] == '$'))
-            interval = Interval::Special;
+            if ((interval == Interval::Regular && _data[i] == '\\') || (i > 0 && _markup.interval(i - 1) == Interval::Command))
+                interval = Interval::Command;
+
+            if (i > 0 && _markup.interval(i - 1) == Interval::Command) {
+                if (_data[i].isLetter())
+                    interval = Interval::Command;
+                else if (_data[i] != '\\') // \\ should be colored both
+                    interval = Interval::Regular;
+            }
+
+            if (interval == Interval::Regular && (_data[i] == '{' || _data[i] == '}' || _data[i] == '$'))
+                interval = Interval::Special;
+        }
 
         _markup.setInterval(i, i + 1, interval);
     }

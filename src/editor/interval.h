@@ -6,7 +6,8 @@ enum Interval
     Regular,
     Mathematics,
     Command,
-    Special
+    Special,
+    Comment
 };
 
 #endif // INTERVAL_H
