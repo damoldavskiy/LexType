@@ -5,7 +5,6 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QFontDialog>
-#include <QColorDialog>
 #include <QAction>
 #include <QTextEdit>
 #include <QLineEdit>
@@ -14,6 +13,7 @@
 
 #include "styler.h"
 #include "snippetmanager.h"
+#include "colorbutton.h"
 
 QString fontToString(const QFont &font)
 {
@@ -129,14 +129,11 @@ void SettingsDialog::appendFontButtons(const Properties &pairs)
 void SettingsDialog::appendColorButtons(const Properties &pairs)
 {
     for (const auto &pair : pairs) {
-        QPushButton *button = new QPushButton(Styler::get<QColor>(pair.first).name());
+        ColorButton *button = new ColorButton;
         button->setMaximumWidth(200);
-        connect(button, &QPushButton::pressed, this, [button, pair] () {
-            QColor color = QColorDialog::getColor(Styler::get<QColor>(pair.first));
-            if (color.isValid()) {
-                Styler::set(pair.first, color);
-                button->setText(Styler::get<QColor>(pair.first).name());
-            }
+        button->setColor(Styler::get<QColor>(pair.first));
+        connect(button, &ColorButton::selected, this, [pair] (QColor color) {
+            Styler::set(pair.first, color);
         });
         _form->addRow(pair.second, button);
     }
@@ -203,9 +200,6 @@ void SettingsDialog::appendSnippetsList()
         if (index == -1)
             return;
         Snippet &snippet = snippets[index];
-
-//        if (info->parent() == nullptr)
-//            layout->addLayout(info);
 
         math->setVisible(true);
         position->setVisible(true);

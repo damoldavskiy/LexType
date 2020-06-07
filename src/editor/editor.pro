@@ -30,7 +30,8 @@ SOURCES += \
     paintertoolkit.cpp \
     gapbuffer.cpp \
     snippetmanager.cpp \
-    finddialog.cpp
+    finddialog.cpp \
+    colorbutton.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -66,7 +67,8 @@ HEADERS += \
     paintertoolkit.h \
     gapbuffer.h \
     snippetmanager.h \
-    finddialog.h
+    finddialog.h \
+    colorbutton.h
 
 RESOURCES += \
     images.qrc
