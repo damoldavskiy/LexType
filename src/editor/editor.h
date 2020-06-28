@@ -27,6 +27,8 @@ public:
     Interval markup(int pos) const;
     void updateSettings();
 
+    int nextWordEnd(int pos, int dir) const;
+
 signals:
     void typed(int pos, QChar symbol);
 

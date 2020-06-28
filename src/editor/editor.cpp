@@ -93,6 +93,16 @@ void Editor::updateSettings()
     }
 }
 
+int Editor::nextWordEnd(int pos, int dir) const
+{
+    for (pos += dir; pos + dir >= 0 && pos + dir < _text.size(); pos += dir)
+        if (!_text[pos].isSpace() && _text[pos + dir].isSpace())
+            return pos;
+    if (pos <= 0)
+        return 0;
+    return _text.size() - 1;
+}
+
 void Editor::find(const QString &substring, bool matchCase)
 {
     if (substring.size() == 0)
@@ -281,7 +291,7 @@ void Editor::paintEvent(QPaintEvent *)
 
 void Editor::keyPressEvent(QKeyEvent *event)
 {
-    int line;
+    int line, newpos;
 
     switch (event->key()) {
     case Qt::Key_Backspace:
@@ -297,29 +307,37 @@ void Editor::keyPressEvent(QKeyEvent *event)
             removeText(_pos, 1);
         break;
     case Qt::Key_Left:
+        newpos = _pos - 1;
+        if (event->modifiers() & Qt::ControlModifier)
+            newpos = nextWordEnd(_pos, -1);
+
         if (event->modifiers() & Qt::ShiftModifier) {
             if (_spos == -1)
                 _spos = _pos;
             if (_pos > 0)
-                --_pos;
+                _pos = newpos;
         } else if (_spos != -1) {
             _pos = qMin(_pos, _spos);
             _spos = -1;
         } else if (_pos > 0) {
-            --_pos;
+            _pos = newpos;
         }
         break;
     case Qt::Key_Right:
+        newpos = _pos + 1;
+        if (event->modifiers() & Qt::ControlModifier)
+            newpos = nextWordEnd(_pos, 1) + 1;
+
         if (event->modifiers() & Qt::ShiftModifier) {
             if (_spos == -1)
                 _spos = _pos;
             if (_pos < _text.size())
-                ++_pos;
+                _pos = newpos;
         } else if (_spos != -1) {
             _pos = qMax(_pos, _spos);
             _spos = -1;
         } else if (_pos < _text.size()) {
-            ++_pos;
+            _pos = newpos;
         }
         break;
     case Qt::Key_Up:
