@@ -106,6 +106,43 @@ QString MathWriter::pass(const QString &source)
     return result;
 }
 
+QString MathWriter::applyParameters(QString source)
+{
+    // TODO \\sqrt(x + 2) -> \\sqrt{x + 2}, \\lim(x -> 0) -> \\lim_{x -> 0}
+    return source;
+}
+
+QString MathWriter::applyMatrices(QString source)
+{
+    QVector<QVector<QString>> matrices {
+        { "\\\\left(", "\\right)", "pmatrix" },
+        { "\\\\left[", "\\right]", "bmatrix" },
+        { "\\{", "}", "Bmatrix" },
+        { "\\|", "|", "vmatrix" },
+    };
+
+    for (int i = 0; i < source.size() - 1; ++i)
+        for (const QVector<QString> &pattern : matrices)
+            if (source.size() - i >= pattern[0].size() && source.mid(i, pattern[0].size()) == pattern[0]) {
+                source.replace(i, pattern[0].size(), "\\begin{" + pattern[2] + '}');
+                i += 8 + pattern[2].size();
+                for (; source.size() - i >= pattern[1].size() && source.mid(i, pattern[1].size()) != pattern[1]; ++i) {
+                    if (source[i] == ',') {
+                        source.replace(i, 1, " & ");
+                        i += 3;
+                    } else if (source[i] == ';') {
+                        source.replace(i, 1, " \\\\ ");
+                        i += 4;
+                    }
+                }
+                source.replace(i, pattern[1].size(), "\\end{" + pattern[2] + "}");
+                i += 6 + pattern[2].size();
+                break;
+            }
+
+    return source;
+}
+
 QString MathWriter::applyFractions(QString source)
 {
     for (int i = 0; i < source.size(); ++i) {
@@ -138,18 +175,14 @@ QString MathWriter::applyFractions(QString source)
     return source;
 }
 
-QString MathWriter::applyParameters(QString source)
-{
-    // TODO \\sqrt(x + 2) -> \\sqrt{x + 2}, \\lim(x -> 0) -> \\lim_{x -> 0}
-    return source;
-}
-
-QString MathWriter::apply(QString source)
+QString MathWriter::apply(const QString &source)
 {
     QVector<QPair<QString, QString>> dict;
 
     dict.append({ "(", "\\left(" });
     dict.append({ ")", "\\right)" });
+    dict.append({ "[", "\\left[" });
+    dict.append({ "]", "\\right]" });
     dict.append({ "⟨", "\\left\\langle" });
     dict.append({ "⟩", "\\right\\rangle" });
 
@@ -253,9 +286,6 @@ QString MathWriter::apply(QString source)
     dict.append({ "Ω", "{\\Omega}" });
     dict.append({ "ω", "{\\omega}" });
 
-    // TODO More effective
-    source = applyFractions(source);
-
     QString result;
 
     for (int i = 0; i < source.size(); ++i) {
@@ -278,7 +308,10 @@ QString MathWriter::apply(QString source)
         result += source[i];
     }
 
+    // TODO More effective
     result = applyParameters(result);
+    result = applyMatrices(result);
+    result = applyFractions(result);
 
     return result;
 }

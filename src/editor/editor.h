@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QTime>
 
 #include "text.h"
 #include "linenumbers.h"
@@ -49,6 +50,7 @@ protected:
     void paintEvent(QPaintEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
@@ -57,6 +59,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
     bool event(QEvent *event);
 
+    void mouseTripleClick(QMouseEvent *event);
     void removeSelection();
     void updateShift();
     void updateShift(QPointF point);
@@ -66,10 +69,8 @@ protected:
     void insertText(int pos, const QString &text);
     void removeText(int pos, int count);
 
-    int findPos(qreal x, qreal y) const;
+    int findPos(qreal x, qreal y, bool exact = false) const;
     QPointF findShift(int pos) const;
-//    qreal advanceWidth(qreal left, int pos) const;
-//    qreal lineWidth(int line) const;
 
 private:
     Text _text;
@@ -84,6 +85,10 @@ private:
     bool _caret = true;
 
     int _timerInterval = 600;
+
+    QTime _lastDoubleClick;
+    int _doubleX;
+    int _doubleY;
 };
 
 #endif // EDITOR_H

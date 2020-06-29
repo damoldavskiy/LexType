@@ -19,6 +19,15 @@ void limit(T& value, T min, T max)
         value = max;
 }
 
+int charClass(QChar symbol)
+{
+    if (symbol.isLetterOrNumber())
+        return 0;
+    else if (symbol.isSpace())
+        return 1;
+    return 2;
+}
+
 Editor::Editor(QWidget *parent, LineNumbers *numbers)
     : QWidget(parent), _text(font()), _numbers(numbers) // TODO Pass font parameter
 {
@@ -95,8 +104,9 @@ void Editor::updateSettings()
 
 int Editor::nextWordEnd(int pos, int dir) const
 {
+    // TODO Customize
     for (pos += dir; pos + dir >= 0 && pos + dir < _text.size(); pos += dir)
-        if (!_text[pos].isSpace() && _text[pos + dir].isSpace())
+        if (!_text[pos].isSpace() && charClass(_text[pos]) != charClass(_text[pos + dir]))
             return pos;
     if (pos <= 0)
         return 0;
@@ -246,32 +256,32 @@ void Editor::paintEvent(QPaintEvent *)
 
             left += cwidth;
             if (pos < end) {
-                switch (_text.markup(pos)) {
-                case Interval::Regular:
-                    painter.setPen(Styler::get<QColor>("editor-regular"));
-                    break;
-                case Interval::Mathematics:
-                    painter.setPen(Styler::get<QColor>("editor-mathematics"));
-                    break;
-                case Interval::Command:
-                    painter.setPen(Styler::get<QColor>("editor-command"));
-                    break;
-                case Interval::Special:
-                    painter.setPen(Styler::get<QColor>("editor-special"));
-                    break;
-                case Interval::Comment:
-                    painter.setPen(Styler::get<QColor>("editor-comment"));
-                    break;
-                }
-
                 cwidth = _text.advanceWidth(left, pos);
+
+                if (_spos != -1 && (_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos)) {
+                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
+                    painter.setPen(Styler::get<QColor>("editor-regular"));
+                } else
+                    switch (_text.markup(pos)) {
+                    case Interval::Regular:
+                        painter.setPen(Styler::get<QColor>("editor-regular"));
+                        break;
+                    case Interval::Mathematics:
+                        painter.setPen(Styler::get<QColor>("editor-mathematics"));
+                        break;
+                    case Interval::Command:
+                        painter.setPen(Styler::get<QColor>("editor-command"));
+                        break;
+                    case Interval::Special:
+                        painter.setPen(Styler::get<QColor>("editor-special"));
+                        break;
+                    case Interval::Comment:
+                        painter.setPen(Styler::get<QColor>("editor-comment"));
+                        break;
+                    }
+
                 if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
                     painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
-
-                // TODO replace with style range
-                if (_spos != -1)
-                    if ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))
-                        painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
             }
 
             if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
@@ -291,7 +301,8 @@ void Editor::paintEvent(QPaintEvent *)
 
 void Editor::keyPressEvent(QKeyEvent *event)
 {
-    int line, newpos;
+    int line;
+    int newpos = -1;
 
     switch (event->key()) {
     case Qt::Key_Backspace:
@@ -306,10 +317,25 @@ void Editor::keyPressEvent(QKeyEvent *event)
         else if (_pos < _text.size())
             removeText(_pos, 1);
         break;
+    case Qt::Key_PageUp:
+        newpos = 0;
+        // Fall through
+    case Qt::Key_Home:
+        if (newpos == -1) {
+            if (event->modifiers() & Qt::ControlModifier)
+                newpos = 0;
+            else {
+                line = _text.findLine(qMax(_pos - 1, 0));
+                newpos = _text.lineStart(line);
+            }
+        }
+        // Fall through
     case Qt::Key_Left:
-        newpos = _pos - 1;
-        if (event->modifiers() & Qt::ControlModifier)
-            newpos = nextWordEnd(_pos, -1);
+        if (newpos == -1) {
+            newpos = _pos - 1;
+            if (event->modifiers() & Qt::ControlModifier)
+                newpos = nextWordEnd(_pos, -1);
+        }
 
         if (event->modifiers() & Qt::ShiftModifier) {
             if (_spos == -1)
@@ -323,10 +349,25 @@ void Editor::keyPressEvent(QKeyEvent *event)
             _pos = newpos;
         }
         break;
+    case Qt::Key_PageDown:
+        newpos = _text.size();
+        // Fall through
+    case Qt::Key_End:
+        if (newpos == -1) {
+            if (event->modifiers() & Qt::ControlModifier)
+                newpos = _text.size();
+            else {
+                line = _text.findLine(qMin(_pos + 1, _text.size()));
+                newpos = _text.lineStart(line) + _text.lineSize(line);
+            }
+        }
+        // Fall through
     case Qt::Key_Right:
-        newpos = _pos + 1;
-        if (event->modifiers() & Qt::ControlModifier)
-            newpos = nextWordEnd(_pos, 1) + 1;
+        if (newpos == -1) {
+            newpos = _pos + 1;
+            if (event->modifiers() & Qt::ControlModifier)
+                newpos = nextWordEnd(_pos - 1, 1) + 1;
+        }
 
         if (event->modifiers() & Qt::ShiftModifier) {
             if (_spos == -1)
@@ -394,9 +435,34 @@ void Editor::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() != Qt::MouseButton::LeftButton)
         return;
+
+    if (QApplication::doubleClickInterval() > _lastDoubleClick.elapsed())
+        if (event->x() == _doubleX && event->y() == _doubleY) {
+            mouseTripleClick(event);
+            return;
+        }
+
     _pos = findPos(event->x(), event->y());
     _spos = _pos;
     updateUi(false);
+}
+
+void Editor::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() != Qt::MouseButton::LeftButton)
+        return;
+
+    if (_text.size() > 0) { // Last symbol of word is selected until text is empty
+        int pos = findPos(event->x(), event->y(), true);
+        _spos = nextWordEnd(pos + 1, -1);
+        _pos = nextWordEnd(pos - 1, 1) + 1;
+        updateUi(false);
+    }
+
+    _lastDoubleClick = QTime::currentTime();
+    _lastDoubleClick.start();
+    _doubleX = event->x();
+    _doubleY = event->y();
 }
 
 void Editor::mouseReleaseEvent(QMouseEvent *)
@@ -476,6 +542,20 @@ bool Editor::event(QEvent *event)
     return QWidget::event(event);
 }
 
+void Editor::mouseTripleClick(QMouseEvent *event)
+{
+    // TODO Customize (select \n on the end of line)
+
+    int pos = findPos(event->x(), event->y(), true);
+    int line = _text.findLine(pos);
+    if (_text.lineSize(line) == 0)
+        return;
+
+    _spos = _text.lineStart(line);
+    _pos = _spos + _text.lineSize(line);
+    updateUi(false);
+}
+
 void Editor::removeSelection()
 {
     Q_ASSERT(_spos != -1);
@@ -540,7 +620,7 @@ void Editor::removeText(int pos, int count)
 //    emit removed(pos, count);
 }
 
-int Editor::findPos(qreal x, qreal y) const
+int Editor::findPos(qreal x, qreal y, bool exact) const
 {
     x += _xshift;
 
@@ -564,7 +644,7 @@ int Editor::findPos(qreal x, qreal y) const
         }
 
         // TODO There was problem with parallel execution, add 'pos > 0 &&' statement if needed
-        if (left - x > width / 2)
+        if (exact || left - x > width / 2)
             --pos;
 
         Q_ASSERT(pos >= 0);
