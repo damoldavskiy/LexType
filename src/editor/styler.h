@@ -7,6 +7,7 @@ class Styler
 {
 public:
     static bool init();
+    static void reset();
 
     template <typename T>
     static T get(const QString &key)

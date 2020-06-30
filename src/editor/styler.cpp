@@ -8,6 +8,12 @@ bool Styler::init()
     if (_settings.allKeys().size() > 0)
         return false;
 
+    reset();
+    return true;
+}
+
+void Styler::reset()
+{
     set("widget-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }");
     set("menu-style", "QWidget { background: rgb(50, 50, 50); color: rgb(240, 240, 240); }"
                       "QMenuBar::item { background: rgb(50, 50, 50); }"
@@ -32,7 +38,9 @@ bool Styler::init()
     set("editor-special", QColor { 230, 160, 90 });
     set("editor-comment", QColor { 220, 70, 70 });
     set("editor-line", QColor { 55, 55, 55 });
-    set("editor-selection", QColor { 40, 50, 80 });
+    set("editor-selection-back", QColor { 40, 70, 120 });
+    set("editor-selection-fore", QColor { 210, 210, 210 });
+    set("editor-error", QColor { 150, 40, 40 });
     set("editor-caret", QColor { 240, 240, 240 });
 
     set("numbers-back", QColor { 50, 50, 50 });
@@ -57,8 +65,6 @@ bool Styler::init()
     set("painter-flag-snippets", true);
 
     set("window-flag-askexit", true);
-
-    return true;
 }
 
 QSettings Styler::_settings("DMSoft", "LexType");

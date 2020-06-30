@@ -62,6 +62,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             appendCheckBoxes(Properties {
                 { "window-flag-askexit", "Ask on exit" }
             });
+            appendResetSettings();
         } else if (item == editorItem) {
             appendFontButtons(Properties {
                 { "editor-font", "Editor font" }
@@ -75,7 +76,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-special", "Editor special" },
                 { "editor-comment", "Editor comment" },
                 { "editor-line", "Editor line" },
-                { "editor-selection", "Editor selection" },
+                { "editor-selection-back", "Editor selection background" },
+                { "editor-selection-fore", "Editor selection text" },
+                { "editor-error", "Editor error" },
                 { "editor-caret", "Editor caret" },
                 { "numbers-back", "Numbers background" },
                 { "numbers-fore", "Numbers foreground" },
@@ -284,4 +287,13 @@ void SettingsDialog::appendSnippetsList()
     box->setLayout(layout);
 
     _form->addRow(box);
+}
+
+void SettingsDialog::appendResetSettings()
+{
+    QPushButton *reset = new QPushButton("Reset to defaults");
+    connect(reset, &QPushButton::clicked, this, [this] () {
+        Styler::reset();
+    });
+    _form->addRow(reset);
 }

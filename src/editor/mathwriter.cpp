@@ -1,8 +1,5 @@
 #include "mathwriter.h"
 
-#include <QVector>
-#include <QStack>
-
 QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
 QVector<QChar> openBraces = { '(', '{', '[' };
 QVector<QChar> closeBraces = { ')', '}', ']' };
@@ -12,7 +9,7 @@ bool isDelimeter(QChar symbol)
     return delimeters.contains(symbol);
 }
 
-bool isOpenBrace(QChar symbol, int direction = 1)
+bool isOpenBrace(QChar symbol, int direction)
 {
     if (direction == 1)
         return openBraces.contains(symbol);
@@ -20,7 +17,7 @@ bool isOpenBrace(QChar symbol, int direction = 1)
         return closeBraces.contains(symbol);
 }
 
-bool isCloseBrace(QChar symbol, int direction = 1)
+bool isCloseBrace(QChar symbol, int direction)
 {
     if (direction == 1)
         return closeBraces.contains(symbol);
@@ -28,61 +25,12 @@ bool isCloseBrace(QChar symbol, int direction = 1)
         return openBraces.contains(symbol);
 }
 
-bool isClosing(QChar open, QChar close, int direction = 1)
+bool isClosing(QChar open, QChar close, int direction)
 {
     if (direction == 1)
         return openBraces.indexOf(open) != -1 && openBraces.indexOf(open) == closeBraces.indexOf(close);
     else
         return openBraces.indexOf(close) != -1 && openBraces.indexOf(close) == closeBraces.indexOf(open);
-}
-
-int findBracePlace(const QString &source, int start, int direction)
-{
-    int i = start + direction;
-    if (i < 0 || i >= source.size() || isDelimeter(source[i]))
-        return  i - direction;
-
-    QStack<QChar> braces;
-    bool bracesFail = false;
-    do {
-        if (isOpenBrace(source[i], direction))
-            braces.push(source[i]);
-        else if (isCloseBrace(source[i], direction)) {
-            if (braces.size() > 0 && isClosing(braces.top(), source[i], direction))
-                braces.pop();
-            else
-                bracesFail = true;
-        }
-        i += direction;
-    } while (i >= 0 && i < source.size() && !bracesFail && (braces.size() > 0 || (braces.size() == 0 && !isDelimeter(source[i]))));
-    i -= direction;
-
-    // (sin(x)/x) -> (\frac{sin(x)}{x})
-    if (isCloseBrace(source[i], direction) && bracesFail)
-        i -= direction;
-
-    return i;
-}
-
-int findBrace(const QString &source, int start, QChar open)
-{
-    QStack<QChar> braces;
-    braces.append(open);
-
-    for (int i = start; i < source.size(); ++i) {
-        if (isOpenBrace(source[i]))
-            braces.push(source[i]);
-        else if (isCloseBrace(source[i])) {
-            if (braces.size() > 0 && isClosing(braces.top(), source[i]))
-                braces.pop();
-            // TODO else brace sequence is incorrect
-        }
-
-        if (braces.size() == 0)
-            return i;
-    }
-
-    return start;
 }
 
 QString MathWriter::pass(const QString &source)

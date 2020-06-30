@@ -64,6 +64,8 @@ protected:
     void updateShift();
     void updateShift(QPointF point);
     void updateUi(bool resetCaret);
+    void highlightSpecial();
+    void highlightBrace(int pos);
     void type(const QString &text);
 
     void insertText(int pos, const QString &text);
@@ -85,6 +87,9 @@ private:
     bool _caret = true;
 
     int _timerInterval = 600;
+
+    QSet<int> _highlighted;
+    QSet<int> _error;
 
     QTime _lastDoubleClick;
     int _doubleX;

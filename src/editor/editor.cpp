@@ -8,6 +8,7 @@
 #include <QStyle>
 
 #include "styler.h"
+#include "mathwriter.h"
 #include "keyboardlayout.h"
 
 template <typename T>
@@ -258,9 +259,9 @@ void Editor::paintEvent(QPaintEvent *)
             if (pos < end) {
                 cwidth = _text.advanceWidth(left, pos);
 
-                if (_spos != -1 && (_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos)) {
-                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
-                    painter.setPen(Styler::get<QColor>("editor-regular"));
+                if ((_spos != -1 && ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))) || _highlighted.contains(pos)) {
+                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
+                    painter.setPen(Styler::get<QColor>("editor-selection-fore"));
                 } else
                     switch (_text.markup(pos)) {
                     case Interval::Regular:
@@ -290,7 +291,7 @@ void Editor::paintEvent(QPaintEvent *)
 
         if (_spos != -1)
             if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
-                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::get<QColor>("editor-selection"));
+                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::get<QColor>("editor-selection-back"));
 
         top += _text.fontHeight();
     }
@@ -592,8 +593,39 @@ void Editor::updateUi(bool resetCaret)
         _timer->start(_timerInterval);
         _caret = true;
     }
+    highlightSpecial();
     updateShift();
     update();
+}
+
+void Editor::highlightSpecial()
+{
+    _highlighted.clear();
+    _error.clear();
+    if (_spos != -1 && _spos != _pos)
+        return;
+    if (_pos < _text.size())
+        highlightBrace(_pos);
+    if (_pos > 0)
+        highlightBrace(_pos - 1);
+}
+
+void Editor::highlightBrace(int pos)
+{
+    int dir = 0;
+    if (isOpenBrace(_text[pos]))
+        dir = 1;
+    else if (isOpenBrace(_text[pos], -1))
+        dir = -1;
+
+    if (dir != 0) {
+        _highlighted.insert(pos);
+        int spos = findBrace(_text, pos, dir);
+        if (spos == -1)
+            _error.insert(pos);
+        else
+            _highlighted.insert(spos);
+    }
 }
 
 void Editor::type(const QString &text)

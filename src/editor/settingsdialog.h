@@ -19,6 +19,7 @@ public:
     void appendColorButtons(const Properties &pairs);
     void appendCheckBoxes(const Properties &pairs);
     void appendSnippetsList();
+    void appendResetSettings();
 
 private:
     QListWidget *_list;
