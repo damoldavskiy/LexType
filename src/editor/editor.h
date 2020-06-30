@@ -91,6 +91,8 @@ private:
     QSet<int> _highlighted;
     QSet<int> _error;
 
+    int _lastLayout;
+
     QTime _lastDoubleClick;
     int _doubleX;
     int _doubleY;
