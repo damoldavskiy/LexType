@@ -10,5 +10,15 @@ QChar KeyboardLayout::pass(QChar symbol)
     return symbol;
 }
 
+bool KeyboardLayout::isLatin(QChar symbol)
+{
+    return _latin.indexOf(symbol) > -1;
+}
+
+bool KeyboardLayout::isCyrillic(QChar symbol)
+{
+    return _cyril.indexOf(symbol) > -1;
+}
+
 QString KeyboardLayout::_latin = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./ ~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?";
 QString KeyboardLayout::_cyril = "ё1234567890-=йцукенгшщзхъ\\фывапролджэячсмитьбю. Ё!\"№;%:?*()_+ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,";

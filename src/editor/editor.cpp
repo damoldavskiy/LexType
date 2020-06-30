@@ -420,8 +420,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         QString text = event->text();
         if (text.size() > 0) {
             // TODO Refactor
-            // TODO Symbol just after mathematics is reversed
-            if (Styler::get<bool>("editor-flag-keyboard") && (text == "ё" || (_pos > 0 && _text.markup(_pos - 1) == Interval::Mathematics)))
+            if (Styler::get<bool>("editor-flag-keyboard") && !KeyboardLayout::isLatin(text[0]) && (text == "ё" || (_pos > 1 && _text.markup(_pos - 1) == Interval::Mathematics && !(_text[_pos - 1] == '`' && _text.markup(_pos - 2) == Interval::Mathematics))))
                 text = KeyboardLayout::pass(text[0]);
             type(text);
             emit typed(_pos - 1, text[0]);
