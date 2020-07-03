@@ -92,8 +92,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             });
         } else if (item == viewerItem) {
             appendColorButtons(Properties {
-                { "viewer-back", "Document background" },
-                { "viewer-fore", "Document foreground" }
+                { "viewer-back", "Viewer background" },
+                { "viewer-paper", "Document paper" },
+                { "viewer-text", "Document text" }
             });
         } else if (item == snippetsItem) {
             appendCheckBoxes(Properties {

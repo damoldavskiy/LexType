@@ -51,7 +51,8 @@ void Styler::reset()
     set("painter-fore", QColor { 240, 240, 240 });
 
     set("viewer-back", QColor { 50, 50, 50 });
-    set("viewer-fore", QColor { 240, 240, 240 });
+    set("viewer-paper", QColor { 60, 60, 60 });
+    set("viewer-text", QColor { 240, 240, 240 });
 
     set("editor-font", QFont("Ubuntu", 11));
 

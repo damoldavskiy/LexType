@@ -14,10 +14,12 @@ SOURCES += \
     ../editor/styler.cpp \
     ../editor/pathwatcher.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    scrollarea.cpp
 
 HEADERS += \
     ../editor/styler.h \
     ../editor/pathwatcher.h \
-    mainwindow.h
+    mainwindow.h \
+    scrollarea.h
 

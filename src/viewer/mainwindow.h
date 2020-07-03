@@ -3,12 +3,10 @@
 
 #include <QMainWindow>
 #include <QMenuBar>
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
-#include <poppler-qt5.h>
 
+#include "scrollarea.h"
 #include "../editor/pathwatcher.h"
 
 class MainWindow : public QMainWindow
@@ -32,15 +30,12 @@ private:
     void createMenus();
     void loadDocument();
 
-    QScrollArea *_scroll;
-    QVBoxLayout *_layout;
+    ScrollArea *_scroll;
 
     QAction *_openAction;
     QAction *_quitAction;
     QAction *_zoomInAction;
     QAction *_zoomOutAction;
-
-    qreal _res = 300;
 
     PathWatcher _path = PathWatcher("LexType Viewer");
 

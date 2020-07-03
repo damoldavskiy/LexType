@@ -144,7 +144,10 @@ void MainWindow::compile()
 
     connect(_compilation, &QProcess::readyRead, this, &MainWindow::output);
     connect(_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
-    _splitter->setSizes({ 7, 3 });
+
+    if (!Styler::get<bool>("editor-flag-autocompile"))
+        _splitter->setSizes({ 7, 3 });
+
     _console->setText("");
     _compilation->start("pdflatex", { fileInfo.filePath() });
 }
@@ -197,7 +200,8 @@ void MainWindow::compiled(int exitCode, QProcess::ExitStatus)
     _console->insert(_console->caret(), "Process finished with exit code " + QString::number(exitCode));
 
     if (exitCode == 0) {
-        _splitter->setSizes({ 1, 0 });
+        if (!Styler::get<bool>("editor-flag-autocompile"))
+            _splitter->setSizes({ 1, 0 });
         statusBar()->showMessage("Compilation successful");
     } else {
         statusBar()->showMessage("Compilation failed");
