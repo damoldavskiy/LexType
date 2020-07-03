@@ -63,29 +63,53 @@ QString MathWriter::applyParameters(QString source)
 QString MathWriter::applyMatrices(QString source)
 {
     QVector<QVector<QString>> matrices {
-        { "\\\\left(", "\\right)", "pmatrix" },
-        { "\\\\left[", "\\right]", "bmatrix" },
+        { "\\(", ")", "pmatrix" },
+        { "\\[", "]", "bmatrix" },
         { "\\{", "}", "Bmatrix" },
-        { "\\|", "|", "vmatrix" },
+        { "{{", "}}", "cases" }
     };
 
     for (int i = 0; i < source.size() - 1; ++i)
         for (const QVector<QString> &pattern : matrices)
             if (source.size() - i >= pattern[0].size() && source.mid(i, pattern[0].size()) == pattern[0]) {
-                source.replace(i, pattern[0].size(), "\\begin{" + pattern[2] + '}');
-                i += 8 + pattern[2].size();
-                for (; source.size() - i >= pattern[1].size() && source.mid(i, pattern[1].size()) != pattern[1]; ++i) {
-                    if (source[i] == ',') {
-                        source.replace(i, 1, " & ");
-                        i += 3;
-                    } else if (source[i] == ';') {
-                        source.replace(i, 1, " \\\\ ");
-                        i += 4;
+
+                int start = i;
+
+                QStack<QChar> braces;
+                for (++i; i < source.size(); ++i) {
+                    if (isOpenBrace(source[i]))
+                        braces.push(source[i]);
+                    else if (isCloseBrace(source[i])) {
+                        if (braces.size() > 0 && isClosing(braces.top(), source[i]))
+                            braces.pop();
+                        else
+                            break;
+                    } else {
+                        if (braces.size() == 1) {
+                            if (source[i] == ',') {
+                                if (pattern[2] != "cases") {
+                                    source.replace(i, 1, " &");
+                                    i += 2;
+                                } else {
+                                    source.replace(i, 1, " ,&");
+                                    i += 3;
+                                }
+                            } else if (source[i] == ';') {
+                                source.replace(i, 1, " \\\\");
+                                i += 3;
+                            }
+
+                        }
                     }
+
+                    if (braces.size() == 0)
+                        break;
                 }
-                source.replace(i, pattern[1].size(), "\\end{" + pattern[2] + "}");
-                i += 6 + pattern[2].size();
-                break;
+
+                source.replace(i, pattern[1].size(), " \\end{" + pattern[2] + "}");
+                source.replace(start, pattern[0].size(), "\\begin{" + pattern[2] + "} ");
+
+                i = start + 6 + pattern[2].size();
             }
 
     return source;
@@ -123,7 +147,7 @@ QString MathWriter::applyFractions(QString source)
     return source;
 }
 
-QString MathWriter::apply(const QString &source)
+QString MathWriter::apply(QString source)
 {
     QVector<QPair<QString, QString>> dict;
 
@@ -151,6 +175,8 @@ QString MathWriter::apply(const QString &source)
     dict.append({ "sqrt", "\\sqrt" });
     dict.append({ "exp", "\\exp" });
 
+    dict.append({ "text", "\\text" });
+
     dict.append({ "lim", "\\lim" });
     dict.append({ "∑", "\\sum" });
     dict.append({ "∏", "\\prod" });
@@ -158,9 +184,6 @@ QString MathWriter::apply(const QString &source)
 
     dict.append({ "oline", "\\overline" });
     dict.append({ "uline", "\\underline" });
-
-    dict.append({ "matrix", "\\matrix" });
-    dict.append({ "system", "\\system" });
 
     dict.append({ "⇔", "\\iff" });
     dict.append({ "↔", "\\leftrightarrow" });
@@ -234,8 +257,12 @@ QString MathWriter::apply(const QString &source)
     dict.append({ "Ω", "{\\Omega}" });
     dict.append({ "ω", "{\\omega}" });
 
-    QString result;
+    // TODO More effective
+    source = applyParameters(source);
+    source = applyMatrices(source);
+    source = applyFractions(source);
 
+    QString result;
     for (int i = 0; i < source.size(); ++i) {
         bool next = false;
         for (const auto &pair : dict)
@@ -255,11 +282,6 @@ QString MathWriter::apply(const QString &source)
 
         result += source[i];
     }
-
-    // TODO More effective
-    result = applyParameters(result);
-    result = applyMatrices(result);
-    result = applyFractions(result);
 
     return result;
 }

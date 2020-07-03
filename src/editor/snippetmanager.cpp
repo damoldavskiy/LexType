@@ -34,6 +34,8 @@ void SnippetManager::reset()
     _snippets.append(Snippet(true, "item", "\\begin{itemize}\n\t\\item \n\\end{itemize}\n", 23, true));
     _snippets.append(Snippet(true, "enum", "\\begin{enumerate}\n\t\\item \n\\end{enumerate}\n", 25, true));
 
+    _snippets.append(Snippet(false, "t", "text{}", 5, true));
+
     _snippets.append(Snippet(false, "<<", "⟨"));
     _snippets.append(Snippet(false, ">>", "⟩"));
 

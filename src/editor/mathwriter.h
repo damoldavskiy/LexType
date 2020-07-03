@@ -51,13 +51,15 @@ int findBrace(const T &source, int start, int direction = 1)
         else if (isCloseBrace(source[i], direction)) {
             if (braces.size() > 0 && isClosing(braces.top(), source[i], direction))
                 braces.pop();
-            // TODO else brace sequence is incorrect
+            else // Brace sequence is incorrect
+                return -1;
         }
 
         if (braces.size() == 0)
             return i;
     }
 
+    // Close brace not found
     return -1;
 }
 
@@ -68,7 +70,7 @@ public:
     static QString applyParameters(QString source);
     static QString applyMatrices(QString source);
     static QString applyFractions(QString source);
-    static QString apply(const QString &source);
+    static QString apply(QString source);
 };
 
 #endif // MATHWRITER_H
