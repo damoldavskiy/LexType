@@ -1,12 +1,15 @@
 #include "scrollarea.h"
 
 #include <QtMath>
+#include <QtConcurrent/QtConcurrent>
 
 #include "../editor/styler.h"
 
 ScrollArea::ScrollArea(QWidget *parent)
     : QWidget(parent)
-{ }
+{
+    setFocusPolicy(Qt::StrongFocus);
+}
 
 ScrollArea::~ScrollArea()
 {
@@ -21,6 +24,7 @@ int ScrollArea::dpi()
 void ScrollArea::setDpi(int value)
 {
     _dpi = value;
+    _cache.clear();
     updateShifts();
     update();
 }
@@ -51,6 +55,7 @@ void ScrollArea::paintEvent(QPaintEvent *)
 
     int top = 0;
     for (int i = 0; i < _pages.size(); ++i) {
+        // TODO Replace with function
         QSize size = _pages[i]->pageSize() * _dpi / 72;
 
         if (top - _yshift > height())
@@ -66,12 +71,8 @@ void ScrollArea::paintEvent(QPaintEvent *)
             int rw = qMax(0, qMin(size.width(), width() - x) - rx);
             int rh = qMax(0, qMin(size.height(), height() - y) - ry);
 
-            QImage image = _pages[i]->renderToImage(_dpi * _scale, _dpi * _scale, rx * _scale, ry * _scale, rw * _scale, rh * _scale);
-            if (_scale != 1)
-                image = image.scaled(image.width() / _scale, image.height() / _scale, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            recolor(&image);
-
-            painter.drawImage(x + rx, y + ry, image);
+            for (const SplitArea& area : splitImage(i, size, rx, ry, rw, rh))
+                painter.drawImage(x + area.dx, y + area.dy, area.image);
         }
 
         top += size.height() + _pageShift;
@@ -87,6 +88,41 @@ void ScrollArea::wheelEvent(QWheelEvent *event)
     update();
 }
 
+void ScrollArea::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_Down:
+        _yshift += 40;
+        break;
+    case Qt::Key_Up:
+        _yshift -= 40;
+        break;
+    case Qt::Key_Left:
+        if (_pages.size() > 0) {
+            QSize size = _pages[0]->pageSize() * _dpi / 72;
+            int n = (_yshift - 1) / (size.height() + _pageShift);
+            _yshift = n * size.height() + n * _pageShift;
+        }
+        break;
+    case Qt::Key_Right:
+        if (_pages.size() > 0) {
+            QSize size = _pages[0]->pageSize() * _dpi / 72;
+            int n = (_yshift / (size.height() + _pageShift)) + 1;
+            if (n == _pages.size())
+                return;
+            _yshift = n * size.height() + n * _pageShift;
+        }
+    }
+
+    updateShifts();
+    update();
+}
+
+void ScrollArea::resizeEvent(QResizeEvent *)
+{
+    updateShifts();
+}
+
 void ScrollArea::clear()
 {
     for (Poppler::Page *page : _pages)
@@ -96,6 +132,8 @@ void ScrollArea::clear()
     if (_document != nullptr)
         delete _document;
     _document = nullptr;
+
+    _cache.clear();
 }
 
 void ScrollArea::updateShifts()
@@ -140,9 +178,69 @@ void ScrollArea::recolor(QImage *image)
     int size = image->byteCount();
     uchar *begin = image->bits();
 
-    // TODO Parallel
-    for (int i = 0; i < size; ++i) {
-        uchar cur = begin[i];
-        begin[i] = backArray[i % 4] * cur / 255 + foreArray[i % 4] * (255 - cur) / 255;
+    int threadsCount = QThreadPool::globalInstance()->maxThreadCount();
+    QVector<QFuture<void>> futures;
+
+    for (int i = 0; i < threadsCount; ++i) {
+        int from = size / threadsCount * i;
+        int to = from + size / threadsCount;
+        futures.append(QtConcurrent::run([=] () {
+            for (int j = from; j < to; ++j) {
+                uchar cur = begin[j];
+                begin[j] = backArray[j % 4] * cur / 255 + foreArray[j % 4] * (255 - cur) / 255;
+            }
+        }));
     }
+
+    for (QFuture<void> &future : futures)
+        future.waitForFinished();
+}
+
+QVector<SplitArea> ScrollArea::splitImage(int page, QSize psize, int x, int y, int w, int h)
+{
+    int xs = x / _areaWidth;
+    int xe = (x + w) / _areaWidth;
+    int ys = y / _areaHeight;
+    int ye = (y + h) / _areaHeight;
+
+    QVector<SplitArea> result;
+
+    QVector<QPair<int, int>> params;
+    for (int xi = xs; xi <= xe; ++xi)
+        for (int yi = ys; yi <= ye; ++yi) {
+            QQueue<SplitArea>::const_iterator it;
+            for (it = _cache.cbegin(); it != _cache.cend(); ++it)
+                if (it->page == page && it->dx / _areaWidth == xi && it->dy / _areaHeight == yi)
+                    break;
+
+            if (it != _cache.cend())
+                result.append(*it);
+            else
+                params.append({ xi, yi });
+        }
+
+    QVector<SplitArea> areas = QtConcurrent::blockingMapped(params, std::function<SplitArea(QPair<int, int>)>([=] (QPair<int, int> pair) -> SplitArea {
+        int xi = pair.first;
+        int yi = pair.second;
+
+        int dx = xi * _areaWidth;
+        int dy = yi * _areaHeight;
+
+        QImage image = _pages[page]->renderToImage(_dpi * _scale, _dpi * _scale, dx * _scale, dy * _scale, qMin(_areaWidth, psize.width() - dx) * _scale, qMin(_areaHeight, psize.height() - dy) * _scale);
+        if (_scale != 1)
+            image = image.scaled(image.width() / _scale, image.height() / _scale, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        recolor(&image);
+
+        return { std::move(image), dx, dy, page };
+    }));
+
+    for (const SplitArea& area : areas) {
+        result.append(area);
+
+        _cache.append(area);
+        if (_cache.size() > _maxCacheSize)
+            _cache.removeFirst();
+    }
+
+    return result;
 }

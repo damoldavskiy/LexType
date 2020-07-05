@@ -1,4 +1,7 @@
-QT += widgets
+QT += widgets \
+      concurrent
+
+CONFIG += c++17
 
 unix {
     INCLUDEPATH += /usr/include/poppler/qt5
@@ -21,5 +24,6 @@ HEADERS += \
     ../editor/styler.h \
     ../editor/pathwatcher.h \
     mainwindow.h \
-    scrollarea.h
+    scrollarea.h \
+    splitarea.h
 
