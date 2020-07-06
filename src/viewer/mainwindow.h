@@ -9,6 +9,8 @@
 #include "scrollarea.h"
 #include "../editor/pathwatcher.h"
 
+namespace Viewer {
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,5 +43,7 @@ private:
 
     QFileSystemWatcher _watcher;
 };
+
+}
 
 #endif // MAINWINDOW_H

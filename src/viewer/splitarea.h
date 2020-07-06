@@ -3,6 +3,8 @@
 
 #include <QImage>
 
+namespace Viewer {
+
 struct SplitArea
 {
     QImage image;
@@ -10,5 +12,7 @@ struct SplitArea
     int dy;
     int page;
 };
+
+}
 
 #endif // SPLITAREA_H

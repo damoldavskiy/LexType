@@ -10,6 +10,7 @@ public:
     void paint(QPainter *painter) const;
     QString latex() const;
     Figure* copy() const;
+    QPointF attract(QPointF point) const;
 };
 
 #endif // FIGURELINE_H

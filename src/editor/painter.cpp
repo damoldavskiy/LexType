@@ -75,8 +75,13 @@ void Painter::paintEvent(QPaintEvent *)
     qreal height = size().height();
 
     painter.setRenderHint(QPainter::Antialiasing);
-
     painter.fillRect(0, 0, width, height, Styler::get<QColor>("painter-back"));
+
+    if (_attracted) {
+        painter.setPen(Styler::get<QColor>("painter-highlight"));
+        painter.drawEllipse(_mouse, _attractRadius, _attractRadius);
+    }
+
     painter.setPen(Styler::get<QColor>("painter-fore"));
     painter.setFont(QFont("Cambria Math", 14));
 
@@ -98,7 +103,10 @@ void Painter::keyReleaseEvent(QKeyEvent *event)
 
 void Painter::mousePressEvent(QMouseEvent *event)
 {
-    _mouse = event->pos();
+    _mouse = realPoint(event->pos()).toPoint();
+    _attracted = _mouse != QPoint { 0, 0 };
+    if (_mouse == QPoint { 0, 0 })
+        _mouse = event->pos();
 
     _figures.append(_current);
     _current->setStart(_mouse);
@@ -113,6 +121,8 @@ void Painter::mousePressEvent(QMouseEvent *event)
 
 void Painter::mouseReleaseEvent(QMouseEvent *)
 {
+    _attracted = false;
+
     if (_current->release())
         _current = _current->copy();
     else
@@ -125,8 +135,12 @@ void Painter::mouseReleaseEvent(QMouseEvent *)
 
 void Painter::mouseMoveEvent(QMouseEvent *event)
 {
-    _mouse = event->pos();
-    _current->setEnd(event->pos(), event->modifiers() & Qt::ShiftModifier);
+    _mouse = realPoint(event->pos()).toPoint();
+    _attracted = _mouse != QPoint { 0, 0 };
+    if (_mouse == QPoint { 0, 0 })
+        _mouse = event->pos();
+
+    _current->setEnd(_mouse, event->modifiers() & Qt::ShiftModifier);
     update();
 }
 
@@ -137,4 +151,13 @@ void Painter::resizeEvent(QResizeEvent *event)
 
     for (auto &figure : _figures)
         figure->shift(dx / 2, dy / 2);
+}
+
+QPointF Painter::realPoint(QPointF point) const
+{
+    QPointF attraced;
+    for (auto figure : _figures)
+        if (figure != _current && (attraced = figure->attract(point)) != QPointF { 0, 0 })
+            break;
+    return attraced;
 }

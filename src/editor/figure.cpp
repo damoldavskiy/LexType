@@ -43,6 +43,11 @@ void Figure::clear()
     _end = { 0, 0 };
 }
 
+QPointF Figure::attract(QPointF) const
+{
+    return { 0, 0 };
+}
+
 QString Figure::num(qreal n)
 {
     return QString::number(n / 50);

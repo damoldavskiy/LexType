@@ -5,6 +5,8 @@
 
 #include "../editor/styler.h"
 
+namespace Viewer {
+
 ScrollArea::ScrollArea(QWidget *parent)
     : QWidget(parent)
 {
@@ -55,8 +57,7 @@ void ScrollArea::paintEvent(QPaintEvent *)
 
     int top = 0;
     for (int i = 0; i < _pages.size(); ++i) {
-        // TODO Replace with function
-        QSize size = _pages[i]->pageSize() * _dpi / 72;
+        QSize size = pageSize(i);
 
         if (top - _yshift > height())
             break;
@@ -99,19 +100,25 @@ void ScrollArea::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Left:
         if (_pages.size() > 0) {
-            QSize size = _pages[0]->pageSize() * _dpi / 72;
+            QSize size = pageSize(0);
             int n = (_yshift - 1) / (size.height() + _pageShift);
             _yshift = n * size.height() + n * _pageShift;
         }
         break;
     case Qt::Key_Right:
         if (_pages.size() > 0) {
-            QSize size = _pages[0]->pageSize() * _dpi / 72;
+            QSize size = pageSize(0);
             int n = (_yshift / (size.height() + _pageShift)) + 1;
             if (n == _pages.size())
                 return;
             _yshift = n * size.height() + n * _pageShift;
         }
+        break;
+    case Qt::Key_Home:
+        _yshift = 0;
+        break;
+    case Qt::Key_End:
+        _yshift = INT_MAX;
     }
 
     updateShifts();
@@ -121,6 +128,11 @@ void ScrollArea::keyPressEvent(QKeyEvent *event)
 void ScrollArea::resizeEvent(QResizeEvent *)
 {
     updateShifts();
+}
+
+QSize ScrollArea::pageSize(int number)
+{
+    return _pages[number]->pageSize() * _dpi / 72;
 }
 
 void ScrollArea::clear()
@@ -142,7 +154,7 @@ void ScrollArea::updateShifts()
         _xshift = 0;
         _yshift = 0;
     } else {
-        QSize size = _pages[0]->pageSize() * _dpi / 72;
+        QSize size = pageSize(0);
         int w = size.width();
         int n = _document->numPages();
         int h = n * size.height() + (n - 1) * _pageShift;
@@ -243,4 +255,6 @@ QVector<SplitArea> ScrollArea::splitImage(int page, QSize psize, int x, int y, i
     }
 
     return result;
+}
+
 }

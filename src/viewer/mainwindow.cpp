@@ -6,6 +6,8 @@
 
 #include "../editor/styler.h"
 
+namespace Viewer {
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -91,4 +93,6 @@ void MainWindow::loadDocument()
         return;
 
     _scroll->load(Poppler::Document::load(_path.path()));
+}
+
 }

@@ -1,7 +1,7 @@
 QT += widgets \
       concurrent
 
-CONFIG += c++17
+DEFINES += QT_DEPRECATED_WARNINGS
 
 unix {
     INCLUDEPATH += /usr/include/poppler/qt5
@@ -26,4 +26,3 @@ HEADERS += \
     mainwindow.h \
     scrollarea.h \
     splitarea.h
-

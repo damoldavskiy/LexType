@@ -11,6 +11,8 @@
 
 #include "splitarea.h"
 
+namespace Viewer {
+
 class ScrollArea : public QWidget
 {
 public:
@@ -28,6 +30,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *event);
 
+    QSize pageSize(int number);
     void clear();
     void updateShifts();
     void recolor(QImage *image);
@@ -51,5 +54,7 @@ private:
     QQueue<SplitArea> _cache;
     int _maxCacheSize = 12;
 };
+
+}
 
 #endif // SCROLLAREA_H

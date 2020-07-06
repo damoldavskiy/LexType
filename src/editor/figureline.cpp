@@ -44,3 +44,12 @@ Figure* FigureLine::copy() const
     figure->setTip(tip());
     return figure;
 }
+
+QPointF FigureLine::attract(QPointF point) const
+{
+    if (Math::dist(point, _start) < 10)
+        return _start;
+    if (Math::dist(point, _end) < 10)
+        return _end;
+    return { 0, 0 };
+}

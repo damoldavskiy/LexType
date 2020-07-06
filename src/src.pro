@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     editor \
-    viewer
+    viewer \
+    updater

@@ -19,6 +19,7 @@ public:
     QPointF end() const;
     virtual Figure* copy() const = 0;
     virtual void clear();
+    virtual QPointF attract(QPointF point) const;
 
 protected:
     static QString num(qreal n);
