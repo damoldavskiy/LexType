@@ -10,7 +10,7 @@ unix {
 
 win32 {
     INCLUDEPATH += D:/lib/poppler/qt5
-    LIBS += -LD:/lib/poppler/ -lpoppler-qt5
+    LIBS += -LD:/lib/poppler -lpoppler-qt5
 }
 
 SOURCES += \

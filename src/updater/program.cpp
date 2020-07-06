@@ -16,12 +16,6 @@ Program::Program(QObject *parent)
 
 void Program::run()
 {
-    #ifdef _WIN32
-    std::cout << "Windows is not supported" << std::endl;
-    emit finished();
-    return;
-    #endif
-
     std::cout << "Getting list of available updates..." << std::endl;
     QNetworkReply *reply = _manager->get(QNetworkRequest(QUrl(_url)));
     connect(reply, &QNetworkReply::downloadProgress, this, &Program::progress);
@@ -70,9 +64,14 @@ void Program::reply(QNetworkReply *reply)
 
         JlCompress::extractDir(zip, unzip);
 
-        QString program = "rm *; mv " + unzip + "* .; rm -r " + unzip;
-
+        #ifdef __linux__
+        QString program = "rm * 2> /dev/null; mv \"" + unzip + "\"* .; rm -r \"" + unzip + "\"";
         QProcess::startDetached("sh", QStringList() << "-c" << program);
+        #elif _WIN32
+        unzip.replace('/', '\\');
+        QString program = "rm *.* & move " + unzip + "* . & rd " + unzip;
+        QProcess::startDetached("cmd", QStringList() << "/c" << program);
+        #endif
 
         emit finished();
     }
