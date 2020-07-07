@@ -7,6 +7,15 @@
 #include <iostream>
 #include <JlCompress.h>
 
+// TODO Already defined in editor/mainwindow.cpp
+QString readText(const QString &path)
+{
+    QFile file(path);
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    return in.readAll();
+}
+
 Program::Program(QObject *parent)
     : QObject(parent)
 {
@@ -17,16 +26,27 @@ Program::Program(QObject *parent)
 void Program::run()
 {
     std::cout << "Getting list of available updates..." << std::endl;
-    QNetworkReply *reply = _manager->get(QNetworkRequest(QUrl(_url)));
-    connect(reply, &QNetworkReply::downloadProgress, this, &Program::progress);
+    _manager->get(QNetworkRequest(QUrl(_url)));
 }
 
 void Program::reply(QNetworkReply *reply)
 {
-    std::cout << std::endl;
-
     if (reply->request().url().toString().endsWith("latest")) {
         QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+
+        if (!QFile("version").exists())
+            std::cout << "Version file not found.";
+        else {
+            QString current = readText("version").trimmed();
+            QString latest = doc.object().value("tag_name").toString();
+            if (current == latest) {
+                std::cout << "Latest version already downloaded" << std::endl;
+                emit finished();
+                return;
+            } else {
+                std::cout << "Current version is " << current.toStdString() << ", latest is " << latest.toStdString() << ".";
+            }
+        }
 
         QJsonValue assets = doc.object().value("assets");
         for (const QJsonValue &assetValue : assets.toArray()) {
@@ -40,22 +60,25 @@ void Program::reply(QNetworkReply *reply)
             #endif
                 continue;
 
+            std::cout << " Downloading latest release..." << std::endl;
+
             QNetworkRequest request;
             request.setUrl(QUrl(url));
             request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 
-            std::cout << "Downloading latest release..." << std::endl;
             QNetworkReply *reply = _manager->get(request);
             connect(reply, &QNetworkReply::downloadProgress, this, &Program::progress);
 
             return;
         }
 
-        std::cout << "No releases found" << std::endl;
+        std::cout << "No suitable releases found" << std::endl;
         emit finished();
     } else {
+        std::cout << std::endl;
+
         QString zip = QDir::current().absoluteFilePath(_zipName);
-        QString unzip = QDir::current().absoluteFilePath(_unzipName);
+        QString unzip = QDir::current().absoluteFilePath(_unzipName) + "/";
 
         QFile file(zip);
         file.open(QIODevice::WriteOnly);
@@ -63,13 +86,13 @@ void Program::reply(QNetworkReply *reply)
         file.close();
 
         JlCompress::extractDir(zip, unzip);
+        file.remove();
 
         #ifdef __linux__
-        QString program = "rm * 2> /dev/null; mv \"" + unzip + "\"* .; rm -r \"" + unzip + "\"";
+        QString program = "mv " + _unzipName + "/* .; rm -r " + _unzipName;
         QProcess::startDetached("sh", QStringList() << "-c" << program);
         #elif _WIN32
-        unzip.replace('/', '\\');
-        QString program = "rm *.* & move " + unzip + "* . & rd " + unzip;
+        QString program = "ping 127.0.0.1 -n 1 >nul & xcopy " + _unzipName + " . /e /y >nul & rd " + _unzipName + " /s /q";
         QProcess::startDetached("cmd", QStringList() << "/c" << program);
         #endif
 

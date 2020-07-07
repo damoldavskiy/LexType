@@ -23,8 +23,8 @@ private:
     QNetworkAccessManager *_manager;
 
     QString _url = "https://api.github.com/repos/damoldavskiy/lextype/releases/latest";
-    QString _zipName = "latest.zip";
-    QString _unzipName = "latest/";
+    QString _zipName = "lextype-latest.zip";
+    QString _unzipName = "lextype-latest";
 };
 
 #endif // PROGRAM_H
