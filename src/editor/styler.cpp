@@ -49,7 +49,7 @@ void Styler::reset()
 
     set("painter-back", QColor { 50, 50, 50 });
     set("painter-fore", QColor { 240, 240, 240 });
-    set("painter-highlight", QColor { 150, 150, 40 });
+    set("painter-highlight", QColor { 190, 190, 30 });
 
     set("viewer-back", QColor { 50, 50, 50 });
     set("viewer-paper", QColor { 60, 60, 60 });

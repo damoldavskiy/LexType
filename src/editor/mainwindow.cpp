@@ -18,6 +18,7 @@ void writeText(const QString &path, const QString &text)
     QFile file(path);
     file.open(QIODevice::WriteOnly);
     QTextStream out(&file);
+    out.setCodec("UTF-8");
     out << text << '\n';
 }
 
@@ -26,6 +27,7 @@ QString readText(const QString &path)
     QFile file(path);
     file.open(QIODevice::ReadOnly);
     QTextStream in(&file);
+    in.setCodec("UTF-8");
     return in.readAll();
 }
 

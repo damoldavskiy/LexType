@@ -31,6 +31,15 @@ void Program::run()
 
 void Program::reply(QNetworkReply *reply)
 {
+    if (reply->error() != QNetworkReply::NoError) {
+        std::cout << "Error: " << reply->errorString().toStdString() << std::endl;
+        #ifdef _WIN32
+        system("pause");
+        #endif
+        emit finished();
+        return;
+    }
+
     if (reply->request().url().toString().endsWith("latest")) {
         QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
 
@@ -41,11 +50,13 @@ void Program::reply(QNetworkReply *reply)
             QString latest = doc.object().value("tag_name").toString();
             if (current == latest) {
                 std::cout << "Latest version already downloaded" << std::endl;
+                #ifdef _WIN32
+                system("pause");
+                #endif
                 emit finished();
                 return;
-            } else {
+            } else
                 std::cout << "Current version is " << current.toStdString() << ", latest is " << latest.toStdString() << ".";
-            }
         }
 
         QJsonValue assets = doc.object().value("assets");
@@ -73,6 +84,9 @@ void Program::reply(QNetworkReply *reply)
         }
 
         std::cout << "No suitable releases found" << std::endl;
+        #ifdef _WIN32
+        system("pause");
+        #endif
         emit finished();
     } else {
         std::cout << std::endl;
@@ -92,7 +106,7 @@ void Program::reply(QNetworkReply *reply)
         QString program = "mv " + _unzipName + "/* .; rm -r " + _unzipName;
         QProcess::startDetached("sh", QStringList() << "-c" << program);
         #elif _WIN32
-        QString program = "ping 127.0.0.1 -n 1 >nul & xcopy " + _unzipName + " . /e /y >nul & rd " + _unzipName + " /s /q";
+        QString program = "ping 127.0.0.1 -n 1 >nul & xcopy " + _unzipName + " . /e /y >nul & rd " + _unzipName + " /s /q & pause";
         QProcess::startDetached("cmd", QStringList() << "/c" << program);
         #endif
 

@@ -46,17 +46,19 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     QListWidgetItem *generalItem = new QListWidgetItem("General");
     QListWidgetItem *editorItem = new QListWidgetItem("Editor");
+    QListWidgetItem *painterItem = new QListWidgetItem("Painter");
     QListWidgetItem *viewerItem = new QListWidgetItem("Viewer");
     QListWidgetItem *snippetsItem = new QListWidgetItem("Snippets");
     QListWidgetItem *mathItem = new QListWidgetItem("Math mode");
 
     _list->addItem(generalItem);
     _list->addItem(editorItem);
+    _list->addItem(painterItem);
     _list->addItem(viewerItem);
     _list->addItem(snippetsItem);
     _list->addItem(mathItem);
 
-    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, editorItem, viewerItem, snippetsItem, mathItem] (QListWidgetItem *item) {
+    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, editorItem, painterItem, viewerItem, snippetsItem, mathItem] (QListWidgetItem *item) {
         clearForm();
         if (item == generalItem) {
             appendCheckBoxes(Properties {
@@ -89,6 +91,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
                 { "editor-flag-autocompile", "Compile on type" }
+            });
+        } else if (item == painterItem) {
+            appendColorButtons(Properties {
+                { "painter-back", "Painter background" },
+                { "painter-fore", "Painter foreground" },
+                { "painter-highlight", "Painter highlight" }
             });
         } else if (item == viewerItem) {
             appendColorButtons(Properties {
