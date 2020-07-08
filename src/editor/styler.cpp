@@ -67,6 +67,7 @@ void Styler::reset()
     set("window-flag-askexit", true);
 
     set("editor-tick-time", 600);
+    set("editor-tab-width", 4);
 
     set("painter-attract-radius", 10);
 }

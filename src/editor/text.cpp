@@ -10,8 +10,8 @@ QVector<QStaticText> cacheText(int start, int end, QFontMetricsF fm)
     return values;
 }
 
-Text::Text(const QFont &font)
-    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * 4)
+Text::Text(const QFont &font, int tabWidth)
+    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * tabWidth), _tabCount(tabWidth)
 {
     cache();
 }
@@ -19,8 +19,14 @@ Text::Text(const QFont &font)
 void Text::setFont(const QFont &font)
 {
     _fm = QFontMetricsF(font);
-    _tabWidth = _fm.width('x') * 4;
+    _tabWidth = _fm.width('x') * _tabCount;
     cache();
+}
+
+void Text::setTabWidth(int tabWidth)
+{
+    _tabCount = tabWidth;
+    _tabWidth = _fm.width('x') * _tabCount;
 }
 
 void Text::cache()

@@ -30,7 +30,7 @@ int charClass(QChar symbol)
 }
 
 Editor::Editor(QWidget *parent, LineNumbers *numbers)
-    : QWidget(parent), _text(font()), _numbers(numbers) // TODO Pass font parameter
+    : QWidget(parent), _text(font(), Styler::get<int>("editor-tab-width")), _numbers(numbers) // TODO Pass font parameter
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -97,6 +97,7 @@ void Editor::updateSettings()
 {
     setFont(Styler::get<QFont>("editor-font"));
     _text.setFont(font());
+    _text.setTabWidth(Styler::get<int>("editor-tab-width"));
     _timer->setInterval(Styler::get<int>("editor-tick-time"));
     if (_numbers != nullptr) {
         _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));

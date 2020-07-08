@@ -15,7 +15,7 @@ private slots:
 void tst_Text::basic()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QCOMPARE(text.width(), 0.0);
     QCOMPARE(text.size(), 0);
@@ -57,7 +57,7 @@ void tst_Text::basic()
 void tst_Text::removeInline()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     text.insert(0,"some\ttext\n");
     text.remove(1, 3);
@@ -74,7 +74,7 @@ void tst_Text::removeInline()
 void tst_Text::removeOutline()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     text.insert(0, "012345\n6789\n012345678\n");
     text.remove(4, 13);
@@ -86,5 +86,4 @@ void tst_Text::removeOutline()
     QCOMPARE(text.lineStart(0), 0);
     QCOMPARE(text.lineSize(1), 0);
     QCOMPARE(text.lineStart(1), 9);
-
 }

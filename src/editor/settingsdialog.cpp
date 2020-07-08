@@ -91,6 +91,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-autocompile", "Compile on type" }
             });
 
+            appendNumberEditInt({ "editor-tab-width", "Tab width" }, [] (int n) { return n > 0; });
             appendNumberEditInt({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
         } else if (item == painterItem) {
             appendColorButtons(Properties {

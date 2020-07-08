@@ -20,7 +20,7 @@ private slots:
 void tst_Text::type()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QBENCHMARK {
         text.insert(text.size(), QString('a'));
@@ -30,7 +30,7 @@ void tst_Text::type()
 void tst_Text::typeStart()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QBENCHMARK {
         text.insert(0, QString('a'));
@@ -40,7 +40,7 @@ void tst_Text::typeStart()
 void tst_Text::line()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QBENCHMARK {
         text.insert(text.size(), "Simple text with length of 30!");
@@ -50,7 +50,7 @@ void tst_Text::line()
 void tst_Text::lineStart()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QBENCHMARK {
         text.insert(0, "Simple text with length of 30!");
@@ -60,7 +60,7 @@ void tst_Text::lineStart()
 void tst_Text::multiline()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     QBENCHMARK {
         text.insert(text.size(), "Simple line with length of 30\n");
@@ -70,7 +70,7 @@ void tst_Text::multiline()
 void tst_Text::removeLine()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     for (int i = 0; i < 10000; ++i)
         text.insert(text.size(), "Simple line with length of 30\n");
@@ -84,7 +84,7 @@ void tst_Text::removeLine()
 void tst_Text::removeAll()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     for (int i = 0; i < 10000; ++i)
         text.insert(text.size(), "Simple line with length of 30\n");
@@ -97,7 +97,7 @@ void tst_Text::removeAll()
 void tst_Text::editStart()
 {
     QFont font;
-    Text text(font);
+    Text text(font, 4);
 
     for (int i = 0; i < 10000; ++i)
         text.insert(text.size(), "w");

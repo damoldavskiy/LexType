@@ -15,9 +15,10 @@
 class Text
 {
 public:
-    Text(const QFont &font);
+    Text(const QFont &font, int tabWidth);
 
     void setFont(const QFont &font);
+    void setTabWidth(int tabWidth);
     void cache();
 
     void insert(int pos, const QString &text);
@@ -61,6 +62,7 @@ private:
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;
     qreal _tabWidth;
+    int _tabCount;
     MultiRange<QStaticText> _cachedText;
 };
 
