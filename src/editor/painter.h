@@ -44,8 +44,6 @@ private:
     QPoint _mouse;
     bool _attracted = false;
 
-    int _attractRadius = 10;
-
     QStack<Figure*> _figures;
     QStack<Figure*> _afterFigures;
     Figure* _current = new FigurePath;

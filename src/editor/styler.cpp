@@ -24,9 +24,7 @@ void Styler::reset()
                       "QMenu::item:pressed { background: rgb(70, 70, 70); }"
                       "QMenu::separator { background: rgb(70, 70, 70); height: 1px; }");
     set("toolbar-style", "QToolBar::separator { height: 10px; width: 10px; border: none; }");
-    set("scroll-style", "QScrollArea { border: none; }"
-                        "QAbstractScrollArea::corner { background: rgb(50, 50, 50); }"
-                        "QScrollBar { background: rgb(50, 50, 50); margin: 0; }"
+    set("scroll-style", "QScrollBar { background: rgb(50, 50, 50); margin: 0; }"
                         "QScrollBar::add-line, QScrollBar::sub-line { background: rgb(50, 50, 50); width: 0px; height: 0px; }"
                         "QScrollBar::handle { background: rgb(60, 60, 60); min-height: 30px; min-width: 30px; }");
     set("status-style", "QWidget { background: rgb(50, 50, 50); color: rgb(150, 150, 150); }");
@@ -67,6 +65,10 @@ void Styler::reset()
     set("painter-flag-snippets", true);
 
     set("window-flag-askexit", true);
+
+    set("editor-tick-time", 600);
+
+    set("painter-attract-radius", 10);
 }
 
 QSettings Styler::_settings("DMSoft", "LexType");

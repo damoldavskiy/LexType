@@ -86,8 +86,6 @@ private:
     QTimer *_timer = new QTimer(this);
     bool _caret = true;
 
-    int _timerInterval = 600;
-
     QSet<int> _highlighted;
     QSet<int> _error;
 

@@ -1,5 +1,7 @@
 #include "figureline.h"
 
+#include "styler.h"
+
 void FigureLine::setEnd(QPointF point, bool modifier)
 {
     Figure::setEnd(point);
@@ -47,9 +49,10 @@ Figure* FigureLine::copy() const
 
 QPointF FigureLine::attract(QPointF point) const
 {
-    if (Math::dist(point, _start) < 10)
+    int r = Styler::get<int>("painter-attract-radius");
+    if (Math::dist(point, _start) <= r)
         return _start;
-    if (Math::dist(point, _end) < 10)
+    if (Math::dist(point, _end) <= r)
         return _end;
     return { 0, 0 };
 }

@@ -3,15 +3,12 @@
 #include <QListWidget>
 #include <QHBoxLayout>
 #include <QCheckBox>
-#include <QPushButton>
 #include <QFontDialog>
 #include <QAction>
 #include <QTextEdit>
-#include <QLineEdit>
 #include <QGroupBox>
 #include <QMessageBox>
 
-#include "styler.h"
 #include "snippetmanager.h"
 #include "colorbutton.h"
 
@@ -28,8 +25,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     setMinimumWidth(700);
     setMaximumWidth(700);
-    setMinimumHeight(500);
-    setMaximumHeight(500);
+    setMinimumHeight(600);
+    setMaximumHeight(600);
 
     _list = new QListWidget;
     _form = new QFormLayout;
@@ -64,7 +61,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             appendCheckBoxes(Properties {
                 { "window-flag-askexit", "Ask on exit" }
             });
-            appendResetSettings();
+
+            appendButton("Reset to defaults", Styler::reset);
         } else if (item == editorItem) {
             appendFontButtons(Properties {
                 { "editor-font", "Editor font" }
@@ -92,12 +90,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-numbers", "Show line numbers" },
                 { "editor-flag-autocompile", "Compile on type" }
             });
+
+            appendNumberEditInt({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
         } else if (item == painterItem) {
             appendColorButtons(Properties {
                 { "painter-back", "Painter background" },
                 { "painter-fore", "Painter foreground" },
                 { "painter-highlight", "Painter highlight" }
             });
+
+            appendNumberEditInt({ "painter-attract-radius", "Attract radius (px)" }, [] (int n) { return n > 0; });
         } else if (item == viewerItem) {
             appendColorButtons(Properties {
                 { "viewer-back", "Viewer background" },
@@ -110,6 +112,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-snippets-math", "Enable math snippets in editor" },
                 { "painter-flag-snippets", "Enable snippets in painter (math only)" }
             });
+
             appendSnippetsList();
         } else if (item == mathItem) {
             appendCheckBoxes(Properties {
@@ -170,6 +173,7 @@ void SettingsDialog::appendSnippetsList()
     QHBoxLayout *layout = new QHBoxLayout;
 
     QListWidget *list = new QListWidget;
+    list->setStyleSheet(Styler::get<QString>("scroll-style"));
     list->setMinimumWidth(150);
     list->setMaximumWidth(150);
 
@@ -196,13 +200,13 @@ void SettingsDialog::appendSnippetsList()
     info->addWidget(remove);
     info->addWidget(insert);
 
-    math->setVisible(false);
-    position->setVisible(false);
-    pattern->setVisible(false);
-    value->setVisible(false);
-    accept->setVisible(false);
-    remove->setVisible(false);
-    insert->setVisible(false);
+    math->setEnabled(false);
+    position->setEnabled(false);
+    pattern->setEnabled(false);
+    value->setEnabled(false);
+    accept->setEnabled(false);
+    remove->setEnabled(false);
+    insert->setEnabled(false);
 
     // TODO Better to save indices of all snippets
     connect(list, &QListWidget::currentItemChanged, this, [list, info, layout, math, position, pattern, value, accept, remove, insert] (QListWidgetItem *) {
@@ -213,13 +217,13 @@ void SettingsDialog::appendSnippetsList()
             return;
         Snippet &snippet = snippets[index];
 
-        math->setVisible(true);
-        position->setVisible(true);
-        pattern->setVisible(true);
-        value->setVisible(true);
-        accept->setVisible(true);
-        remove->setVisible(true);
-        insert->setVisible(true);
+        math->setEnabled(true);
+        position->setEnabled(true);
+        pattern->setEnabled(true);
+        value->setEnabled(true);
+        accept->setEnabled(true);
+        remove->setEnabled(true);
+        insert->setEnabled(true);
 
         math->setChecked(!snippet.regular());
         position->setText(QString::number(snippet.position()));
@@ -262,13 +266,13 @@ void SettingsDialog::appendSnippetsList()
         snippets.remove(index);
         Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
 
-        math->setVisible(false);
-        position->setVisible(false);
-        pattern->setVisible(false);
-        value->setVisible(false);
-        accept->setVisible(false);
-        remove->setVisible(false);
-        insert->setVisible(false);
+        math->setEnabled(false);
+        position->setEnabled(false);
+        pattern->setEnabled(false);
+        value->setEnabled(false);
+        accept->setEnabled(false);
+        remove->setEnabled(false);
+        insert->setEnabled(false);
 
         list->clear();
         for (const Snippet &snippet : snippets)
@@ -296,13 +300,4 @@ void SettingsDialog::appendSnippetsList()
     box->setLayout(layout);
 
     _form->addRow(box);
-}
-
-void SettingsDialog::appendResetSettings()
-{
-    QPushButton *reset = new QPushButton("Reset to defaults");
-    connect(reset, &QPushButton::clicked, this, [this] () {
-        Styler::reset();
-    });
-    _form->addRow(reset);
 }

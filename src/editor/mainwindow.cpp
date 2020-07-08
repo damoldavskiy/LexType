@@ -179,6 +179,16 @@ void MainWindow::options()
     delete dialog;
 }
 
+void MainWindow::about()
+{
+    QMessageBox::about(this, "About LexType", "LexType is a software environment targeted on effecive writing of any kind of lecture or technical notes.\n\nAuthor: DA Moldavskiy\n\nContact me: party_50@mail.ru");
+}
+
+void MainWindow::aboutQt()
+{
+    QMessageBox::aboutQt(this);
+}
+
 void MainWindow::typed(int, QChar)
 {
     // TODO Insert from clipborad doesn't emit Editor::typed
@@ -271,6 +281,12 @@ void MainWindow::createActions()
 
     _optionsAction = new QAction("Options", this);
     connect(_optionsAction, &QAction::triggered, this, &MainWindow::options);
+
+    _aboutAction = new QAction("About", this);
+    connect(_aboutAction, &QAction::triggered, this, &MainWindow::about);
+
+    _aboutQtAction = new QAction("About Qt", this);
+    connect(_aboutQtAction, &QAction::triggered, this, &MainWindow::aboutQt);
 }
 
 void MainWindow::createMenus()
@@ -293,4 +309,7 @@ void MainWindow::createMenus()
     menu->addActions({ _compileAction, _painterAction });
     menu->addSeparator();
     menu->addActions({ _optionsAction });
+
+    menu = menuBar()->addMenu("Help");
+    menu->addActions({ _aboutAction, _aboutQtAction });
 }

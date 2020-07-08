@@ -37,7 +37,7 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
     updateSettings();
 
     connect(_timer, &QTimer::timeout, this, &Editor::tick);
-    _timer->start(_timerInterval);
+    _timer->start(Styler::get<int>("editor-tick-time"));
 }
 
 QString Editor::text() const
@@ -97,6 +97,7 @@ void Editor::updateSettings()
 {
     setFont(Styler::get<QFont>("editor-font"));
     _text.setFont(font());
+    _timer->setInterval(Styler::get<int>("editor-tick-time"));
     if (_numbers != nullptr) {
         _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));
         _numbers->setFont(font());
@@ -502,7 +503,7 @@ void Editor::wheelEvent(QWheelEvent *event)
 void Editor::focusInEvent(QFocusEvent *)
 {
     _caret = true;
-    _timer->start(_timerInterval);
+    _timer->start(Styler::get<int>("editor-tick-time"));
     update();
 }
 
@@ -598,7 +599,7 @@ void Editor::updateShift(QPointF point)
 void Editor::updateUi(bool resetCaret)
 {
     if (resetCaret) {
-        _timer->start(_timerInterval);
+        _timer->start(Styler::get<int>("editor-tick-time"));
         _caret = true;
     }
     highlightSpecial();

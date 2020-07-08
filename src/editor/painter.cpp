@@ -79,7 +79,8 @@ void Painter::paintEvent(QPaintEvent *)
 
     if (_attracted) {
         painter.setPen(Styler::get<QColor>("painter-highlight"));
-        painter.drawEllipse(_mouse, _attractRadius, _attractRadius);
+        int r = Styler::get<int>("painter-attract-radius");
+        painter.drawEllipse(_mouse, r, r);
     }
 
     painter.setPen(Styler::get<QColor>("painter-fore"));

@@ -26,6 +26,8 @@ public slots:
     void compile();
     void painter();
     void options();
+    void about();
+    void aboutQt();
     void typed(int pos, QChar symbol);
 
 private slots:
@@ -60,6 +62,8 @@ private:
     QAction *_compileAction;
     QAction *_painterAction;
     QAction *_optionsAction;
+    QAction *_aboutAction;
+    QAction *_aboutQtAction;
 
     PathWatcher _path = PathWatcher("LexType");
     QProcess *_compilation = nullptr;
