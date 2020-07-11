@@ -37,15 +37,27 @@ QString MathWriter::pass(const QString &source)
 {
     QString result;
     bool math = false;
+    bool mline = false;
     int start;
 
     for (int i = 0; i < source.size(); ++i) {
         if (source[i] == '`') {
+            if (math && source[i - 1] == '`' && !mline) {
+                mline = true;
+                continue;
+            }
+            if (math && source[i - 1] != '`' && source[i + 1] == '`' && mline)
+                continue;
             math = !math;
             if (math)
                 start = i + 1;
-            else // TODO string_view
-                result += "$" + apply(source.mid(start, i - start)) + "$";
+            else { // TODO string_view
+                if (mline)
+                    result += "$$" + apply(source.mid(start + 1, i - start - 2)) + "$$";
+                else
+                    result += "$" + apply(source.mid(start, i - start)) + "$";
+                mline = false;
+            }
         } else if (!math) {
             result += source[i];
         }
@@ -176,6 +188,7 @@ QString MathWriter::apply(QString source)
     dict.append({ "exp", "\\exp" });
 
     dict.append({ "text", "\\text" });
+    dict.append({ "comment", "\\comment" });
 
     dict.append({ "lim", "\\lim" });
     dict.append({ "∑", "\\sum" });

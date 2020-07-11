@@ -250,6 +250,7 @@ void Text::updateMarkup(int) // TODO Unused parameter
 {
     Interval interval = Interval::Regular;
     bool math = false;
+    bool mline = false;
 
     // TODO Extremely inefficient
     for (int i = 0; i < _data.size(); ++i) {
@@ -257,8 +258,19 @@ void Text::updateMarkup(int) // TODO Unused parameter
             interval = Interval::Comment;
             math = false;
         } else {
-            if (_data[i] == '`')
-                math = !math;
+            if (_data[i] == '`') {
+                if (math && _data[i - 1] == '`' && !mline) {
+                    mline = true;
+                } else if (math && _data[i - 1] != '`' && mline) {
+                    // TODO _data[i + 1] SEGFAULT
+                } else
+                    math = !math;
+                if (!math)
+                    mline = false;
+            }
+
+//            if (_data[i] == '`')
+//                math = !math;
 
             if (_data[i] == '`' || math)
                 interval = Interval::Mathematics;
