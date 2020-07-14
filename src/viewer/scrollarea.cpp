@@ -1,8 +1,8 @@
 #include "scrollarea.h"
 
-#include <QtMath>
 #include <QtConcurrent/QtConcurrent>
 
+#include "../editor/math.h"
 #include "../editor/styler.h"
 
 namespace Viewer {
@@ -18,14 +18,31 @@ ScrollArea::~ScrollArea()
     clear();
 }
 
-int ScrollArea::dpi()
+void ScrollArea::zoomIn(QPointF center)
 {
-    return _dpi;
+    zoom(center, _zoomScale);
 }
 
-void ScrollArea::setDpi(int value)
+void ScrollArea::zoomOut(QPointF center)
 {
-    _dpi = value;
+    zoom(center, 1 / _zoomScale);
+}
+
+void ScrollArea::zoom(QPointF center, qreal factor)
+{
+    if (center == QPointF { -1, -1 }) {
+        center.setX(width() / 2);
+        center.setY(height() / 2);
+    }
+
+    int newdpi = _dpi * factor;
+    if (newdpi < _minDpi || newdpi > _maxDpi)
+        return;
+
+    _dpi = newdpi;
+    _xshift = _xshift * factor + center.x() * factor - center.x();
+    _yshift = _yshift * factor + center.y() * factor - center.y();
+
     _cache.clear();
     updateShifts();
     update();
@@ -63,7 +80,7 @@ void ScrollArea::paintEvent(QPaintEvent *)
             break;
 
         if (top - _yshift + size.height() > 0) {
-            int x = (width() - size.width()) / 2 - _xshift;
+            int x = -_xshift;
             int y = top - _yshift;
 
             int rx = qMax(0, -x);
@@ -82,6 +99,14 @@ void ScrollArea::paintEvent(QPaintEvent *)
 
 void ScrollArea::wheelEvent(QWheelEvent *event)
 {
+    if (event->modifiers() & Qt::ControlModifier) {
+        if (event->angleDelta().y() > 0)
+            zoomIn(event->posF());
+        else
+            zoomOut(event->posF());
+        return;
+    }
+
     _xshift -= event->angleDelta().x();
     _yshift -= event->angleDelta().y();
 
@@ -159,24 +184,15 @@ void ScrollArea::updateShifts()
         int n = _document->numPages();
         int h = n * size.height() + (n - 1) * _pageShift;
 
-        // TODO Use limit function
         if (w < width())
-            _xshift = 0;
-        else {
-            if (_xshift > w / 2 - width() / 2)
-                _xshift = w / 2 - width() / 2;
-            if (_xshift < -(w / 2 - width() / 2))
-                _xshift = -(w / 2 - width() / 2);
-        }
+            _xshift = (w - width()) / 2;
+        else
+            Math::limit(_xshift, 0, w - width());
 
         if (h < height())
             _yshift = 0;
-        else {
-            if (_yshift < 0)
-                _yshift = 0;
-            if (_yshift > h - height())
-                _yshift = h - height();
-        }
+        else
+            Math::limit(_yshift, 0, h - height());
     }
 }
 

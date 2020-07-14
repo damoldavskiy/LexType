@@ -45,12 +45,12 @@ void MainWindow::quit()
 
 void MainWindow::zoomIn()
 {
-    _scroll->setDpi(_scroll->dpi() * 1.2);
+    _scroll->zoomIn();
 }
 
 void MainWindow::zoomOut()
 {
-    _scroll->setDpi(_scroll->dpi() / 1.2);
+    _scroll->zoomOut();
 }
 
 void MainWindow::fileChanged()

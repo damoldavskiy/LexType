@@ -19,8 +19,9 @@ public:
     ScrollArea(QWidget *parent = 0);
     ~ScrollArea();
 
-    int dpi();
-    void setDpi(int value);
+    void zoomIn(QPointF center = { -1, -1 });
+    void zoomOut(QPointF center = { -1, -1 });
+    void zoom(QPointF center, qreal factor);
 
     void load(Poppler::Document *document);
 
@@ -44,10 +45,14 @@ private:
     int _yshift = 0;
 
     int _dpi = 72;
+    int _minDpi = 10;
+    int _maxDpi = 300;
+    qreal _zoomScale = 1.2;
 
-    qreal _scale = 2;
+    qreal _scale = 2; // Antialiasing
     int _pageShift = 20;
 
+    // Caching
     int _areaWidth = 512;
     int _areaHeight = 512;
 

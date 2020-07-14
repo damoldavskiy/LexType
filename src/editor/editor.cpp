@@ -10,15 +10,7 @@
 #include "styler.h"
 #include "mathwriter.h"
 #include "keyboardlayout.h"
-
-template <typename T>
-void limit(T& value, T min, T max)
-{
-    if (value < min)
-        value = min;
-    if (value > max)
-        value = max;
-}
+#include "math.h"
 
 int charClass(QChar symbol)
 {
@@ -148,7 +140,7 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
         pos += after.size();
     } while (all);
 
-    limit(_pos, 0, _text.size());
+    Math::limit(_pos, 0, _text.size());
     _spos = -1;
 
     updateUi(true);
@@ -495,8 +487,8 @@ void Editor::wheelEvent(QWheelEvent *event)
     _yshift -= event->angleDelta().y();
     _xshift -= event->angleDelta().x();
 
-    limit(_yshift, static_cast<qreal>(0), (_text.lineCount() - 1) * _text.fontHeight());
-    limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1));
+    Math::limit(_yshift, static_cast<qreal>(0), (_text.lineCount() - 1) * _text.fontHeight());
+    Math::limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1));
 
     update();
 }
@@ -590,8 +582,8 @@ void Editor::updateShift()
 
 void Editor::updateShift(QPointF point)
 {
-    limit(_yshift, point.y() - size().height() + _text.fontHeight(), point.y());
-    limit(_xshift, point.x() - size().width() + 1, qMin(point.x(), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1)));
+    Math::limit(_yshift, point.y() - size().height() + _text.fontHeight(), point.y());
+    Math::limit(_xshift, point.x() - size().width() + 1, qMin(point.x(), qMax(static_cast<qreal>(0), _text.width() - size().width() + 1)));
 
     Q_ASSERT(_yshift >= 0);
     Q_ASSERT(_xshift >= 0);

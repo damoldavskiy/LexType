@@ -30,6 +30,15 @@ T abs(T n)
     return n < 0 ? -n : n;
 }
 
+template <typename T>
+void limit(T& value, T min, T max)
+{
+    if (value < min)
+        value = min;
+    if (value > max)
+        value = max;
+}
+
 qreal dist(QPointF p1, QPointF p2);
 
 void shift(QPointF &p, qreal shiftX, qreal shiftY);
