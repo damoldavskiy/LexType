@@ -35,7 +35,7 @@ void ScrollArea::zoom(QPointF center, qreal factor)
         center.setY(height() / 2);
     }
 
-    int newdpi = _dpi * factor;
+    qreal newdpi = _dpi * factor;
     if (newdpi < _minDpi || newdpi > _maxDpi)
         return;
 
@@ -180,19 +180,19 @@ void ScrollArea::updateShifts()
         _yshift = 0;
     } else {
         QSize size = pageSize(0);
-        int w = size.width();
+        qreal w = size.width();
         int n = _document->numPages();
-        int h = n * size.height() + (n - 1) * _pageShift;
+        qreal h = n * size.height() + (n - 1) * _pageShift;
 
         if (w < width())
             _xshift = (w - width()) / 2;
         else
-            Math::limit(_xshift, 0, w - width());
+            Math::limit(_xshift, 0.0, w - width());
 
         if (h < height())
             _yshift = 0;
         else
-            Math::limit(_yshift, 0, h - height());
+            Math::limit(_yshift, 0.0, h - height());
     }
 }
 
@@ -212,6 +212,8 @@ void ScrollArea::recolor(QImage *image)
     for (int i = 0; i < threadsCount; ++i) {
         int from = size / threadsCount * i;
         int to = from + size / threadsCount;
+        if (i == threadsCount - 1)
+            to = size;
         futures.append(QtConcurrent::run([=] () {
             for (int j = from; j < to; ++j) {
                 uchar cur = begin[j];

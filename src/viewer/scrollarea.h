@@ -41,12 +41,12 @@ private:
     Poppler::Document *_document = nullptr;
     QVector<Poppler::Page*> _pages;
 
-    int _xshift = 0;
-    int _yshift = 0;
+    qreal _xshift = 0;
+    qreal _yshift = 0;
 
-    int _dpi = 72;
-    int _minDpi = 10;
-    int _maxDpi = 300;
+    qreal _dpi = 72;
+    qreal _minDpi = 10;
+    qreal _maxDpi = 350;
     qreal _zoomScale = 1.2;
 
     qreal _scale = 2; // Antialiasing
