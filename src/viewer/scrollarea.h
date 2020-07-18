@@ -31,10 +31,10 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-    QSize pageSize(int number);
+    QSize pageSize(int number) const;
     void clear();
     void updateShifts();
-    void recolor(QImage *image);
+    void recolor(QImage *image) const;
     QVector<SplitArea> splitImage(int page, QSize psize, int x, int y, int w, int h);
 
 private:

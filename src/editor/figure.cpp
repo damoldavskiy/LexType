@@ -1,5 +1,7 @@
 #include "figure.h"
 
+#include "styler.h"
+
 Figure::~Figure()
 { }
 
@@ -56,6 +58,15 @@ QString Figure::num(qreal n)
 QString Figure::pair(QPointF point)
 {
     return "(" + num(point.x()) + "," + num(-point.y()) + ")";
+}
+
+QPointF Figure::findAttract(const QVector<QPointF> &points, QPointF from)
+{
+    for (QPointF point : points)
+        if (Math::dist(point, from) <= Styler::get<int>("painter-attract-radius"))
+            return point;
+
+    return { 0, 0 };
 }
 
 QStringList Figure::modifiers() const

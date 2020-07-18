@@ -153,6 +153,11 @@ QStringList FigurePath::modifiers() const
     return listArrow + listFill;
 }
 
+QPointF FigurePath::attract(QPointF point) const
+{
+    return findAttract({ _start, _end }, point);
+}
+
 const QVector<QPointF>& FigurePath::path() const
 {
     return _path;

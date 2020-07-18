@@ -24,6 +24,7 @@ public:
 protected:
     static QString num(qreal n);
     static QString pair(QPointF point);
+    static QPointF findAttract(const QVector<QPointF> &points, QPointF from);
 
     virtual QStringList modifiers() const;
     QString modifier() const;

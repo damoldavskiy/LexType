@@ -32,3 +32,8 @@ Figure* FigureEllipse::copy() const
     figure->setFill(fill());
     return figure;
 }
+
+QPointF FigureEllipse::attract(QPointF point) const
+{
+    return findAttract({ { _start.x() + dx() / 2, _start.y() + dy() / 2 } }, point);
+}

@@ -16,6 +16,7 @@ public:
     Figure* copy() const;
     void clear();
     QStringList modifiers() const;
+    QPointF attract(QPointF point) const;
 
     const QVector<QPointF>& path() const;
     void setPath(const QVector<QPointF>& value);

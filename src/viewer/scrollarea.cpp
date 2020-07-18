@@ -162,7 +162,7 @@ void ScrollArea::resizeEvent(QResizeEvent *)
     updateShifts();
 }
 
-QSize ScrollArea::pageSize(int number)
+QSize ScrollArea::pageSize(int number) const
 {
     return _pages[number]->pageSize() * _dpi / 72;
 }
@@ -203,7 +203,7 @@ void ScrollArea::updateShifts()
     }
 }
 
-void ScrollArea::recolor(QImage *image)
+void ScrollArea::recolor(QImage *image) const
 {
     QColor back = Styler::get<QColor>("viewer-paper");
     QColor fore = Styler::get<QColor>("viewer-text");

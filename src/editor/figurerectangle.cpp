@@ -32,3 +32,8 @@ Figure* FigureRectangle::copy() const
     figure->setFill(fill());
     return figure;
 }
+
+QPointF FigureRectangle::attract(QPointF point) const
+{
+    return findAttract({ _start, { _start.x(), _end.y() }, { _end.x(), _start.y() }, _end }, point);
+}
