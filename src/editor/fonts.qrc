@@ -1,0 +1,6 @@
+<RCC>
+    <qresource>
+        <file alias="Lato-Regular.ttf">../../res/fonts/Lato-Regular.ttf</file>
+        <file alias="CMUSerif-Roman.ttf">../../res/fonts/CMUSerif-Roman.ttf</file>
+    </qresource>
+</RCC>

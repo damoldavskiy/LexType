@@ -1,17 +1,18 @@
 #include "text.h"
 
-QVector<QStaticText> cacheText(int start, int end, QFontMetricsF fm)
+QVector<QStaticText> cacheText(int start, int end, QFont font, QFontMetricsF fm)
 {
     QVector<QStaticText> values(end - start + 1);
     for (int i = 0; i < end - start; ++i) {
         values[i] = QStaticText(static_cast<QChar>(start + i));
         values[i].setTextWidth(fm.width(static_cast<QChar>(start + i)));
+        values[i].prepare(QTransform(), font);
     }
     return values;
 }
 
 Text::Text(const QFont &font, int tabWidth)
-    : _tracker(1), _widths(1), _fm(font), _tabWidth(_fm.width('x') * tabWidth), _tabCount(tabWidth)
+    : _tracker(1), _widths(1), _fm(font), _font(font), _tabWidth(_fm.width('x') * tabWidth), _tabCount(tabWidth)
 {
     cache();
 }
@@ -19,6 +20,7 @@ Text::Text(const QFont &font, int tabWidth)
 void Text::setFont(const QFont &font)
 {
     _fm = QFontMetricsF(font);
+    _font = font;
     _tabWidth = _fm.width('x') * _tabCount;
     cache();
 }
@@ -32,8 +34,8 @@ void Text::setTabWidth(int tabWidth)
 void Text::cache()
 {
     _cachedText.clear();
-    _cachedText.add(0x0000, cacheText(0x0000, 0x00FF, _fm)); // ASCII
-    _cachedText.add(0x0400, cacheText(0x0400, 0x04FF, _fm)); // Cyrillic
+    _cachedText.add(0x0000, cacheText(0x0000, 0x00FF, _font, _fm)); // ASCII
+    _cachedText.add(0x0400, cacheText(0x0400, 0x04FF, _font, _fm)); // Cyrillic
 }
 
 void Text::insert(int pos, const QString &text)

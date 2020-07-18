@@ -26,3 +26,6 @@ HEADERS += \
     mainwindow.h \
     scrollarea.h \
     splitarea.h
+
+RESOURCES += \
+    ../editor/fonts.qrc

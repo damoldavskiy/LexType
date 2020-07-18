@@ -73,4 +73,5 @@ HEADERS += \
     colorbutton.h
 
 RESOURCES += \
+    fonts.qrc \
     images.qrc

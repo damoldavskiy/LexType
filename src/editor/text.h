@@ -61,6 +61,7 @@ private:
     MarkupModel _markup;
     MaxVector<qreal> _widths;
     QFontMetricsF _fm;
+    QFont _font;
     qreal _tabWidth;
     int _tabCount;
     MultiRange<QStaticText> _cachedText;

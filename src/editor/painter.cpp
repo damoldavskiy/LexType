@@ -84,7 +84,7 @@ void Painter::paintEvent(QPaintEvent *)
     }
 
     painter.setPen(Styler::get<QColor>("painter-fore"));
-    painter.setFont(QFont("Cambria Math", 14));
+    painter.setFont(QFont("CMU Serif", 14));
 
     for (auto figure : _figures)
         figure->paint(&painter);

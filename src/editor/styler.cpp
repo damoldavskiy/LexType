@@ -36,7 +36,7 @@ void Styler::reset()
     set("editor-special", QColor { 230, 160, 90 });
     set("editor-comment", QColor { 220, 70, 70 });
     set("editor-line", QColor { 55, 55, 55 });
-    set("editor-selection-back", QColor { 40, 70, 120 });
+    set("editor-selection-back", QColor { 40, 70, 100 });
     set("editor-selection-fore", QColor { 210, 210, 210 });
     set("editor-error", QColor { 150, 40, 40 });
     set("editor-caret", QColor { 240, 240, 240 });
@@ -53,7 +53,7 @@ void Styler::reset()
     set("viewer-paper", QColor { 60, 60, 60 });
     set("viewer-text", QColor { 240, 240, 240 });
 
-    set("editor-font", QFont("Ubuntu", 11));
+    set("editor-font", QFont("Lato", 11));
 
     set("editor-flag-line", true);
     set("editor-flag-numbers", true);
