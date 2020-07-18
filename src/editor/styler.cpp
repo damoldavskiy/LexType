@@ -70,6 +70,13 @@ void Styler::reset()
     set("editor-tab-width", 4);
 
     set("painter-attract-radius", 10);
+
+    set("viewer-page-shift", 0.5);
+    set("viewer-zoom-factor", 1.2);
+    set("viewer-dpi-default", 72);
+    set("viewer-dpi-min", 10);
+    set("viewer-dpi-max", 350);
+    set("viewer-resolution", 2.0);
 }
 
 QSettings Styler::_settings("DMSoft", "LexType");

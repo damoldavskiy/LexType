@@ -8,7 +8,11 @@
 namespace Viewer {
 
 ScrollArea::ScrollArea(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      _dpi(Styler::get<int>("viewer-dpi-default")),
+      _zoomScale(Styler::get<qreal>("viewer-zoom-factor")),
+      _scale(Styler::get<qreal>("viewer-resolution")),
+      _pageShift(Styler::get<qreal>("viewer-page-shift"))
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -36,12 +40,12 @@ void ScrollArea::zoom(QPointF center, qreal factor)
     }
 
     qreal newdpi = _dpi * factor;
-    if (newdpi < _minDpi || newdpi > _maxDpi)
+    if (newdpi < Styler::get<int>("viewer-dpi-min") || newdpi > Styler::get<int>("viewer-dpi-max"))
         return;
 
     _dpi = newdpi;
-    _xshift = _xshift * factor + center.x() * factor - center.x();
-    _yshift = _yshift * factor + center.y() * factor - center.y();
+    _xshift = (_xshift + center.x()) * factor - center.x();
+    _yshift = (_yshift + center.y()) * factor - center.y();
 
     _cache.clear();
     updateShifts();
@@ -93,22 +97,25 @@ void ScrollArea::paintEvent(QPaintEvent *)
                 painter.drawImage(x + area.dx, y + area.dy, area.image);
         }
 
-        top += size.height() + _pageShift;
+        top += size.height() + _pageShift * _dpi;
     }
 }
 
 void ScrollArea::wheelEvent(QWheelEvent *event)
 {
+    int dx = event->angleDelta().x();
+    int dy = event->angleDelta().y();
+
     if (event->modifiers() & Qt::ControlModifier) {
-        if (event->angleDelta().y() > 0)
+        if (dy > 0)
             zoomIn(event->posF());
-        else
+        else if (dy < 0)
             zoomOut(event->posF());
         return;
     }
 
-    _xshift -= event->angleDelta().x();
-    _yshift -= event->angleDelta().y();
+    _xshift -= dx;
+    _yshift -= dy;
 
     updateShifts();
     update();
@@ -182,7 +189,7 @@ void ScrollArea::updateShifts()
         QSize size = pageSize(0);
         qreal w = size.width();
         int n = _document->numPages();
-        qreal h = n * size.height() + (n - 1) * _pageShift;
+        qreal h = n * size.height() + (n - 1) * _pageShift * _dpi;
 
         if (w < width())
             _xshift = (w - width()) / 2;

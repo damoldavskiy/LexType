@@ -44,13 +44,11 @@ private:
     qreal _xshift = 0;
     qreal _yshift = 0;
 
-    qreal _dpi = 72;
-    qreal _minDpi = 10;
-    qreal _maxDpi = 350;
-    qreal _zoomScale = 1.2;
+    qreal _dpi;
+    qreal _zoomScale;
 
-    qreal _scale = 2; // Antialiasing
-    int _pageShift = 20;
+    qreal _scale; // Resolution
+    qreal _pageShift;
 
     // Caching
     int _areaWidth = 512;

@@ -34,24 +34,46 @@ public:
         _form->addRow(button);
     }
 
-    template <typename T>
-    void appendNumberEditInt(const Property &prop, T checker)
+    template <typename T, typename U, typename V>
+    void appendTextEdit(const Property &prop, U converter, V checker)
     {
         QLineEdit *edit = new QLineEdit;
-        edit->setText(QString::number(Styler::get<int>(prop.first)));
+        edit->setText(QString::number(Styler::get<T>(prop.first)));
         edit->setMaximumWidth(200);
-        connect(edit, &QLineEdit::textChanged, this, [edit, checker, prop] () {
+        connect(edit, &QLineEdit::textChanged, this, [edit, converter, checker, prop] () {
             QString text = edit->text();
-            bool ok;
-            int n = text.toInt(&ok);
-            if (ok && checker(n)) {
+            if (checker(text)) {
                 edit->setStyleSheet("QLineEdit { background: rgb(50, 50, 50); }");
-                Styler::set(prop.first, n);
+                Styler::set(prop.first, converter(text));
             }
             else
                 edit->setStyleSheet("QLineEdit { background: rgb(150, 30, 30); }");
         });
         _form->addRow(prop.second, edit);
+    }
+
+    template <typename T>
+    void appendIntEdit(const Property &prop, T checker)
+    {
+        appendTextEdit<int>(prop, [] (QString text) {
+            return text.toInt();
+        }, [checker] (QString text) {
+            bool ok;
+            int n = text.toInt(&ok);
+            return ok && checker(n);
+        });
+    }
+
+    template <typename T>
+    void appendDoubleEdit(const Property &prop, T checker)
+    {
+        appendTextEdit<qreal>(prop, [] (QString text) {
+            return text.toDouble();
+        }, [checker] (QString text) {
+            bool ok;
+            qreal n = text.toDouble(&ok);
+            return ok && checker(n);
+        });
     }
 
 private:

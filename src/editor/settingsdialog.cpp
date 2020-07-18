@@ -85,14 +85,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "numbers-current", "Numbers current" }
             });
 
+            appendIntEdit({ "editor-tab-width", "Tab width" }, [] (int n) { return n > 0; });
+            appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
+
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
                 { "editor-flag-autocompile", "Compile on type" }
             });
-
-            appendNumberEditInt({ "editor-tab-width", "Tab width" }, [] (int n) { return n > 0; });
-            appendNumberEditInt({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
         } else if (item == painterItem) {
             appendColorButtons(Properties {
                 { "painter-back", "Painter background" },
@@ -100,13 +100,22 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "painter-highlight", "Painter highlight" }
             });
 
-            appendNumberEditInt({ "painter-attract-radius", "Attract radius (px)" }, [] (int n) { return n > 0; });
+            appendIntEdit({ "painter-attract-radius", "Attract radius (px)" }, [] (int n) { return n > 0; });
         } else if (item == viewerItem) {
             appendColorButtons(Properties {
                 { "viewer-back", "Viewer background" },
                 { "viewer-paper", "Document paper" },
                 { "viewer-text", "Document text" }
             });
+
+            appendDoubleEdit({ "viewer-page-shift", "Shift between pages (inches)" }, [] (qreal n) { return n >= 0; });
+            appendDoubleEdit({ "viewer-zoom-factor", "Zoom factor" }, [] (qreal n) { return n > 1 && n <= 2; });
+
+            appendIntEdit({ "viewer-dpi-default", "Default DPI" }, [] (int n) { return n > 0 && n <= 500; });
+            appendIntEdit({ "viewer-dpi-min", "Minumum DPI" }, [] (int n) { return n > 0 && n <= 500; });
+            appendIntEdit({ "viewer-dpi-max", "Maximum DPI" }, [] (int n) { return n > 0 && n <= 500; });
+
+            appendDoubleEdit({ "viewer-resolution", "Render resolution" }, [] (qreal n) { return n > 0 && n <= 4; });
         } else if (item == snippetsItem) {
             appendCheckBoxes(Properties {
                 { "editor-flag-snippets-regular", "Enable regular snippets in editor" },
