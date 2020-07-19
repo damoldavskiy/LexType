@@ -1,5 +1,7 @@
 #include "mathwriter.h"
 
+#include "styler.h"
+
 QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
 QVector<QChar> openBraces = { '(', '{', '[' };
 QVector<QChar> closeBraces = { ')', '}', ']' };
@@ -40,6 +42,8 @@ QString MathWriter::pass(const QString &source)
     bool mline = false;
     int start;
 
+    QVector<QPair<QString, QString>> dict = snippetList();
+
     for (int i = 0; i < source.size(); ++i) {
         if (source[i] == '`') {
             if (math && source[i - 1] == '`' && !mline) {
@@ -53,9 +57,9 @@ QString MathWriter::pass(const QString &source)
                 start = i + 1;
             else { // TODO string_view
                 if (mline)
-                    result += "$$" + apply(source.mid(start + 1, i - start - 2)) + "$$";
+                    result += "$$" + apply(source.mid(start + 1, i - start - 2), dict) + "$$";
                 else
-                    result += "$" + apply(source.mid(start, i - start)) + "$";
+                    result += "$" + apply(source.mid(start, i - start), dict) + "$";
                 mline = false;
             }
         } else if (!math) {
@@ -66,100 +70,7 @@ QString MathWriter::pass(const QString &source)
     return result;
 }
 
-QString MathWriter::applyParameters(QString source)
-{
-    // TODO \\sqrt(x + 2) -> \\sqrt{x + 2}, \\lim(x -> 0) -> \\lim_{x -> 0}
-    return source;
-}
-
-QString MathWriter::applyMatrices(QString source)
-{
-    QVector<QVector<QString>> matrices {
-        { "\\(", ")", "pmatrix" },
-        { "\\[", "]", "bmatrix" },
-        { "\\{", "}", "Bmatrix" },
-        { "{{", "}}", "cases" }
-    };
-
-    for (int i = 0; i < source.size() - 1; ++i)
-        for (const QVector<QString> &pattern : matrices)
-            if (source.size() - i >= pattern[0].size() && source.mid(i, pattern[0].size()) == pattern[0]) {
-
-                int start = i;
-
-                QStack<QChar> braces;
-                for (++i; i < source.size(); ++i) {
-                    if (isOpenBrace(source[i]))
-                        braces.push(source[i]);
-                    else if (isCloseBrace(source[i])) {
-                        if (braces.size() > 0 && isClosing(braces.top(), source[i]))
-                            braces.pop();
-                        else
-                            break;
-                    } else {
-                        if (braces.size() == 1) {
-                            if (source[i] == ',') {
-                                if (pattern[2] != "cases") {
-                                    source.replace(i, 1, " &");
-                                    i += 2;
-                                } else {
-                                    source.replace(i, 1, " ,&");
-                                    i += 3;
-                                }
-                            } else if (source[i] == ';') {
-                                source.replace(i, 1, " \\\\");
-                                i += 3;
-                            }
-
-                        }
-                    }
-
-                    if (braces.size() == 0)
-                        break;
-                }
-
-                source.replace(i, pattern[1].size(), " \\end{" + pattern[2] + "}");
-                source.replace(start, pattern[0].size(), "\\begin{" + pattern[2] + "} ");
-
-                i = start + 6 + pattern[2].size();
-            }
-
-    return source;
-}
-
-QString MathWriter::applyFractions(QString source)
-{
-    for (int i = 0; i < source.size(); ++i) {
-        if (source[i] == '/') {
-            int leftBrace = findBracePlace(source, i, -1);
-            int rightBrace = findBracePlace(source, i, 1);
-
-            if (leftBrace != i && rightBrace != i) {
-                if (source[leftBrace] == '-')
-                    ++leftBrace;
-                if (source[i - 1] == ')' && source[leftBrace] == '(') {
-                    source.remove(i - 1, 1);
-                    source.remove(leftBrace, 1);
-                    i -= 2;
-                    rightBrace -= 2;
-                }
-                if (source[i + 1] == '(' && source[rightBrace] == ')') {
-                    source.remove(rightBrace, 1);
-                    source.remove(i + 1, 1);
-                    rightBrace -= 2;
-                }
-                source.remove(i, 1);
-                source.insert(rightBrace, "}");
-                source.insert(i, "}{");
-                source.insert(leftBrace, "\\frac{");
-            }
-        }
-    }
-
-    return source;
-}
-
-QString MathWriter::apply(QString source)
+QVector<QPair<QString, QString>> MathWriter::snippetList()
 {
     QVector<QPair<QString, QString>> dict;
 
@@ -270,11 +181,110 @@ QString MathWriter::apply(QString source)
     dict.append({ "Ω", "{\\Omega}" });
     dict.append({ "ω", "{\\omega}" });
 
-    // TODO More effective
-    source = applyParameters(source);
-    source = applyMatrices(source);
-    source = applyFractions(source);
+    return dict;
+}
 
+QString MathWriter::applyParameters(QString source)
+{
+    // TODO \\sqrt(x + 2) -> \\sqrt{x + 2}, \\lim(x -> 0) -> \\lim_{x -> 0}
+    return source;
+}
+
+QString MathWriter::applyMatrices(QString source)
+{
+    if (!Styler::get<bool>("math-flag-matrices"))
+        return std::move(source);
+
+    QVector<QVector<QString>> matrices {
+        { "\\(", ")", "pmatrix" },
+        { "\\[", "]", "bmatrix" },
+        { "\\{", "}", "Bmatrix" },
+        { "{{", "}}", "cases" }
+    };
+
+    for (int i = 0; i < source.size() - 1; ++i)
+        for (const QVector<QString> &pattern : matrices)
+            if (source.size() - i >= pattern[0].size() && source.mid(i, pattern[0].size()) == pattern[0]) {
+
+                int start = i;
+
+                QStack<QChar> braces;
+                for (++i; i < source.size(); ++i) {
+                    if (isOpenBrace(source[i]))
+                        braces.push(source[i]);
+                    else if (isCloseBrace(source[i])) {
+                        if (braces.size() > 0 && isClosing(braces.top(), source[i]))
+                            braces.pop();
+                        else
+                            break;
+                    } else {
+                        if (braces.size() == 1) {
+                            if (source[i] == ',') {
+                                if (pattern[2] != "cases") {
+                                    source.replace(i, 1, " &");
+                                    i += 2;
+                                } else {
+                                    source.replace(i, 1, " ,&");
+                                    i += 3;
+                                }
+                            } else if (source[i] == ';') {
+                                source.replace(i, 1, " \\\\");
+                                i += 3;
+                            }
+
+                        }
+                    }
+
+                    if (braces.size() == 0)
+                        break;
+                }
+
+                source.replace(i, pattern[1].size(), " \\end{" + pattern[2] + "}");
+                source.replace(start, pattern[0].size(), "\\begin{" + pattern[2] + "} ");
+
+                i = start + 6 + pattern[2].size();
+            }
+
+    return source;
+}
+
+QString MathWriter::applyFractions(QString source)
+{
+    if (!Styler::get<bool>("math-flag-fractions"))
+        return std::move(source);
+
+    for (int i = 0; i < source.size(); ++i) {
+        if (source[i] == '/') {
+            int leftBrace = findBracePlace(source, i, -1);
+            int rightBrace = findBracePlace(source, i, 1);
+
+            if (leftBrace != i && rightBrace != i) {
+                if (source[leftBrace] == '-')
+                    ++leftBrace;
+                if (source[i - 1] == ')' && source[leftBrace] == '(') {
+                    source.remove(i - 1, 1);
+                    source.remove(leftBrace, 1);
+                    i -= 2;
+                    rightBrace -= 2;
+                }
+                if (source[i + 1] == '(' && source[rightBrace] == ')') {
+                    source.remove(rightBrace, 1);
+                    source.remove(i + 1, 1);
+                    rightBrace -= 2;
+                }
+                source.remove(i, 1);
+                source.insert(rightBrace, "}");
+                source.insert(i, "}{");
+                source.insert(leftBrace, "\\frac{");
+            }
+        }
+    }
+
+    return source;
+}
+
+QString MathWriter::applySnippets(QString source, const QVector<QPair<QString, QString>> &dict)
+{
     QString result;
     for (int i = 0; i < source.size(); ++i) {
         bool next = false;
@@ -297,5 +307,16 @@ QString MathWriter::apply(QString source)
     }
 
     return result;
+}
+
+QString MathWriter::apply(QString source, const QVector<QPair<QString, QString>> &dict)
+{
+    // TODO More effective
+    source = applyParameters(source);
+    source = applyMatrices(source);
+    source = applyFractions(source);
+    source = applySnippets(source, dict);
+
+    return source;
 }
 

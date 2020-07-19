@@ -71,10 +71,17 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
+    _timer.setSingleShot(true);
+
     menuBar()->setStyleSheet(Styler::get<QString>("menu-style"));
     statusBar()->setStyleSheet(Styler::get<QString>("status-style"));
 
     connect(_editor, &Editor::typed, this, &MainWindow::typed);
+
+    connect(&_compilation, &QProcess::readyRead, this, &MainWindow::output);
+    connect(&_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
+
+    connect(&_timer, &QTimer::timeout, this, &MainWindow::compile);
 }
 
 void MainWindow::open()
@@ -132,26 +139,25 @@ void MainWindow::compile()
         return;
     }
 
-    save();
-
     QFileInfo fileInfo(_path.dir(), _path.baseName() + ".tex");
-    writeText(fileInfo.filePath(), MathWriter::pass(_editor->text()));
 
-    if (_compilation != nullptr)
-        delete _compilation;
-    _compilation = new QProcess;
-    _compilation->setWorkingDirectory(fileInfo.dir().absolutePath());
-    // TODO do we need it?
-//    process->deleteLater();
+    if (_path.edited() || !fileInfo.exists()) {
+        save(); // .lex
+        writeText(fileInfo.filePath(), MathWriter::pass(_editor->text())); // .tex
+    }
 
-    connect(_compilation, &QProcess::readyRead, this, &MainWindow::output);
-    connect(_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
+    if (_compilation.state() != QProcess::NotRunning) {
+        _compilation.kill();
+        _compilation.waitForFinished(-1);
+    }
+
+    _compilation.setWorkingDirectory(fileInfo.dir().absolutePath());
 
     if (!Styler::get<bool>("editor-flag-autocompile"))
         _splitter->setSizes({ 7, 3 });
 
     _console->setText("");
-    _compilation->start("pdflatex", { fileInfo.filePath() });
+    _compilation.start("pdflatex", { fileInfo.filePath() });
 }
 
 void MainWindow::painter()
@@ -181,7 +187,7 @@ void MainWindow::options()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, "About LexType", "LexType is a software environment targeted on effecive writing of any kind of lecture or technical notes.\n\nAuthor: DA Moldavskiy\n\nContact me: party_50@mail.ru");
+    QMessageBox::about(this, "About LexType", "LexType is a software environment targeted on effecive writing of any kind of lecture or technical notes.\n\nAuthor: DA Moldavsky\n\nContact me: party_50@mail.ru");
 }
 
 void MainWindow::aboutQt()
@@ -197,13 +203,13 @@ void MainWindow::typed(int, QChar)
 
     _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
 
-    if (Styler::get<bool>("editor-flag-autocompile"))
-        compile();
+    if (Styler::get<bool>("editor-flag-autocompile") && _timer.remainingTime() == -1)
+        _timer.start(Styler::get<int>("editor-autocompile-interval"));
 }
 
 void MainWindow::output()
 {
-    _console->insert(_console->caret(), QString(_compilation->readAll()));
+    _console->insert(_console->caret(), QString(_compilation.readAll()));
     statusBar()->showMessage("Compiling...");
 }
 

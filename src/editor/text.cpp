@@ -271,9 +271,6 @@ void Text::updateMarkup(int) // TODO Unused parameter
                     mline = false;
             }
 
-//            if (_data[i] == '`')
-//                math = !math;
-
             if (_data[i] == '`' || math)
                 interval = Interval::Mathematics;
             else

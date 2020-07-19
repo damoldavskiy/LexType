@@ -60,7 +60,10 @@ void Styler::reset()
     set("editor-flag-keyboard", true);
     set("editor-flag-snippets-regular", true);
     set("editor-flag-snippets-math", true);
-    set("editor-flag-autocompile", false);
+    set("editor-flag-autocompile", true);
+
+    set("math-flag-fractions", true);
+    set("math-flag-matrices", true);
 
     set("painter-flag-snippets", true);
 
@@ -68,6 +71,7 @@ void Styler::reset()
 
     set("editor-tick-time", 600);
     set("editor-tab-width", 4);
+    set("editor-autocompile-interval", 1000);
 
     set("painter-attract-radius", 10);
 

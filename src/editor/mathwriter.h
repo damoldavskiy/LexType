@@ -67,10 +67,12 @@ class MathWriter
 {
 public:
     static QString pass(const QString &source);
+    static QVector<QPair<QString, QString>> snippetList();
     static QString applyParameters(QString source);
     static QString applyMatrices(QString source);
     static QString applyFractions(QString source);
-    static QString apply(QString source);
+    static QString applySnippets(QString source, const QVector<QPair<QString, QString>> &dict);
+    static QString apply(QString source, const QVector<QPair<QString, QString>> &dict);
 };
 
 #endif // MATHWRITER_H

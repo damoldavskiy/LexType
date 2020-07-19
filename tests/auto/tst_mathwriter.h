@@ -14,8 +14,9 @@ private slots:
 
 void tst_MathWriter::basic()
 {
-    QCOMPARE(MathWriter::apply("f: x → y"), QString("f \\colon x \\to y"));
-    QCOMPARE(MathWriter::apply("f : x > y"), QString("f : x > y"));
+    auto dict = MathWriter::snippetList();
+    QCOMPARE(MathWriter::apply("f: x → y", dict), QString("f \\colon x \\to y"));
+    QCOMPARE(MathWriter::apply("f : x > y", dict), QString("f : x > y"));
 }
 
 void tst_MathWriter::fractions()

@@ -66,7 +66,8 @@ private:
     QAction *_aboutQtAction;
 
     PathWatcher _path = PathWatcher("LexType");
-    QProcess *_compilation = nullptr;
+    QProcess _compilation;
+    QTimer _timer;
 };
 
 #endif // MAINWINDOW_H

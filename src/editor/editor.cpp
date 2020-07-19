@@ -28,8 +28,8 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
     setFocusPolicy(Qt::ClickFocus);
     updateSettings();
 
-    connect(_timer, &QTimer::timeout, this, &Editor::tick);
-    _timer->start(Styler::get<int>("editor-tick-time"));
+    connect(&_timer, &QTimer::timeout, this, &Editor::tick);
+    _timer.start(Styler::get<int>("editor-tick-time"));
 }
 
 QString Editor::text() const
@@ -90,7 +90,7 @@ void Editor::updateSettings()
     setFont(Styler::get<QFont>("editor-font"));
     _text.setFont(font());
     _text.setTabWidth(Styler::get<int>("editor-tab-width"));
-    _timer->setInterval(Styler::get<int>("editor-tick-time"));
+    _timer.setInterval(Styler::get<int>("editor-tick-time"));
     if (_numbers != nullptr) {
         _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));
         _numbers->setFont(font());
@@ -308,12 +308,14 @@ void Editor::keyPressEvent(QKeyEvent *event)
             removeSelection();
         else if (_pos > 0)
             removeText(--_pos, 1);
+        emit typed(_pos, '\b');
         break;
     case Qt::Key_Delete:
         if (_spos != -1)
             removeSelection();
         else if (_pos < _text.size())
             removeText(_pos, 1);
+        emit typed(_pos + 1, '\b');
         break;
     case Qt::Key_PageUp:
         newpos = 0;
@@ -499,13 +501,13 @@ void Editor::wheelEvent(QWheelEvent *event)
 void Editor::focusInEvent(QFocusEvent *)
 {
     _caret = true;
-    _timer->start(Styler::get<int>("editor-tick-time"));
+    _timer.start(Styler::get<int>("editor-tick-time"));
     update();
 }
 
 void Editor::focusOutEvent(QFocusEvent *)
 {
-    _timer->stop();
+    _timer.stop();
     _caret = false;
     update();
 }
@@ -578,8 +580,6 @@ void Editor::removeSelection()
 // Shifts window to the caret
 void Editor::updateShift()
 {
-    if (_spos != -1)
-        updateShift(findShift(_spos)); // TODO We can find this point faster, based on _pos point
     updateShift(findShift(_pos));
 }
 
@@ -595,7 +595,7 @@ void Editor::updateShift(QPointF point)
 void Editor::updateUi(bool resetCaret)
 {
     if (resetCaret) {
-        _timer->start(Styler::get<int>("editor-tick-time"));
+        _timer.start(Styler::get<int>("editor-tick-time"));
         _caret = true;
     }
     highlightSpecial();

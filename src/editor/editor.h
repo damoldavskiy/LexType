@@ -83,7 +83,7 @@ private:
     qreal _xshift = 0;
     qreal _yshift = 0;
 
-    QTimer *_timer = new QTimer(this);
+    QTimer _timer;
     bool _caret = true;
 
     QSet<int> _highlighted;

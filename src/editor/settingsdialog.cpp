@@ -87,6 +87,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
             appendIntEdit({ "editor-tab-width", "Tab width" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
+            appendIntEdit({ "editor-autocompile-interval", "Auto-compile interval" }, [] (int n) { return n >= 0; });
 
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },
@@ -126,7 +127,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             appendSnippetsList();
         } else if (item == mathItem) {
             appendCheckBoxes(Properties {
-                { "editor-flag-keyboard", "Inverse keyboard layout in math mode" }
+                { "editor-flag-keyboard", "Inverse keyboard layout in math mode" },
+                { "math-flag-fractions", "New fraction style" },
+                { "math-flag-matrices", "New matrix style" }
             });
         }
     });
