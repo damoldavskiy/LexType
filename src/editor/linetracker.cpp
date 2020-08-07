@@ -9,26 +9,32 @@ QPair<int, int> LineTracker::insert(int pos, const QString &text)
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
 
+    int lineCount = 0;
+    for (int i = 0; i < text.size(); ++i)
+        if (text[i] == '\n')
+            ++lineCount;
+
     int line = find(pos);
     int startLine = line;
-    int count = 0;
+    for (int i = line + 1; i < _lines.size(); ++i)
+        _lines[i].start += text.size();
+
+    int extra = _lines[line].size - (pos - _lines[line].start);
+    _lines[line].size -= extra;
+
+    _lines.insert(line + 1, lineCount, { 0, 0 });
+
     for (int i = 0; i < text.size(); ++i)
         if (text[i] == '\n') {
-            if (count > 0) {
-                insertText(line, count);
-                pos += count;
-                count = 0;
-            }
-            insertLine(line, pos++ - _lines[line].start);
             ++line;
+            _lines[line].start = _lines[line - 1].start + _lines[line - 1].size + 1;
         } else {
-            ++count;
+            ++_lines[line].size;
         }
 
-    if (count > 0)
-        insertText(line, count);
+    _lines[line].size += extra;
 
-    return { startLine, line - startLine };
+    return { startLine, lineCount };
 }
 
 void LineTracker::insertText(int line, int count)
