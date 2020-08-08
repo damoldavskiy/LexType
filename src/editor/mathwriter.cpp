@@ -197,14 +197,16 @@ QString MathWriter::applyParameters(QString source)
 {
     for (int i = 0; i < source.size() - 1; ++i)
         if (source[i] == '_' || source[i] == '^') {
-            int end = findBracketPlace(source, i, 1, { '_', '^' });
+            int end = findBracketPlace(source, i, 1, { '_', '^', '/' });
             if (source[i + 1] == '(' && source[end] == ')') {
                 source.remove(end, 1);
                 source.remove(i + 1, 1);
                 end -= 2;
             }
-            source.insert(end + 1, '}');
-            source.insert(i + 1, '{');
+            if (source[i + 1] != '{') {
+                source.insert(end + 1, '}');
+                source.insert(i + 1, '{');
+            }
         }
 
     return source;
@@ -329,6 +331,27 @@ QString MathWriter::applySnippets(QString source, const QVector<QPair<QString, Q
     return result;
 }
 
+QString MathWriter::applyCyrillic(QString source)
+{
+    for (int i = 0; i < source.size(); ++i)
+        if (QString("ёйцукенгшщзхъфывапролджэячсмитьбю").contains(source[i])) {
+            if (i > 0 && source[i - 1] == '{') {
+                int end = findBracket(source, i - 1);
+                if (end != -1) {
+                    source.insert(i - 1, "\\text");
+                    i = end + 5;
+                }
+            } else {
+                source.insert(i, "\\text{");
+                int end = findBracketPlace(source, i + 5);
+                source.insert(end + 1, '}');
+                i = end;
+            }
+        }
+
+    return source;
+}
+
 QString MathWriter::apply(QString source, const QVector<QPair<QString, QString>> &dict)
 {
     // TODO More effective
@@ -336,6 +359,7 @@ QString MathWriter::apply(QString source, const QVector<QPair<QString, QString>>
     source = applyMatrices(source);
     source = applyFractions(source);
     source = applySnippets(source, dict);
+    source = applyCyrillic(source);
 
     return source;
 }

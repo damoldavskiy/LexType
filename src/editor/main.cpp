@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QFontDatabase::addApplicationFont(":/Lato-Regular.ttf");
     QFontDatabase::addApplicationFont(":/CMUSerif-Roman.ttf");
 
-    a.setFont(QFont("Lato Regular", 11));
+    a.setFont(QFont("Lato", 11));
 
     MainWindow w;
     w.show();
