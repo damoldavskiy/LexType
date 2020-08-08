@@ -87,7 +87,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
             appendIntEdit({ "editor-tab-width", "Tab width (spaces)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
-            appendIntEdit({ "editor-autocompile-interval", "Auto-compile interval" }, [] (int n) { return n >= 0; });
+            appendIntEdit({ "editor-autocompile-interval", "Auto-compile interval (ms)" }, [] (int n) { return n >= 0; });
 
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },

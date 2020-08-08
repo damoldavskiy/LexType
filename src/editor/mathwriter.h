@@ -12,25 +12,25 @@ QChar getClosing(QChar open, int direction = 1);
 bool isClosing(QChar open, QChar close, int direction = 1);
 
 template <typename T>
-int findBracketPlace(const T &source, int start, int direction)
+int findBracketPlace(const T &source, int start, int direction = 1, QVector<QChar> extraDelimeters = { })
 {
     int i = start + direction;
     if (i < 0 || i >= source.size() || isDelimeter(source[i]))
         return  i - direction;
 
-    QStack<QChar> braces;
+    QStack<QChar> brackets;
     bool bracesFail = false;
     do {
         if (isOpenBracket(source[i], direction))
-            braces.push(source[i]);
+            brackets.push(source[i]);
         else if (isCloseBracket(source[i], direction)) {
-            if (braces.size() > 0 && isClosing(braces.top(), source[i], direction))
-                braces.pop();
+            if (brackets.size() > 0 && isClosing(brackets.top(), source[i], direction))
+                brackets.pop();
             else
                 bracesFail = true;
         }
         i += direction;
-    } while (i >= 0 && i < source.size() && !bracesFail && (braces.size() > 0 || (braces.size() == 0 && !isDelimeter(source[i]))));
+    } while (i >= 0 && i < source.size() && !bracesFail && (brackets.size() > 0 || (brackets.size() == 0 && !isDelimeter(source[i]) && !extraDelimeters.contains(source[i]))));
     i -= direction;
 
     // (sin(x)/x) -> (\frac{sin(x)}{x})

@@ -53,7 +53,7 @@ void Styler::reset()
     set("viewer-paper", QColor { 60, 60, 60 });
     set("viewer-text", QColor { 240, 240, 240 });
 
-    set("editor-font", QFont("Lato", 11));
+    set("editor-font", QFont("Lato Regular", 11));
 
     set("editor-flag-line", true);
     set("editor-flag-numbers", true);

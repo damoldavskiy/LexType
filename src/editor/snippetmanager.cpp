@@ -100,7 +100,7 @@ void SnippetManager::reset()
     _snippets.append(Snippet(false, "sum", "∑"));
     _snippets.append(Snippet(false, "prod", "∏"));
     _snippets.append(Snippet(false, "∈t", "∫"));
-    _snippets.append(Snippet(false, "∫i", "∫_{-∞}^{+∞}"));
+    _snippets.append(Snippet(false, "∫i", "∫_-∞^+∞"));
 
     _snippets.append(Snippet(false, "!O", "∅"));
 

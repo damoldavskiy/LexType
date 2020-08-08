@@ -105,6 +105,7 @@ QVector<QPair<QString, QString>> MathWriter::snippetList()
     dict.append({ "cos", "\\cos" });
     dict.append({ "sqrt", "\\sqrt" });
     dict.append({ "exp", "\\exp" });
+    dict.append({ "ker", "\\ker" });
 
     dict.append({ "text", "\\text" });
     dict.append({ "comment", "\\comment" });
@@ -194,7 +195,18 @@ QVector<QPair<QString, QString>> MathWriter::snippetList()
 
 QString MathWriter::applyParameters(QString source)
 {
-    // TODO \\sqrt(x + 2) -> \\sqrt{x + 2}, \\lim(x -> 0) -> \\lim_{x -> 0}
+    for (int i = 0; i < source.size() - 1; ++i)
+        if (source[i] == '_' || source[i] == '^') {
+            int end = findBracketPlace(source, i, 1, { '_', '^' });
+            if (source[i + 1] == '(' && source[end] == ')') {
+                source.remove(end, 1);
+                source.remove(i + 1, 1);
+                end -= 2;
+            }
+            source.insert(end + 1, '}');
+            source.insert(i + 1, '{');
+        }
+
     return source;
 }
 
@@ -216,17 +228,17 @@ QString MathWriter::applyMatrices(QString source)
 
                 int start = i;
 
-                QStack<QChar> braces;
+                QStack<QChar> brackets;
                 for (++i; i < source.size(); ++i) {
                     if (isOpenBracket(source[i]))
-                        braces.push(source[i]);
+                        brackets.push(source[i]);
                     else if (isCloseBracket(source[i])) {
-                        if (braces.size() > 0 && isClosing(braces.top(), source[i]))
-                            braces.pop();
+                        if (brackets.size() > 0 && isClosing(brackets.top(), source[i]))
+                            brackets.pop();
                         else
                             break;
                     } else {
-                        if (braces.size() == 1) {
+                        if (brackets.size() == 1) {
                             if (source[i] == ',') {
                                 if (pattern[2] != "cases") {
                                     source.replace(i, 1, " &");
@@ -243,7 +255,7 @@ QString MathWriter::applyMatrices(QString source)
                         }
                     }
 
-                    if (braces.size() == 0)
+                    if (brackets.size() == 0)
                         break;
                 }
 
@@ -264,7 +276,7 @@ QString MathWriter::applyFractions(QString source)
     for (int i = 0; i < source.size(); ++i) {
         if (source[i] == '/') {
             int leftBrace = findBracketPlace(source, i, -1);
-            int rightBrace = findBracketPlace(source, i, 1);
+            int rightBrace = findBracketPlace(source, i);
 
             if (leftBrace != i && rightBrace != i) {
                 if (source[leftBrace] == '-')

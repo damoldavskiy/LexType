@@ -35,7 +35,7 @@
 \end{proof}
 
 \begin{remark}
-	``∫_{-∞}^{+∞} t ⋅ e^{ -t^2/2σ^2 } dt = 0``
+	``∫_-∞^+∞ t ⋅ e^((-t^2)/(2σ^2)) dt = 0``
 \end{remark}
 
 \begin{lemma}[Евклида]
@@ -55,4 +55,5 @@
 \end{example}
 
 \end{document}
+
 

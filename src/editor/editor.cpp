@@ -275,11 +275,8 @@ void Editor::paintEvent(QPaintEvent *)
                         break;
                     }
 
-                if (_text[pos] != '\t' && left + cwidth >= _xshift) { // Drawable symbol
-                    // Symbol height != font height, centering it
-                    qreal delta = _text.text(pos).size().height() - _text.fontHeight();
-                    painter.drawStaticText(QPointF { left - _xshift, top - delta / 2 }, _text.text(pos));
-                }
+                if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
+                    painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
             }
 
             if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
