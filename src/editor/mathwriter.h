@@ -6,12 +6,13 @@
 #include <QStack>
 
 bool isDelimeter(QChar symbol);
-bool isOpenBrace(QChar symbol, int direction = 1);
-bool isCloseBrace(QChar symbol, int direction = 1);
+bool isOpenBracket(QChar symbol, int direction = 1);
+bool isCloseBracket(QChar symbol, int direction = 1);
+QChar getClosing(QChar open, int direction = 1);
 bool isClosing(QChar open, QChar close, int direction = 1);
 
 template <typename T>
-int findBracePlace(const T &source, int start, int direction)
+int findBracketPlace(const T &source, int start, int direction)
 {
     int i = start + direction;
     if (i < 0 || i >= source.size() || isDelimeter(source[i]))
@@ -20,9 +21,9 @@ int findBracePlace(const T &source, int start, int direction)
     QStack<QChar> braces;
     bool bracesFail = false;
     do {
-        if (isOpenBrace(source[i], direction))
+        if (isOpenBracket(source[i], direction))
             braces.push(source[i]);
-        else if (isCloseBrace(source[i], direction)) {
+        else if (isCloseBracket(source[i], direction)) {
             if (braces.size() > 0 && isClosing(braces.top(), source[i], direction))
                 braces.pop();
             else
@@ -33,29 +34,36 @@ int findBracePlace(const T &source, int start, int direction)
     i -= direction;
 
     // (sin(x)/x) -> (\frac{sin(x)}{x})
-    if (isCloseBrace(source[i], direction) && bracesFail)
+    if (isCloseBracket(source[i], direction) && bracesFail)
         i -= direction;
 
     return i;
 }
 
 template <typename T>
-int findBrace(const T &source, int start, int direction = 1)
+int findBracket(const T &source, int start, int direction = 1, QChar first = QChar::Null)
 {
-    Q_ASSERT(isOpenBrace(source[start]) || isOpenBrace(source[start], -1));
+    if (first == QChar::Null) {
+        first = source[start];
+        start += direction;
+    }
 
-    QStack<QChar> braces;
+    Q_ASSERT(isOpenBracket(first, direction));
+
+    QStack<QChar> brackets;
+    brackets.push(first);
+
     for (int i = start; i >= 0 && i < source.size(); i += direction) {
-        if (isOpenBrace(source[i], direction))
-            braces.push(source[i]);
-        else if (isCloseBrace(source[i], direction)) {
-            if (braces.size() > 0 && isClosing(braces.top(), source[i], direction))
-                braces.pop();
+        if (isOpenBracket(source[i], direction))
+            brackets.push(source[i]);
+        else if (isCloseBracket(source[i], direction)) {
+            if (brackets.size() > 0 && isClosing(brackets.top(), source[i], direction))
+                brackets.pop();
             else // Brace sequence is incorrect
                 return -1;
         }
 
-        if (braces.size() == 0)
+        if (brackets.size() == 0)
             return i;
     }
 

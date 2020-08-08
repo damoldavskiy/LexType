@@ -85,14 +85,15 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "numbers-current", "Numbers current" }
             });
 
-            appendIntEdit({ "editor-tab-width", "Tab width" }, [] (int n) { return n > 0; });
+            appendIntEdit({ "editor-tab-width", "Tab width (spaces)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-autocompile-interval", "Auto-compile interval" }, [] (int n) { return n >= 0; });
 
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
-                { "editor-flag-autocompile", "Compile on type" }
+                { "editor-flag-autocompile", "Compile on type" },
+                { "editor-flag-brackets", "Smart brackets" }
             });
         } else if (item == painterItem) {
             appendColorButtons(Properties {

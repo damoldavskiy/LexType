@@ -3,36 +3,44 @@
 #include "styler.h"
 
 QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
-QVector<QChar> openBraces = { '(', '{', '[' };
-QVector<QChar> closeBraces = { ')', '}', ']' };
+QVector<QChar> openBrackets = { '(', '{', '[' };
+QVector<QChar> closeBrackets = { ')', '}', ']' };
 
 bool isDelimeter(QChar symbol)
 {
     return delimeters.contains(symbol);
 }
 
-bool isOpenBrace(QChar symbol, int direction)
+bool isOpenBracket(QChar symbol, int direction)
 {
     if (direction == 1)
-        return openBraces.contains(symbol);
+        return openBrackets.contains(symbol);
     else
-        return closeBraces.contains(symbol);
+        return closeBrackets.contains(symbol);
 }
 
-bool isCloseBrace(QChar symbol, int direction)
+bool isCloseBracket(QChar symbol, int direction)
 {
     if (direction == 1)
-        return closeBraces.contains(symbol);
+        return closeBrackets.contains(symbol);
     else
-        return openBraces.contains(symbol);
+        return openBrackets.contains(symbol);
+}
+
+QChar getClosing(QChar open, int direction)
+{
+    if (direction == 1)
+        return closeBrackets[openBrackets.indexOf(open)];
+    else
+        return openBrackets[closeBrackets.indexOf(open)];
 }
 
 bool isClosing(QChar open, QChar close, int direction)
 {
     if (direction == 1)
-        return openBraces.indexOf(open) != -1 && openBraces.indexOf(open) == closeBraces.indexOf(close);
+        return openBrackets.indexOf(open) != -1 && openBrackets.indexOf(open) == closeBrackets.indexOf(close);
     else
-        return openBraces.indexOf(close) != -1 && openBraces.indexOf(close) == closeBraces.indexOf(open);
+        return openBrackets.indexOf(close) != -1 && openBrackets.indexOf(close) == closeBrackets.indexOf(open);
 }
 
 QString MathWriter::pass(const QString &source)
@@ -210,9 +218,9 @@ QString MathWriter::applyMatrices(QString source)
 
                 QStack<QChar> braces;
                 for (++i; i < source.size(); ++i) {
-                    if (isOpenBrace(source[i]))
+                    if (isOpenBracket(source[i]))
                         braces.push(source[i]);
-                    else if (isCloseBrace(source[i])) {
+                    else if (isCloseBracket(source[i])) {
                         if (braces.size() > 0 && isClosing(braces.top(), source[i]))
                             braces.pop();
                         else
@@ -255,8 +263,8 @@ QString MathWriter::applyFractions(QString source)
 
     for (int i = 0; i < source.size(); ++i) {
         if (source[i] == '/') {
-            int leftBrace = findBracePlace(source, i, -1);
-            int rightBrace = findBracePlace(source, i, 1);
+            int leftBrace = findBracketPlace(source, i, -1);
+            int rightBrace = findBracketPlace(source, i, 1);
 
             if (leftBrace != i && rightBrace != i) {
                 if (source[leftBrace] == '-')

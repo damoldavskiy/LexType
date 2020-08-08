@@ -66,7 +66,7 @@ protected:
     void updateUi(bool resetCaret);
     void highlightSpecial();
     void highlightBrace(int pos);
-    void type(const QString &text);
+    void type(const QString &text, int skip = -1);
 
     void insertText(int pos, const QString &text);
     void removeText(int pos, int count);

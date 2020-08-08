@@ -418,6 +418,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
     default:
         QString text = event->text();
         if (text.size() > 0) {
+            int skip = text.size();
+
             // TODO Refactor
             if (Styler::get<bool>("editor-flag-keyboard")) {
                 if (text == "ё")
@@ -430,7 +432,21 @@ void Editor::keyPressEvent(QKeyEvent *event)
                         && (_pos == 1 || !(_text[_pos - 1] == '`' && _text.markup(_pos - 2) == Interval::Mathematics)))))
                     text = KeyboardLayout::pass(text[0]);
             }
-            type(text);
+
+            if (Styler::get<bool>("editor-flag-brackets")) {
+                if (isOpenBracket(text[0])) {
+                    int closing = findBracket(_text, _pos, 1, text[0]);
+                    if (closing == -1 || findBracket(_text, closing, -1) != -1) {
+                        text = text[0] + getClosing(text[0]);
+                        skip = 1;
+                    }
+                } else if (isCloseBracket(text[0]) && _pos < _text.size() && text[0] == _text[_pos]) {
+                    text = "";
+                    skip = 1;
+                }
+            }
+
+            type(text, skip);
             emit typed(_pos - 1, text[0]);
         }
     }
@@ -618,14 +634,14 @@ void Editor::highlightSpecial()
 void Editor::highlightBrace(int pos)
 {
     int dir = 0;
-    if (isOpenBrace(_text[pos]))
+    if (isOpenBracket(_text[pos]))
         dir = 1;
-    else if (isOpenBrace(_text[pos], -1))
+    else if (isOpenBracket(_text[pos], -1))
         dir = -1;
 
     if (dir != 0) {
         _highlighted.insert(pos);
-        int spos = findBrace(_text, pos, dir);
+        int spos = findBracket(_text, pos, dir);
         if (spos == -1)
             _error.insert(pos);
         else
@@ -633,15 +649,18 @@ void Editor::highlightBrace(int pos)
     }
 }
 
-void Editor::type(const QString &text)
+void Editor::type(const QString &text, int skip)
 {
+    if (skip == -1)
+        skip = text.size();
+
     if (_spos != -1 && _spos != _pos) // _spos == _pos possible only if mouse button is pressed
         removeSelection();
     _spos = -1;
 
     // TODO Maybe more elegant?
     int pos = _pos;
-    _pos += text.size();
+    _pos += skip;
     insertText(pos, text);
 }
 
