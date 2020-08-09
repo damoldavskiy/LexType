@@ -28,7 +28,7 @@ public slots:
     void options();
     void about();
     void aboutQt();
-    void typed(int pos, QChar symbol);
+    void textChanged();
 
 private slots:
     void output();

@@ -32,6 +32,11 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
     _timer.start(Styler::get<int>("editor-tick-time"));
 }
 
+int Editor::textSize() const
+{
+    return _text.size();
+}
+
 QString Editor::text() const
 {
     return _text.text();
@@ -64,6 +69,7 @@ void Editor::insert(int pos, const QString &text)
     insertText(pos, text);
     _pos = pos + text.size();
     _spos = -1;
+    emit changed();
     updateUi(true);
 }
 
@@ -72,6 +78,7 @@ void Editor::remove(int pos, int count)
     _pos = pos;
     _spos = -1;
     removeText(pos, count);
+    emit changed();
     updateUi(true);
 }
 
@@ -143,6 +150,7 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
     Math::limit(_pos, 0, _text.size());
     _spos = -1;
 
+    emit changed();
     updateUi(true);
 }
 
@@ -153,6 +161,8 @@ void Editor::undo()
 
     _pos = _text.undo();
     _spos = -1;
+
+    emit changed();
     updateUi(false);
 }
 
@@ -163,6 +173,8 @@ void Editor::redo()
 
     _pos = _text.redo();
     _spos = -1;
+
+    emit changed();
     updateUi(false);
 }
 
@@ -175,6 +187,8 @@ void Editor::cut()
     int length = qMax(_pos, _spos) - start;
     QApplication::clipboard()->setText(_text.mid(start, length));
     removeSelection();
+
+    emit changed();
     updateUi(false);
 }
 
@@ -191,6 +205,8 @@ void Editor::copy()
 void Editor::paste()
 {
     type(QApplication::clipboard()->text());
+
+    emit changed();
     updateUi(false);
 }
 
@@ -305,6 +321,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
             removeSelection();
         else if (_pos > 0)
             removeText(--_pos, 1);
+        emit changed();
         emit typed(_pos, '\b');
         break;
     case Qt::Key_Delete:
@@ -312,6 +329,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
             removeSelection();
         else if (_pos < _text.size())
             removeText(_pos, 1);
+        emit changed();
         emit typed(_pos + 1, '\b');
         break;
     case Qt::Key_PageUp:
@@ -408,6 +426,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Return:
         type("\n");
+        emit changed();
         emit typed(_pos - 1, '\n');
         break;
     case Qt::Key_Escape:
@@ -444,6 +463,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
             }
 
             type(text, skip);
+            emit changed();
             emit typed(_pos - 1, text[0]);
         }
     }

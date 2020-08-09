@@ -38,7 +38,9 @@ QString PathWatcher::baseName() const
 
 QString PathWatcher::title() const
 {
-    return _info.fileName() + (_edited ? "*" : "") + " - " + _app;
+    if (_info.fileName().size() > 0)
+        return _info.fileName() + (_edited ? "*" : "") + " - " + _app;
+    return _app + (_edited ? " (edited)" : "");
 }
 
 bool PathWatcher::edited() const

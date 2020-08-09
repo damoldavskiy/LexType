@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     menuBar()->setStyleSheet(Styler::get<QString>("menu-style"));
     statusBar()->setStyleSheet(Styler::get<QString>("status-style"));
 
-    connect(_editor, &Editor::typed, this, &MainWindow::typed);
+    connect(_editor, &Editor::changed, this, &MainWindow::textChanged);
 
     connect(&_compilation, &QProcess::readyRead, this, &MainWindow::output);
     connect(&_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
@@ -86,8 +86,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::open()
 {
-//    if (_path.edited())
-        // Do you want to save changes?
+    if (_path.edited() && QMessageBox::question(this, "Open", "Changes unsaved. Do you really want to open another file?") != QMessageBox::Yes)
+        return;
 
     if (_path.open("LexType (*.lex);;TeX (*tex)")) {
         _editor->setText(readText(_path.path()));
@@ -129,7 +129,7 @@ void MainWindow::find()
     connect(dialog, &FindDialog::find, _editor, &Editor::find);
     connect(dialog, &FindDialog::replace, _editor, &Editor::replace);
     dialog->exec();
-    delete dialog; // TODO Is it ok with connects?
+    delete dialog;
 }
 
 void MainWindow::compile()
@@ -195,10 +195,10 @@ void MainWindow::aboutQt()
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::typed(int, QChar)
+void MainWindow::textChanged()
 {
     // TODO Insert from clipborad doesn't emit Editor::typed
-    _path.setEdited(true);
+    _path.setEdited(_editor->textSize() > 0);
     setWindowTitle(_path.title());
 
     _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));

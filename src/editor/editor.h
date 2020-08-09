@@ -16,6 +16,8 @@ class Editor : public QWidget
 public:
     Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
 
+    int textSize() const;
+
     QString text() const;
     void setText(const QString &text);
     int caret() const;
@@ -32,6 +34,7 @@ public:
 
 signals:
     void typed(int pos, QChar symbol);
+    void changed();
 
 public slots:
     void find(const QString &substring, bool matchCase);
