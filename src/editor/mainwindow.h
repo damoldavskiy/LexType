@@ -23,6 +23,7 @@ public slots:
     void saveAs();
     void quit();
     void find();
+    void toggleConsole();
     void compile();
     void painter();
     void options();
@@ -59,6 +60,7 @@ private:
     QAction *_copyAction;
     QAction *_pasteAction;
     QAction *_selectAllAction;
+    QAction *_toggleConsoleAction;
     QAction *_compileAction;
     QAction *_painterAction;
     QAction *_optionsAction;

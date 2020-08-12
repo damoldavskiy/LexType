@@ -47,10 +47,8 @@ void PainterToolkit::uncheckFill()
 
 void PainterToolkit::showLine(bool value)
 {
-    if (value && _lineSeparator->isVisible()) {
-        uncheckLine();
-        _lineSolid->setChecked(true);
-    }
+    uncheckLine();
+    _lineSolid->setChecked(true);
     _lineSeparator->setVisible(value);
     _lineSolid->setVisible(value);
     _lineDash->setVisible(value);
@@ -58,10 +56,8 @@ void PainterToolkit::showLine(bool value)
 
 void PainterToolkit::showTip(bool value)
 {
-    if (value && _tipSeparator->isVisible()) {
-        uncheckTip();
-        _tipSoft->setChecked(true);
-    }
+    uncheckTip();
+    _tipSoft->setChecked(true);
     _tipSeparator->setVisible(value);
     _tipSoft->setVisible(value);
     _tipArrow->setVisible(value);
@@ -70,10 +66,8 @@ void PainterToolkit::showTip(bool value)
 
 void PainterToolkit::showFill(bool value)
 {
-    if (value && _fillSeparator->isVisible()) {
-        uncheckFill();
-        _fillEmpty->setChecked(true);
-    }
+    uncheckFill();
+    _fillEmpty->setChecked(true);
     _fillSeparator->setVisible(value);
     _fillEmpty->setVisible(value);
     _fillSolid->setVisible(value);

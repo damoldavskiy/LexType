@@ -1,6 +1,7 @@
 #include "mathwriter.h"
 
 #include "styler.h"
+#include "keyboardlayout.h"
 
 QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
 QVector<QChar> openBrackets = { '(', '{', '[' };
@@ -334,7 +335,7 @@ QString MathWriter::applySnippets(QString source, const QVector<QPair<QString, Q
 QString MathWriter::applyCyrillic(QString source)
 {
     for (int i = 0; i < source.size(); ++i)
-        if (QString("ёйцукенгшщзхъфывапролджэячсмитьбю").contains(source[i])) {
+        if (KeyboardLayout::isCyrillicSpecific(source[i])) {
             if (i > 0 && source[i - 1] == '{') {
                 int end = findBracket(source, i - 1);
                 if (end != -1) {

@@ -132,6 +132,14 @@ void MainWindow::find()
     delete dialog;
 }
 
+void MainWindow::toggleConsole()
+{
+    if (_splitter->sizes().at(1) == 0)
+        _splitter->setSizes({ 7, 3 });
+    else
+        _splitter->setSizes({ 1, 0 });
+}
+
 void MainWindow::compile()
 {
     if (!_path.exists()) {
@@ -277,6 +285,10 @@ void MainWindow::createActions()
     _selectAllAction->setShortcut(QKeySequence("Ctrl+A"));
     connect(_selectAllAction, &QAction::triggered, _editor, &Editor::selectAll);
 
+    _toggleConsoleAction = new QAction("Toggle console", this);
+    _toggleConsoleAction->setShortcut(QKeySequence("F4"));
+    connect(_toggleConsoleAction, &QAction::triggered, this, &MainWindow::toggleConsole);
+
     _compileAction = new QAction("Compile", this);
     _compileAction->setShortcut(QKeySequence("F5"));
     connect(_compileAction, &QAction::triggered, this, &MainWindow::compile);
@@ -312,7 +324,7 @@ void MainWindow::createMenus()
     menu->addActions({ _cutAction, _copyAction, _pasteAction, _selectAllAction });
 
     menu = menuBar()->addMenu("Tools");
-    menu->addActions({ _compileAction, _painterAction });
+    menu->addActions({ _toggleConsoleAction, _compileAction, _painterAction });
     menu->addSeparator();
     menu->addActions({ _optionsAction });
 
