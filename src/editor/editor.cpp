@@ -226,7 +226,7 @@ void Editor::tick()
     _caret = !_caret;
 }
 
-void Editor::paintEvent(QPaintEvent *)
+void Editor::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     int width = size().width();
@@ -255,53 +255,58 @@ void Editor::paintEvent(QPaintEvent *)
         if (_numbers != nullptr)
             _numbers->add(top + _text.fontAscent(), i + 1);
 
-        if (i == line && Styler::get<bool>("editor-flag-line"))
-            painter.fillRect(0, top, width, _text.fontHeight(), Styler::get<QColor>("editor-line"));
+        // TODO Specify correct height of this libe (wordwrap)
+        if (QRect(0, top, width, _text.fontHeight()).intersects(event->rect())) {
+            if (i == line && Styler::get<bool>("editor-flag-line"))
+                painter.fillRect(0, top, width, _text.fontHeight(), Styler::get<QColor>("editor-line"));
 
-        left = 0;
-        cwidth = 0;
-        do {
-            // TODO If wordwrap is enabled, continue writing to next line instead
-            if (left - _xshift > width)
-                break;
+            left = 0;
+            cwidth = 0;
+            do {
+                // TODO If wordwrap is enabled, continue writing to next line instead
+                if (left - _xshift > width)
+                    break;
 
-            left += cwidth;
-            if (pos < end) {
-                cwidth = _text.advanceWidth(left, pos);
+                left += cwidth;
+                if (pos < end) {
+                    cwidth = _text.advanceWidth(left, pos);
 
-                if ((_spos != -1 && ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))) || _highlighted.contains(pos)) {
-                    painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
-                    painter.setPen(Styler::get<QColor>("editor-selection-fore"));
-                } else
-                    switch (_text.markup(pos)) {
-                    case Interval::Regular:
-                        painter.setPen(Styler::get<QColor>("editor-regular"));
-                        break;
-                    case Interval::Mathematics:
-                        painter.setPen(Styler::get<QColor>("editor-mathematics"));
-                        break;
-                    case Interval::Command:
-                        painter.setPen(Styler::get<QColor>("editor-command"));
-                        break;
-                    case Interval::Special:
-                        painter.setPen(Styler::get<QColor>("editor-special"));
-                        break;
-                    case Interval::Comment:
-                        painter.setPen(Styler::get<QColor>("editor-comment"));
-                        break;
+                    if (QRect(left - _xshift, top, cwidth, _text.fontHeight()).intersects(event->rect())) {
+                        if ((_spos != -1 && ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))) || _highlighted.contains(pos)) {
+                            painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
+                            painter.setPen(Styler::get<QColor>("editor-selection-fore"));
+                        } else
+                            switch (_text.markup(pos)) {
+                            case Interval::Regular:
+                                painter.setPen(Styler::get<QColor>("editor-regular"));
+                                break;
+                            case Interval::Mathematics:
+                                painter.setPen(Styler::get<QColor>("editor-mathematics"));
+                                break;
+                            case Interval::Command:
+                                painter.setPen(Styler::get<QColor>("editor-command"));
+                                break;
+                            case Interval::Special:
+                                painter.setPen(Styler::get<QColor>("editor-special"));
+                                break;
+                            case Interval::Comment:
+                                painter.setPen(Styler::get<QColor>("editor-comment"));
+                                break;
+                            }
+
+                        if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
+                            painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
                     }
+                }
 
-                if (_text[pos] != '\t' && left + cwidth >= _xshift) // Drawable symbol
-                    painter.drawStaticText(QPointF { left - _xshift, top }, _text.text(pos));
-            }
+                if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
+                    painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight() } }, Styler::get<QColor>("editor-caret"));
+            } while (pos++ < end);
 
-            if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
-                painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight() } }, Styler::get<QColor>("editor-caret"));
-        } while (pos++ < end);
-
-        if (_spos != -1)
-            if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
-                painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::get<QColor>("editor-selection-back"));
+            if (_spos != -1)
+                if ((_spos <= end && end < _pos) || (_spos > end && end >= _pos))
+                    painter.fillRect(QRectF { left - _xshift, top, width - left + _xshift, _text.fontHeight() }, Styler::get<QColor>("editor-selection-back"));
+        }
 
         top += _text.fontHeight();
     }
