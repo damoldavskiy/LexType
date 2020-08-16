@@ -222,7 +222,7 @@ void Editor::selectAll()
 void Editor::tick()
 {
     QPointF point = findShift(_pos);
-    update(point.x() - _xshift, point.y() - _yshift, 2, _text.fontHeight());
+    update(point.x() - _xshift, point.y() - _yshift, qCeil(Styler::get<qreal>("editor-caret-width")) + 1, _text.fontHeight());
     _caret = !_caret;
 }
 
@@ -300,7 +300,7 @@ void Editor::paintEvent(QPaintEvent *event)
                 }
 
                 if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
-                    painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { 1, _text.fontHeight() } }, Styler::get<QColor>("editor-caret"));
+                    painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { Styler::get<qreal>("editor-caret-width"), _text.fontHeight() } }, Styler::get<QColor>("editor-caret"));
             } while (pos++ < end);
 
             if (_spos != -1)

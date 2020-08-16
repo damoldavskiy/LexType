@@ -70,6 +70,7 @@ void Styler::reset()
 
     set("window-flag-askexit", true);
 
+    set("editor-caret-width", 1.0);
     set("editor-tick-time", 600);
     set("editor-tab-width", 4);
     set("editor-autocompile-interval", 1000);

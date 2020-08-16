@@ -85,6 +85,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "numbers-current", "Numbers current" }
             });
 
+            appendDoubleEdit({ "editor-caret-width", "Caret width (pixels)" }, [] (qreal n) { return n > 0 && n <= 5; });
             appendIntEdit({ "editor-tab-width", "Tab width (spaces)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-autocompile-interval", "Auto-compile interval (ms)" }, [] (int n) { return n >= 0; });
