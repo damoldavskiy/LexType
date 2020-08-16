@@ -46,7 +46,7 @@ void Editor::setText(const QString &text)
 {
     if (_text.size() > 0)
         _text.remove(0, _text.size());
-    insertText(0, text);
+    _text.insert(0, text);
     _pos = 0;
     _spos = -1;
     updateUi(true);
@@ -66,7 +66,7 @@ void Editor::setCaret(int value)
 
 void Editor::insert(int pos, const QString &text)
 {
-    insertText(pos, text);
+    _text.insert(pos, text);
     _pos = pos + text.size();
     _spos = -1;
     emit changed();
@@ -77,7 +77,7 @@ void Editor::remove(int pos, int count)
 {
     _pos = pos;
     _spos = -1;
-    removeText(pos, count);
+    _text.remove(pos, count);
     emit changed();
     updateUi(true);
 }
@@ -141,8 +141,8 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
         if (pos == -1)
             break;
 
-        removeText(pos, before.size());
-        insertText(pos, after);
+        _text.remove(pos, before.size());
+        _text.insert(pos, after);
 
         pos += after.size();
     } while (all);
@@ -255,7 +255,7 @@ void Editor::paintEvent(QPaintEvent *event)
         if (_numbers != nullptr)
             _numbers->add(top + _text.fontAscent(), i + 1);
 
-        // TODO Specify correct height of this libe (wordwrap)
+        // TODO Specify correct height of this line (wordwrap)
         if (QRect(0, top, width, _text.fontHeight()).intersects(event->rect())) {
             if (i == line && Styler::get<bool>("editor-flag-line"))
                 painter.fillRect(0, top, width, _text.fontHeight(), Styler::get<QColor>("editor-line"));
@@ -325,7 +325,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         if (_spos != -1)
             removeSelection();
         else if (_pos > 0)
-            removeText(--_pos, 1);
+            _text.remove(--_pos, 1);
         emit changed();
         emit typed(_pos, '\b');
         break;
@@ -333,7 +333,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
         if (_spos != -1)
             removeSelection();
         else if (_pos < _text.size())
-            removeText(_pos, 1);
+            _text.remove(_pos, 1);
         emit changed();
         emit typed(_pos + 1, '\b');
         break;
@@ -441,7 +441,6 @@ void Editor::keyPressEvent(QKeyEvent *event)
         if (text.size() > 0) {
             int skip = text.size();
 
-            // TODO Refactor
             if (Styler::get<bool>("editor-flag-keyboard")) {
                 if (text == "ё")
                     _lastLayout = QLocale::Russian;
@@ -612,7 +611,7 @@ void Editor::removeSelection()
         _pos = _spos;
     _spos = -1;
 
-    removeText(_pos, length);
+    _text.remove(_pos, length);
 }
 
 // Shifts window to the caret
@@ -683,19 +682,7 @@ void Editor::type(const QString &text, int skip)
     // TODO Maybe more elegant?
     int pos = _pos;
     _pos += skip;
-    insertText(pos, text);
-}
-
-void Editor::insertText(int pos, const QString &text)
-{
     _text.insert(pos, text);
-//    emit inserted(pos, text);
-}
-
-void Editor::removeText(int pos, int count)
-{
-    _text.remove(pos, count);
-//    emit removed(pos, count);
 }
 
 int Editor::findPos(qreal x, qreal y, bool exact) const

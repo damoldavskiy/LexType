@@ -71,9 +71,6 @@ protected:
     void highlightBrace(int pos);
     void type(const QString &text, int skip = -1);
 
-    void insertText(int pos, const QString &text);
-    void removeText(int pos, int count);
-
     int findPos(qreal x, qreal y, bool exact = false) const;
     QPointF findShift(int pos) const;
 
