@@ -4,91 +4,49 @@ LineTracker::LineTracker(int n)
     : _lines(n)
 { }
 
-QPair<int, int> LineTracker::insert(int pos, const QString &text)
+void LineTracker::insert(int pos, const QString &text)
 {
     Q_ASSERT(pos >= 0);
-    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start() + _lines[_lines.size() - 1].size());
 
-    int lineCount = 0;
-    for (int i = 0; i < text.size(); ++i)
-        if (text[i] == '\n')
-            ++lineCount;
+    QVector<Line> lines = Line::split(text);
 
     int line = find(pos);
-    int startLine = line;
-    for (int i = line + 1; i < _lines.size(); ++i)
-        _lines[i].start += text.size();
+    QPair<Line, Line> pair = _lines[line].split(pos);
+    lines.first().insert(0, pair.first);
+    lines.last().append(pair.second);
 
-    int extra = _lines[line].size - (pos - _lines[line].start);
-    _lines[line].size -= extra;
+    _lines.insert(line + 1, lines.size() - 1, Line());
+    for (int i = 0; i < lines.size(); ++i)
+        _lines[line + i] = std::move(lines[i]);
 
-    _lines.insert(line + 1, lineCount, { 0, 0 });
-
-    for (int i = 0; i < text.size(); ++i)
-        if (text[i] == '\n') {
-            ++line;
-            _lines[line].start = _lines[line - 1].start + _lines[line - 1].size + 1;
-        } else {
-            ++_lines[line].size;
-        }
-
-    _lines[line].size += extra;
-
-    return { startLine, lineCount };
+    updateStarts(line);
 }
 
-void LineTracker::insertText(int line, int count)
-{
-    Q_ASSERT(line >= 0);
-    Q_ASSERT(line < _lines.size());
-    Q_ASSERT(count > 0);
-
-    _lines[line].size += count;
-    for (int i = line + 1; i < _lines.size(); ++i)
-        _lines[i].start += count;
-}
-
-void LineTracker::insertLine(int line, int shift)
-{
-    Q_ASSERT(line >= 0);
-    Q_ASSERT(line < _lines.size());
-    Q_ASSERT(shift >= 0);
-
-    int start = _lines[line].start;
-
-    _lines.insert(line, { start, shift });
-    _lines[line + 1].start += shift;
-    _lines[line + 1].size -= shift;
-
-    for (int i = line + 1; i < _lines.size(); ++i)
-        ++_lines[i].start;
-}
-
-QPair<int, int> LineTracker::remove(int pos, int count)
+void LineTracker::remove(int pos, int count)
 {
     Q_ASSERT(pos >= 0);
-    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+    Q_ASSERT(pos + count <= _lines[_lines.size() - 1].start() + _lines[_lines.size() - 1].size());
     Q_ASSERT(count > 0);
 
     int line = find(pos);
     int lastLine = find(pos + count);
     if (line != lastLine) {
-        _lines[line].size = pos - _lines[line].start + _lines[lastLine].start + _lines[lastLine].size - pos - count;
+        _lines[line].remove(pos);
+        _lines[lastLine].remove(0, pos + count - _lines[lastLine].start());
+        _lines[line].append(std::move(_lines[lastLine]));
         _lines.remove(line + 1, lastLine - line);
     } else {
-        _lines[line].size -= count;
+        _lines[line].remove(pos, count);
     }
 
-    for (int i = line + 1; i < _lines.size(); ++i)
-        _lines[i].start = _lines[i - 1].start + _lines[i - 1].size + 1;
-
-    return { line, lastLine - line };
+    updateStarts(line + 1);
 }
 
 int LineTracker::find(int pos) const
 {
     Q_ASSERT(pos >= 0);
-    Q_ASSERT(pos <= _lines[_lines.size() - 1].start + _lines[_lines.size() - 1].size);
+    Q_ASSERT(pos <= _lines[_lines.size() - 1].start() + _lines[_lines.size() - 1].size());
 
     int left = 0;
     int right = _lines.size() - 1;
@@ -97,9 +55,9 @@ int LineTracker::find(int pos) const
     while (true) {
         cur = (right + left) / 2;
 
-        if (_lines[cur].start > pos)
+        if (_lines[cur].start() > pos)
             right = cur - 1;
-        else if (pos > _lines[cur].start + _lines[cur].size)
+        else if (pos > _lines[cur].start() + _lines[cur].size())
             left = cur + 1;
         else
             return cur;
@@ -108,15 +66,21 @@ int LineTracker::find(int pos) const
     Q_ASSERT(false);
 }
 
-const Range &LineTracker::operator [](int line) const
+const Line &LineTracker::operator [](int line) const
 {
-    Q_ASSERT(line >= 0);
-    Q_ASSERT(line < _lines.size());
-
     return _lines[line];
 }
 
 int LineTracker::size() const
 {
     return _lines.size();
+}
+
+void LineTracker::updateStarts(int line)
+{
+    if (line == 0)
+        _lines[0].setStart(0);
+
+    for (int i = qMax(1, line); i < _lines.size(); ++i)
+        _lines[i].setStart(_lines[i - 1].start() + _lines[i - 1].size() + 1);
 }

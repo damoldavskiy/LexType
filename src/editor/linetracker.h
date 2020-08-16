@@ -5,24 +5,25 @@
 #include <QString>
 #include <QPair>
 
-#include "range.h"
+#include "line.h"
 
 class LineTracker
 {
 public:
     explicit LineTracker(int n);
 
-    QPair<int, int> insert(int pos, const QString &text);
-    void insertText(int line, int count);
-    void insertLine(int line, int shift);
-    QPair<int, int> remove(int pos, int count);
+    void insert(int pos, const QString &text);
+    void remove(int pos, int count);
 
     int find(int pos) const;
-    const Range &operator [](int line) const;
+
+    const Line &operator [](int line) const;
     int size() const;
 
 private:
-    QVector<Range> _lines;
+    void updateStarts(int line);
+
+    QVector<Line> _lines;
 };
 
 #endif // LINETRACKER_H

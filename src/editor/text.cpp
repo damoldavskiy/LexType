@@ -54,10 +54,11 @@ void Text::insertLinesAdjust(int pos, const QString &text)
         return;
 
     int line = _tracker.find(pos);
-    int start = _tracker[line].start;
-    int end = start + _tracker[line].size;
+    int start = _tracker[line].start();
+    int end = start + _tracker[line].size();
 
-    QPair<int, int> pair = _tracker.insert(pos, text);
+    _tracker.insert(pos, text);
+    QPair<int, int> pair = { line, _tracker.find(pos + text.size()) - line };
     int added = pair.second;
 
     if (added > 0)
@@ -65,7 +66,7 @@ void Text::insertLinesAdjust(int pos, const QString &text)
 
     if (pos == end && text[0] != '\n') {
         qreal width = _widths[line];
-        for (int i = end; i < start + _tracker[line].size; ++i)
+        for (int i = end; i < start + _tracker[line].size(); ++i)
             width += advanceWidth(width, i);
         _widths.set(line, width);
         ++line;
@@ -88,7 +89,8 @@ void Text::remove(int pos, int count)
 
 void Text::removeLinesAdjust(int pos, int count)
 {
-    QPair<int, int> pair = _tracker.remove(pos, count);
+    QPair<int, int> pair = { _tracker.find(pos), _tracker.find(pos + count) - _tracker.find(pos) };
+    _tracker.remove(pos, count);
     int line = pair.first;
     int deleted = pair.second;
 
@@ -158,12 +160,12 @@ int Text::findLine(int pos) const
 
 int Text::lineStart(int line) const
 {
-    return _tracker[line].start;
+    return _tracker[line].start();
 }
 
 int Text::lineSize(int line) const
 {
-    return _tracker[line].size;
+    return _tracker[line].size();
 }
 
 int Text::size() const
@@ -218,8 +220,8 @@ qreal Text::lineWidth(int line) const
     Q_ASSERT(line >= 0);
     Q_ASSERT(line < _tracker.size());
 
-    int pos = _tracker[line].start;
-    int end = pos + _tracker[line].size;
+    int pos = _tracker[line].start();
+    int end = pos + _tracker[line].size();
 
     qreal width = 0;
     for (; pos < end; ++pos)

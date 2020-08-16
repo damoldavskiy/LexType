@@ -3,6 +3,7 @@ QT += widgets
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    line.cpp \
     main.cpp \
     mainwindow.cpp \
     editor.cpp \
@@ -33,9 +34,11 @@ SOURCES += \
     gapbuffer.cpp \
     snippetmanager.cpp \
     finddialog.cpp \
-    colorbutton.cpp
+    colorbutton.cpp \
+    word.cpp
 
 HEADERS += \
+    line.h \
     mainwindow.h \
     editor.h \
     linetracker.h \
@@ -70,7 +73,8 @@ HEADERS += \
     gapbuffer.h \
     snippetmanager.h \
     finddialog.h \
-    colorbutton.h
+    colorbutton.h \
+    word.h
 
 RESOURCES += \
     fonts.qrc \
