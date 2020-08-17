@@ -34,8 +34,7 @@ SOURCES += \
     gapbuffer.cpp \
     snippetmanager.cpp \
     finddialog.cpp \
-    colorbutton.cpp \
-    word.cpp
+    colorbutton.cpp
 
 HEADERS += \
     line.h \

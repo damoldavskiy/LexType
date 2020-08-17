@@ -10,7 +10,7 @@
 class Line
 {
 public:
-    explicit Line(const QString &text = "");
+    Line();
 
     QPair<Line, Line> split(int pos) const;
 
@@ -26,9 +26,13 @@ public:
     static QVector<Line> split(const QString &text);
 
 private:
+    int find(int pos) const;
+    void updateStarts(int word);
+
     int _start;
     int _size;
-//    QVector<Word> _words;
+
+    QVector<Word> _words;
 };
 
 #endif // LINE_H

@@ -6,7 +6,6 @@ SOURCES += \
     ..\..\src\editor\gapbuffer.cpp \
     ..\..\src\editor\linenumbers.cpp \
     ..\..\src\editor\linetracker.cpp \
-    ..\..\src\editor\word.cpp \
     ..\..\src\editor\line.cpp \
     ..\..\src\editor\markupmodel.cpp \
     ..\..\src\editor\text.cpp \

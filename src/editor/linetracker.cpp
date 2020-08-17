@@ -12,11 +12,11 @@ void LineTracker::insert(int pos, const QString &text)
     QVector<Line> lines = Line::split(text);
 
     int line = find(pos);
-    QPair<Line, Line> pair = _lines[line].split(pos);
+    QPair<Line, Line> pair = _lines[line].split(pos - _lines[line].start());
     lines.first().insert(0, pair.first);
     lines.last().append(pair.second);
 
-    _lines.insert(line + 1, lines.size() - 1, Line());
+    _lines.insert(line, lines.size() - 1, Line());
     for (int i = 0; i < lines.size(); ++i)
         _lines[line + i] = std::move(lines[i]);
 
@@ -32,12 +32,12 @@ void LineTracker::remove(int pos, int count)
     int line = find(pos);
     int lastLine = find(pos + count);
     if (line != lastLine) {
-        _lines[line].remove(pos);
+        _lines[line].remove(pos - _lines[line].start());
         _lines[lastLine].remove(0, pos + count - _lines[lastLine].start());
         _lines[line].append(std::move(_lines[lastLine]));
         _lines.remove(line + 1, lastLine - line);
     } else {
-        _lines[line].remove(pos, count);
+        _lines[line].remove(pos - _lines[line].start(), count);
     }
 
     updateStarts(line + 1);

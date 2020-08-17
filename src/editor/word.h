@@ -1,10 +1,13 @@
 #ifndef WORD_H
 #define WORD_H
 
-class Word
+#include <QChar>
+
+struct Word
 {
-public:
-    Word();
+    int start = 0;
+    int size = 0;
+    QChar leading = '\0';
 };
 
 #endif // WORD_H
