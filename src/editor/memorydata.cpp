@@ -44,6 +44,18 @@ Action MemoryData::redo()
     return action;
 }
 
+const Action& MemoryData::backward() const
+{
+    Q_ASSERT(canUndo());
+    return _before.top();
+}
+
+const Action& MemoryData::foreward() const
+{
+    Q_ASSERT(canRedo());
+    return _after.top();
+}
+
 bool MemoryData::canUndo() const
 {
     return _before.size() > 0;

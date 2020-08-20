@@ -31,6 +31,9 @@ void Text::insertLinesAdjust(int pos, const QString &text)
 
     for (int i = line; i <= line + added; ++i)
         _widths.set(i, _tracker[i].width());
+
+    _lastLine = nullptr;
+    _lastWord = nullptr;
 }
 
 void Text::remove(int pos, int count)
@@ -52,6 +55,9 @@ void Text::removeLinesAdjust(int pos, int count)
         _widths.remove(line + 1, deleted);
 
     _widths.set(line, _tracker[line].width());
+
+    _lastLine = nullptr;
+    _lastWord = nullptr;
 }
 
 int Text::find(int pos, const QString &substring, bool matchCase) const
@@ -62,28 +68,34 @@ int Text::find(int pos, const QString &substring, bool matchCase) const
 
 int Text::undo()
 {
-    Action action = _tracker.undo();
-    updateMarkup(action.index);
+    const Action &action = _tracker.backward();
 
     if (action.type == Action::Insert) {
         removeLinesAdjust(action.index, action.text.size());
+        _tracker.undo();
+        updateMarkup(action.index);
         return action.index;
     } else {
+        _tracker.undo();
         insertLinesAdjust(action.index, action.text);
+        updateMarkup(action.index);
         return action.index + action.text.size();
     }
 }
 
 int Text::redo()
 {
-    Action action = _tracker.redo();
-    updateMarkup(action.index);
+    const Action &action = _tracker.foreward();
 
     if (action.type == Action::Insert) {
+        _tracker.redo();
         insertLinesAdjust(action.index, action.text);
+        updateMarkup(action.index);
         return action.index + action.text.size();
     } else {
         removeLinesAdjust(action.index, action.text.size());
+        _tracker.redo();
+        updateMarkup(action.index);
         return action.index;
     }
 }
@@ -108,18 +120,30 @@ QChar Text::operator [](int pos) const
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos < size());
 
-    int lineIndex = _tracker.find(pos);
-    const Line& line = _tracker[lineIndex];
-    pos -= line.start();
+    bool newLine = false;
 
-    int wordIndex = line.find(pos);
-    const Word& word = line[wordIndex];
-    pos -= word.start;
+    if (_lastLine == nullptr ||
+        _lastLine->start() > pos ||
+        _lastLine->start() + _lastLine->size() < pos) {
+        _lastLine = &_tracker[_tracker.find(pos)];
+        newLine = true;
+    }
+    pos -= _lastLine->start();
 
-    if (pos < word.text.size())
-        return word.text[pos];
-    else
-        return word.leading;
+    if (newLine ||
+        _lastWord == nullptr ||
+        _lastWord->start > pos ||
+        _lastWord->start + _lastWord->text.size() < pos)
+        _lastWord = &(*_lastLine)[_lastLine->find(pos)];
+    pos -= _lastWord->start;
+
+    if (pos == _lastLine->size())
+        return '\n';
+
+    if (pos == _lastWord->text.size())
+        return _lastWord->leading;
+
+    return _lastWord->text[pos];
 }
 
 int Text::findLine(int pos) const

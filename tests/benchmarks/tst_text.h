@@ -15,6 +15,7 @@ private slots:
     inline void removeLine();
     inline void removeAll();
     inline void editStart();
+    inline void getOperator();
 };
 
 void tst_Text::type()
@@ -108,5 +109,25 @@ void tst_Text::editStart()
     QBENCHMARK_ONCE {
         for (int i = 0; i < 1000; ++i)
             text.remove(0, 1);
+    }
+}
+
+void tst_Text::getOperator()
+{
+    QFont font;
+    Text text(font, 4);
+
+    for (int i = 0; i < 1000; ++i) {
+        for (int j = 0; j < 100; ++j)
+            text.insert(text.size(), "another_word ");
+        text.insert(text.size(), "\n");
+    }
+
+    QBENCHMARK_ONCE {
+        int result = 0; // Do not allow compiler to optimize text call
+        for (int i = 0; i < 100000; ++i) {
+            QChar c = text[i];
+            result += c.unicode();
+        }
     }
 }

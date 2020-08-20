@@ -34,7 +34,7 @@ public:
 
 signals:
     void typed(int pos, QChar symbol);
-    void changed();
+    void changed(bool undoRedo = false);
 
 public slots:
     void find(const QString &substring, bool matchCase);

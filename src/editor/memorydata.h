@@ -15,6 +15,9 @@ public:
     Action undo();
     Action redo();
 
+    const Action& backward() const;
+    const Action& foreward() const;
+
     bool canUndo() const;
     bool canRedo() const;
 

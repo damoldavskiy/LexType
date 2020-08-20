@@ -6,11 +6,22 @@ class tst_Text : public QObject
 {
     Q_OBJECT
 
+    inline void checkEqual(const Text &text, const QString &pattern);
+
 private slots:
     inline void basic();
     inline void removeInline();
     inline void removeOutline();
 };
+
+void tst_Text::checkEqual(const Text &text, const QString &pattern)
+{
+    QCOMPARE(text.text(), pattern);
+    QCOMPARE(text.mid(0), pattern);
+
+    for (int i = 0; i < pattern.size(); ++i)
+        QCOMPARE(text[i], pattern.at(i));
+}
 
 void tst_Text::basic()
 {
@@ -22,14 +33,14 @@ void tst_Text::basic()
     QCOMPARE(text.lineCount(), 1);
 
     text.insert(0, "Hello, world!\nThere is something");
-    QCOMPARE(text.text(), QString("Hello, world!\nThere is something"));
+    checkEqual(text, "Hello, world!\nThere is something");
 
     QVERIFY(text.width() > 0);
     QCOMPARE(text.size(), 32);
     QCOMPARE(text.lineCount(), 2);
 
     text.insert(0, "\n\n");
-    QCOMPARE(text.text(), QString("\n\nHello, world!\nThere is something"));
+    checkEqual(text, "\n\nHello, world!\nThere is something");
 
     QCOMPARE(text.lineCount(), 4);
 
@@ -47,6 +58,7 @@ void tst_Text::basic()
 
     text.remove(0, 34);
 
+    QCOMPARE(text.text(), QString(""));
     QCOMPARE(text.width(), 0.0);
     QCOMPARE(text.size(), 0);
     QCOMPARE(text.lineCount(), 1);

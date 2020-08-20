@@ -161,7 +161,7 @@ void Editor::undo()
     _pos = _text.undo();
     _spos = -1;
 
-    emit changed();
+    emit changed(true);
     updateUi(false);
 }
 
@@ -173,7 +173,7 @@ void Editor::redo()
     _pos = _text.redo();
     _spos = -1;
 
-    emit changed();
+    emit changed(true);
     updateUi(false);
 }
 

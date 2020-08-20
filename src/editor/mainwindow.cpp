@@ -203,13 +203,14 @@ void MainWindow::aboutQt()
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::textChanged()
+void MainWindow::textChanged(bool undoRedo)
 {
     // TODO Insert from clipborad doesn't emit Editor::typed
     _path.setEdited(_editor->textSize() > 0);
     setWindowTitle(_path.title());
 
-    _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
+    if (!undoRedo)
+        _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
 
     if (Styler::get<bool>("editor-flag-autocompile") && _timer.remainingTime() == -1)
         _timer.start(Styler::get<int>("editor-autocompile-interval"));

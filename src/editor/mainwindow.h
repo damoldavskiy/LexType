@@ -29,7 +29,7 @@ public slots:
     void options();
     void about();
     void aboutQt();
-    void textChanged();
+    void textChanged(bool undoRedo);
 
 private slots:
     void output();

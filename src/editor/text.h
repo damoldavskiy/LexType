@@ -57,6 +57,9 @@ private:
     MemoryData _tracker;
     MarkupModel _markup;
     MaxVector<qreal> _widths;
+
+    mutable const Line *_lastLine = nullptr;
+    mutable const Word *_lastWord = nullptr;
 };
 
 #endif // TEXT_H
