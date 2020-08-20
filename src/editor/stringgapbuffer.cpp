@@ -1,13 +1,61 @@
-#include "gapbuffer.h"
+#include "stringgapbuffer.h"
 
 #include "math.h"
 
-GapBuffer::~GapBuffer()
+StringGapBuffer::StringGapBuffer()
+    : _data(new QChar[8])
+{ }
+
+StringGapBuffer::StringGapBuffer(const StringGapBuffer &other)
+{
+    *this = other;
+}
+
+StringGapBuffer::StringGapBuffer(StringGapBuffer &&other)
+{
+    *this = std::move(other);
+}
+
+StringGapBuffer& StringGapBuffer::operator =(const StringGapBuffer &other)
+{
+    if (this == &other)
+        return *this;
+
+    _allocated = other._allocated;
+    _gap = other._gap;
+    _gapSize = other._gapSize;
+
+    _data = new QChar[_allocated];
+    for (int i = 0; i < _allocated; ++i)
+        _data[i] = other._data[i];
+
+    return *this;
+}
+
+StringGapBuffer& StringGapBuffer::operator =(StringGapBuffer &&other)
+{
+    if (this == &other)
+        return *this;
+
+    _data = other._data;
+    _allocated = other._allocated;
+    _gap = other._gap;
+    _gapSize = other._gapSize;
+
+    other._data = new QChar[8];
+    other._allocated = 8;
+    other._gap = 0;
+    other._gapSize = 8;
+
+    return *this;
+}
+
+StringGapBuffer::~StringGapBuffer()
 {
     delete [] _data;
 }
 
-void GapBuffer::insert(int pos, const QString &text)
+void StringGapBuffer::insert(int pos, const QString &text)
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());
@@ -21,8 +69,16 @@ void GapBuffer::insert(int pos, const QString &text)
     _gapSize -= text.size();
 }
 
-void GapBuffer::remove(int pos, int count)
+void StringGapBuffer::append(const QString &text)
 {
+    insert(size(), text);
+}
+
+void StringGapBuffer::remove(int pos, int count)
+{
+    if (count == -1)
+        count = size() - pos;
+
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos + count <= size());
     Q_ASSERT(count >= 0);
@@ -33,7 +89,7 @@ void GapBuffer::remove(int pos, int count)
     _gapSize += count;
 }
 
-int GapBuffer::find(int pos, const QString &substring, bool matchCase) const
+int StringGapBuffer::find(int pos, const QString &substring, bool matchCase) const
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());
@@ -41,8 +97,11 @@ int GapBuffer::find(int pos, const QString &substring, bool matchCase) const
     return toString().indexOf(substring, pos, matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 
-QString GapBuffer::mid(int pos, int count) const
+QString StringGapBuffer::mid(int pos, int count) const
 {
+    if (count == -1)
+        count = size() - pos;
+
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos + count <= size());
     Q_ASSERT(count >= 0);
@@ -57,7 +116,7 @@ QString GapBuffer::mid(int pos, int count) const
     return result;
 }
 
-QChar GapBuffer::operator [](int pos) const
+QChar StringGapBuffer::operator [](int pos) const
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());
@@ -67,17 +126,17 @@ QChar GapBuffer::operator [](int pos) const
     return _data[pos + _gapSize];
 }
 
-int GapBuffer::size() const
+int StringGapBuffer::size() const
 {
     return _allocated - _gapSize;
 }
 
-QString GapBuffer::toString() const
+QString StringGapBuffer::toString() const
 {
     return mid(0, size());
 }
 
-void GapBuffer::copy(QChar *target, int from, int to) const
+void StringGapBuffer::copy(QChar *target, int from, int to) const
 {
     if (from < _gap)
         for (int i = from; i < Math::min(to, _gap); ++i)
@@ -86,7 +145,7 @@ void GapBuffer::copy(QChar *target, int from, int to) const
         target[i] = _data[i + _gapSize];
 }
 
-void GapBuffer::ensureGap(int pos, int count)
+void StringGapBuffer::ensureGap(int pos, int count)
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(count >= 0);

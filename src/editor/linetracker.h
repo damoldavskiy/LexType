@@ -6,6 +6,7 @@
 #include <QPair>
 
 #include "line.h"
+#include "gapbuffer.h"
 
 class LineTracker
 {
@@ -27,7 +28,7 @@ public:
 private:
     void updateStarts(int line);
 
-    QVector<Line> _lines;
+    GapBuffer<Line> _lines;
     const CachedFont *_font;
 };
 

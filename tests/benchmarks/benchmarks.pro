@@ -3,7 +3,7 @@ QT += testlib widgets
 CONFIG += testcase
 
 SOURCES += \
-    ..\..\src\editor\gapbuffer.cpp \
+    ..\..\src\editor\stringgapbuffer.cpp \
     ..\..\src\editor\linetracker.cpp \
     ..\..\src\editor\line.cpp \
     ..\..\src\editor\cachedfont.cpp \
@@ -14,6 +14,7 @@ SOURCES += \
 
 HEADERS += \
     ..\..\src\editor\gapbuffer.h \
+    ..\..\src\editor\stringgapbuffer.h \
     ..\..\src\editor\linetracker.h \
     ..\..\src\editor\word.h \
     ..\..\src\editor\line.h \

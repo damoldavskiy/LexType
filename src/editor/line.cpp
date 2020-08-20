@@ -67,7 +67,7 @@ void Line::remove(int pos, int count)
     if (word != lastWord) {
         _words[word].text.remove(pos - _words[word].start);
         _words[lastWord].text.remove(0, pos + count - _words[lastWord].start);
-        _words[word].text.append(std::move(_words[lastWord].text));
+        _words[word].text.append(std::move(_words[lastWord].text.toString()));
         _words[word].leading = _words[lastWord].leading;
         _words.remove(word + 1, lastWord - word);
     } else {

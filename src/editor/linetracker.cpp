@@ -1,7 +1,7 @@
 #include "linetracker.h"
 
 LineTracker::LineTracker()
-    : _lines(1, Line()), _font(nullptr)
+    : _lines(1), _font(nullptr)
 { }
 
 void LineTracker::insert(int pos, const QString &text)

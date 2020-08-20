@@ -9,6 +9,7 @@ SOURCES += \
     mainwindow.cpp \
     editor.cpp \
     linetracker.cpp \
+    stringgapbuffer.cpp \
     text.cpp \
     memorydata.cpp \
     styler.cpp \
@@ -32,18 +33,19 @@ SOURCES += \
     keyboardlayout.cpp \
     settingsdialog.cpp \
     paintertoolkit.cpp \
-    gapbuffer.cpp \
     snippetmanager.cpp \
     finddialog.cpp \
     colorbutton.cpp
 
 HEADERS += \
     cachedfont.h \
+    gapbuffer.h \
     line.h \
     mainwindow.h \
     editor.h \
     linetracker.h \
     maxvector.h \
+    stringgapbuffer.h \
     text.h \
     multirange.h \
     range.h \
@@ -71,7 +73,6 @@ HEADERS += \
     keyboardlayout.h \
     settingsdialog.h \
     paintertoolkit.h \
-    gapbuffer.h \
     snippetmanager.h \
     finddialog.h \
     colorbutton.h \
