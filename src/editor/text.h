@@ -15,11 +15,9 @@
 class Text
 {
 public:
-    Text(const QFont &font, int tabWidth);
+    Text(const QFont &font, int tabCount);
 
-    void setFont(const QFont &font);
-    void setTabWidth(int tabWidth);
-    void cache();
+    void setFont(const QFont &font, int tabCount);
 
     void insert(int pos, const QString &text);
     void insertLinesAdjust(int pos, const QString &text);
@@ -34,7 +32,7 @@ public:
     bool canUndo() const;
     bool canRedo() const;
 
-    QString mid(int pos, int count) const;
+    QString mid(int pos, int count = -1) const;
     QChar operator [](int pos) const;
 
     int findLine(int pos) const;
@@ -48,7 +46,6 @@ public:
     qreal fontHeight() const;
     qreal fontAscent() const;
     qreal advanceWidth(qreal left, int pos) const;
-    qreal lineWidth(int line) const;
 
     QString text() const;
     QStaticText text(int pos) const;
@@ -56,15 +53,10 @@ public:
     Interval markup(int pos) const;
 
 private:
-    MemoryData _data;
-    LineTracker _tracker;
+    CachedFont _font;
+    MemoryData _tracker;
     MarkupModel _markup;
     MaxVector<qreal> _widths;
-    QFontMetricsF _fm;
-    QFont _font;
-    qreal _tabWidth;
-    int _tabCount;
-    MultiRange<QStaticText> _cachedText;
 };
 
 #endif // TEXT_H

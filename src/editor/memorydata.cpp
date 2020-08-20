@@ -4,19 +4,14 @@ void MemoryData::insert(int pos, const QString &text)
 {
     _before.push({ pos, text, Action::Insert });
     _after.clear();
-    _data.insert(pos, text);
+    LineTracker::insert(pos, text);
 }
 
 void MemoryData::remove(int pos, int count)
 {
-    _before.push({ pos, _data.mid(pos, count), Action::Remove });
+    _before.push({ pos, LineTracker::mid(pos, count), Action::Remove });
     _after.clear();
-    _data.remove(pos, count);
-}
-
-int MemoryData::find(int pos, const QString &substring, bool matchCase) const
-{
-    return _data.find(pos, substring, matchCase);
+    LineTracker::remove(pos, count);
 }
 
 Action MemoryData::undo()
@@ -27,9 +22,9 @@ Action MemoryData::undo()
     _after.push(action);
 
     if (action.type == Action::Insert)
-        _data.remove(action.index, action.text.size());
+        LineTracker::remove(action.index, action.text.size());
     else
-        _data.insert(action.index, action.text);
+        LineTracker::insert(action.index, action.text);
 
     return action;
 }
@@ -42,31 +37,11 @@ Action MemoryData::redo()
     _before.push(action);
 
     if (action.type == Action::Insert)
-        _data.insert(action.index, action.text);
+        LineTracker::insert(action.index, action.text);
     else
-        _data.remove(action.index, action.text.size());
+        LineTracker::remove(action.index, action.text.size());
 
     return action;
-}
-
-int MemoryData::size() const
-{
-    return _data.size();
-}
-
-QString MemoryData::text() const
-{
-    return _data.toString();
-}
-
-QString MemoryData::mid(int pos, int count) const
-{
-    return _data.mid(pos, count);
-}
-
-QChar MemoryData::operator [](int pos) const
-{
-    return _data[pos];
 }
 
 bool MemoryData::canUndo() const

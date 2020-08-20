@@ -29,12 +29,6 @@ public:
         return _values[index][pos - _shifts[index]];
     }
 
-    void clear()
-    {
-        _shifts.clear();
-        _values.clear();
-    }
-
 private:
     QVector<int> _shifts;
     QVector<QVector<T>> _values;

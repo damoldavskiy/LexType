@@ -7,6 +7,7 @@ SOURCES += \
     ..\..\src\editor\linenumbers.cpp \
     ..\..\src\editor\linetracker.cpp \
     ..\..\src\editor\line.cpp \
+    ..\..\src\editor\cachedfont.cpp \
     ..\..\src\editor\markupmodel.cpp \
     ..\..\src\editor\text.cpp \
     ..\..\src\editor\memorydata.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     ..\..\src\editor\linetracker.h \
     ..\..\src\editor\word.h \
     ..\..\src\editor\line.h \
+    ..\..\src\editor\cachedfont.h \
     ..\..\src\editor\markupmodel.h \
     ..\..\src\editor\text.h \
     ..\..\src\editor\memorydata.h \

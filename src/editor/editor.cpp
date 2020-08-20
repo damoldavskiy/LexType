@@ -95,8 +95,7 @@ Interval Editor::markup(int pos) const
 void Editor::updateSettings()
 {
     setFont(Styler::get<QFont>("editor-font"));
-    _text.setFont(font());
-    _text.setTabWidth(Styler::get<int>("editor-tab-width"));
+    _text.setFont(font(), Styler::get<int>("editor-tab-width"));
     _timer.setInterval(Styler::get<int>("editor-tick-time"));
     if (_numbers != nullptr) {
         _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));

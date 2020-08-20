@@ -3,6 +3,7 @@ QT += widgets
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    cachedfont.cpp \
     line.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -37,6 +38,7 @@ SOURCES += \
     colorbutton.cpp
 
 HEADERS += \
+    cachedfont.h \
     line.h \
     mainwindow.h \
     editor.h \
