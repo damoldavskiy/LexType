@@ -55,6 +55,7 @@ void Styler::reset()
 
     set("editor-font", QFont("Lato", 11));
 
+    set("editor-flag-wordwrap", true);
     set("editor-flag-line", true);
     set("editor-flag-numbers", true);
     set("editor-flag-keyboard", true);

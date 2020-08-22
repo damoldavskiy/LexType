@@ -17,6 +17,7 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(pos <= size());
 
     _tracker.insert(pos, text);
+    updateLineBreaks(); // TODO Not effective
     insertLinesAdjust(pos, text);
     updateMarkup(pos);
 }
@@ -30,7 +31,7 @@ void Text::insertLinesAdjust(int pos, const QString &text)
         _widths.insert(line, added, 0);
 
     for (int i = line; i <= line + added; ++i)
-        _widths.set(i, _tracker[i].width());
+        _widths.set(i, lineWidth(i));
 
     _lastLine = nullptr;
     _lastWord = nullptr;
@@ -43,6 +44,7 @@ void Text::remove(int pos, int count)
 
     removeLinesAdjust(pos, count);
     _tracker.remove(pos, count);
+    updateLineBreaks(); // TODO Not effective
     updateMarkup(pos);
 }
 
@@ -54,10 +56,38 @@ void Text::removeLinesAdjust(int pos, int count)
     if (deleted > 0)
         _widths.remove(line + 1, deleted);
 
-    _widths.set(line, _tracker[line].width());
+    _widths.set(line, lineWidth(line));
 
     _lastLine = nullptr;
     _lastWord = nullptr;
+}
+
+void Text::setWindowWidth(qreal width)
+{
+    _windowWidth = width;
+    updateLineBreaks();
+    for (int i = 0; i < _tracker.size(); ++i)
+        _widths.set(i, lineWidth(i));
+}
+
+void Text::updateLineBreaks()
+{
+    _lineBreaks.clear();
+
+    for (int i = 0; i < _tracker.size(); ++i) {
+        qreal width = 0;
+        for (int j = 0; j < _tracker[i].count(); ++j) {
+            width += _tracker[i][j].width;
+
+            if (width + 1 >= _windowWidth) {
+                if (j != 0)
+                    _lineBreaks[i].insert(j);
+                width = _tracker[i][j].width;
+            }
+
+            width += advanceLeading(width, _tracker[i][j]);
+        }
+    }
 }
 
 int Text::find(int pos, const QString &substring, bool matchCase) const
@@ -70,34 +100,40 @@ int Text::undo()
 {
     const Action &action = _tracker.backward();
 
+    int result;
     if (action.type == Action::Insert) {
         removeLinesAdjust(action.index, action.text.size());
         _tracker.undo();
-        updateMarkup(action.index);
-        return action.index;
+        result = action.index;
     } else {
         _tracker.undo();
         insertLinesAdjust(action.index, action.text);
-        updateMarkup(action.index);
-        return action.index + action.text.size();
+        result = action.index + action.text.size();
     }
+
+    updateMarkup(action.index);
+    updateLineBreaks(); // TODO Not effective
+    return result;
 }
 
 int Text::redo()
 {
     const Action &action = _tracker.foreward();
 
+    int result;
     if (action.type == Action::Insert) {
         _tracker.redo();
         insertLinesAdjust(action.index, action.text);
-        updateMarkup(action.index);
-        return action.index + action.text.size();
+        result = action.index + action.text.size();
     } else {
         removeLinesAdjust(action.index, action.text.size());
         _tracker.redo();
-        updateMarkup(action.index);
-        return action.index;
+        result = action.index;
     }
+
+    updateMarkup(action.index);
+    updateLineBreaks(); // TODO Not effective
+    return result;
 }
 
 bool Text::canUndo() const
@@ -135,10 +171,11 @@ QChar Text::operator [](int pos) const
         _lastWord->start > pos ||
         _lastWord->start + _lastWord->text.size() < pos)
         _lastWord = &(*_lastLine)[_lastLine->find(pos)];
-    pos -= _lastWord->start;
 
     if (pos == _lastLine->size())
         return '\n';
+
+    pos -= _lastWord->start;
 
     if (pos == _lastWord->text.size())
         return _lastWord->leading;
@@ -161,15 +198,71 @@ int Text::lineSize(int line) const
     return _tracker[line].size();
 }
 
+qreal Text::lineHeight(int line) const
+{
+    auto set = _lineBreaks.find(line);
+    return _font.height() * ((set == _lineBreaks.end() ? 0 : set->size()) + 1);
+}
+
+qreal Text::linesHeightBefore(int line) const
+{
+    qreal height = 0;
+    for (int i = 0; i < line; ++i)
+        height += lineHeight(i);
+    return height;
+}
+
+qreal Text::lineWidth(int line) const
+{
+    qreal width = 0;
+    qreal currentWidth = 0;
+
+    for (int i = 0; i < _tracker[line].count(); ++i) {
+        if (_lineBreaks[line].contains(i)) {
+            width = Math::max(width, currentWidth);
+            currentWidth = 0;
+        }
+
+        // TODO Word wrap off, long line, incorrect x scroll
+        currentWidth += _tracker[line][i].width;
+        qreal leading = advanceLeading(currentWidth, _tracker[line][i]);
+        if (currentWidth + leading <= _windowWidth)
+            currentWidth += leading;
+    }
+
+    return Math::max(width, currentWidth);
+}
+
+bool Text::isBreak(int pos) const
+{
+    // TODO Not good solution. We cache words in operator [],
+    // we should use this cache here, because isBreak is called on
+    // every symbol
+
+    int line = _tracker.find(pos);
+    pos -= _tracker[line].start();
+    int word = _tracker[line].find(pos);
+    pos -= _tracker[line][word].start;
+
+    return pos == 0 && _lineBreaks[line].contains(word);
+}
+
 int Text::size() const
 {
-    // TODO More effective
     return _tracker[_tracker.size() - 1].start() + _tracker[_tracker.size() - 1].size();
 }
 
 int Text::lineCount() const
 {
     return _tracker.size();
+}
+
+int Text::visualLinesCount() const
+{
+    int extra = 0;
+    for (const auto &set : _lineBreaks)
+        extra += set.size();
+    return extra + _tracker.size();
 }
 
 qreal Text::width() const
@@ -199,6 +292,16 @@ qreal Text::advanceWidth(qreal left, int pos) const
         return Line::appendTab(left, _font.tabWidth()) - left;
     else
         return _font.width(symbol);
+}
+
+qreal Text::advanceLeading(qreal left, const Word &word) const
+{
+    if (word.leading == '\t')
+        return Line::appendTab(left, _font.tabWidth()) - left;
+    else if (word.leading == ' ')
+        return _font.width(' ');
+
+    return 0;
 }
 
 QString Text::text() const
@@ -263,3 +366,91 @@ Interval Text::markup(int pos) const
 {
     return _markup.interval(pos);
 }
+
+int Text::findPos(qreal x, qreal y, bool exact) const
+{
+    if (x < 0)
+        x = 0;
+
+    int line = 0;
+    qreal height = 0;
+    for (; line < _tracker.size() && height + lineHeight(line) <= y; ++line)
+        height += lineHeight(line);
+
+//    if (line == _tracker.size() - 1 && height + lineHeight(line) < y)
+//        return size();
+
+    int word = 0;
+    QMap<int, QSet<int>>::const_iterator set;
+    if ((set = _lineBreaks.find(line)) != _lineBreaks.end()) {
+        QVector<int> wordBreaks { 0 };
+        for (int pos : *set)
+            wordBreaks.append(pos);
+        std::sort(wordBreaks.begin(), wordBreaks.end());
+
+        word = wordBreaks[(y - height) / _font.height()];
+    }
+
+    if (line < _tracker.size()) {
+        int pos = _tracker[line].start() + _tracker[line][word].start;
+
+        // Incorrect end
+        int end = _tracker[line].start() + _tracker[line].size();
+
+        qreal width, left;
+        width = 0;
+        left = 0;
+        while (pos < end && left < x) {
+            width = advanceWidth(left, pos);
+            left += width;
+            pos++;
+        }
+
+        if (exact || left - x > width / 2)
+            --pos;
+
+        Q_ASSERT(pos >= 0);
+        Q_ASSERT(pos <= size());
+
+        return pos;
+    } else {
+        return size();
+    }
+}
+
+QPointF Text::findShift(int pos) const
+{
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= size());
+
+    int line = _tracker.find(pos);
+    int word = _tracker[line].find(pos - _tracker[line].start());
+
+    // TODO More effective
+    qreal y = linesHeightBefore(line);
+
+    int startWord = 0;
+    QMap<int, QSet<int>>::const_iterator set;
+    if ((set = _lineBreaks.find(line)) != _lineBreaks.end()) {
+        QVector<int> wordBreaks { 0 };
+        for (int pos : *set)
+            if (pos <= word)
+            wordBreaks.append(pos);
+        std::sort(wordBreaks.begin(), wordBreaks.end());
+
+        startWord = wordBreaks.back();
+        y += (wordBreaks.size() - 1) * _font.height();
+    }
+
+    qreal x = 0;
+    for (int i = startWord; i < word; ++i) {
+        x += _tracker[line][i].width;
+        x += advanceLeading(x, _tracker[line][i]);
+    }
+
+    for (int i = _tracker[line].start() + _tracker[line][word].start; i < pos; ++i)
+        x += advanceWidth(x, i);
+
+    return { x, y };
+}
+

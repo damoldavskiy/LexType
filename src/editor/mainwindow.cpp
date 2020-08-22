@@ -183,12 +183,19 @@ void MainWindow::painter()
     delete dialog;
 }
 
+void MainWindow::wordWrap(bool checked)
+{
+    Styler::set<bool>("editor-flag-wordwrap", checked);
+    _editor->updateSettings();
+}
+
 void MainWindow::options()
 {
     SettingsDialog *dialog = new SettingsDialog;
     dialog->exec();
     _editor->updateSettings();
     _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
+    _wordWrap->setChecked(Styler::get<bool>("editor-flag-wordwrap"));
     statusBar()->showMessage("Settings applied");
     delete dialog;
 }
@@ -298,6 +305,11 @@ void MainWindow::createActions()
     _painterAction->setShortcut(QKeySequence("Ctrl+D"));
     connect(_painterAction, &QAction::triggered, this, &MainWindow::painter);
 
+    _wordWrap = new QAction("Word wrap", this);
+    _wordWrap->setCheckable(true);
+    _wordWrap->setChecked(Styler::get<bool>("editor-flag-wordwrap"));
+    connect(_wordWrap, &QAction::toggled, this, &MainWindow::wordWrap);
+
     _optionsAction = new QAction("Options", this);
     connect(_optionsAction, &QAction::triggered, this, &MainWindow::options);
 
@@ -327,7 +339,7 @@ void MainWindow::createMenus()
     menu = menuBar()->addMenu("Tools");
     menu->addActions({ _toggleConsoleAction, _compileAction, _painterAction });
     menu->addSeparator();
-    menu->addActions({ _optionsAction });
+    menu->addActions({ _wordWrap, _optionsAction });
 
     menu = menuBar()->addMenu("Help");
     menu->addActions({ _aboutAction, _aboutQtAction });

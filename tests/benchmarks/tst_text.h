@@ -100,14 +100,14 @@ void tst_Text::editStart()
     QFont font;
     Text text(font, 4);
 
-    for (int i = 0; i < 10000; ++i)
+    for (int i = 0; i <= 2000; ++i)
         text.insert(text.size(), "w");
     text.remove(0, 1);
 
     // TODO Theoretically, GapBuffer should work greatly faster
     // than QString, but it's really not. Something slows it down
     QBENCHMARK_ONCE {
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 2000; ++i)
             text.remove(0, 1);
     }
 }

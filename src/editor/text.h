@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QFontMetrics>
 #include <QStaticText>
+#include <QSet>
+#include <QMap>
 
 #include "linetracker.h"
 #include "maxvector.h"
@@ -25,6 +27,9 @@ public:
     void remove(int pos, int count);
     void removeLinesAdjust(int pos, int count);
 
+    void setWindowWidth(qreal width);
+    void updateLineBreaks();
+
     int find(int pos, const QString &substring, bool matchCase) const;
 
     int undo();
@@ -38,25 +43,38 @@ public:
     int findLine(int pos) const;
     int lineStart(int line) const;
     int lineSize(int line) const;
+    qreal lineHeight(int line) const;
+    qreal linesHeightBefore(int line) const;
+    qreal lineWidth(int line) const;
+
+    bool isBreak(int pos) const;
 
     int size() const;
     int lineCount() const;
 
     qreal width() const;
+    int visualLinesCount() const;
     qreal fontHeight() const;
     qreal fontAscent() const;
     qreal advanceWidth(qreal left, int pos) const;
+    qreal advanceLeading(qreal left, const Word &word) const;
 
     QString text() const;
     QStaticText text(int pos) const;
     void updateMarkup(int pos);
     Interval markup(int pos) const;
 
+    int findPos(qreal x, qreal y, bool exact = false) const;
+    QPointF findShift(int pos) const;
+
 private:
     CachedFont _font;
     MemoryData _tracker;
     MarkupModel _markup;
     MaxVector<qreal> _widths;
+
+    QMap<int, QSet<int>> _lineBreaks;
+    qreal _windowWidth = qInf();
 
     mutable const Line *_lastLine = nullptr;
     mutable const Word *_lastWord = nullptr;

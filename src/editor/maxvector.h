@@ -1,7 +1,7 @@
 #ifndef MAXVECTOR_H
 #define MAXVECTOR_H
 
-#include <QVector>
+#include "gapbuffer.h"
 
 template <typename T>
 class MaxVector

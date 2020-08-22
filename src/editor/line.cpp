@@ -125,7 +125,12 @@ int Line::size() const
     return _size;
 }
 
-qreal Line::width() const
+int Line::count() const
+{
+    return _words.size();
+}
+
+/*qreal Line::width() const
 {
     qreal result = 0;
 
@@ -138,7 +143,7 @@ qreal Line::width() const
     }
 
     return result;
-}
+}*/
 
 const Word &Line::operator [](int word) const
 {

@@ -26,6 +26,7 @@ public slots:
     void toggleConsole();
     void compile();
     void painter();
+    void wordWrap(bool checked);
     void options();
     void about();
     void aboutQt();
@@ -63,6 +64,7 @@ private:
     QAction *_toggleConsoleAction;
     QAction *_compileAction;
     QAction *_painterAction;
+    QAction *_wordWrap;
     QAction *_optionsAction;
     QAction *_aboutAction;
     QAction *_aboutQtAction;

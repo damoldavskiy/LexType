@@ -26,7 +26,8 @@ public:
 
     int start() const;
     int size() const;
-    qreal width() const;
+    int count() const;
+//    qreal width() const;
 
     const Word &operator [](int word) const;
     QString mid(int pos, int count = -1) const;

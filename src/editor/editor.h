@@ -60,6 +60,7 @@ protected:
     void focusInEvent(QFocusEvent *event);
     void focusOutEvent(QFocusEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void resizeEvent(QResizeEvent *event);
     bool event(QEvent *event);
 
     void mouseTripleClick(QMouseEvent *event);
