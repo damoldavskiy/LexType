@@ -416,7 +416,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Up:
-        if (_text.findLine(_pos) != 0) {
+        line = _text.findLine(_pos);
+        if (line > 0 || _text.breaksInline(_pos) > 0) {
             if (event->modifiers() & Qt::ShiftModifier) {
                 if (_spos == -1)
                     _spos = _pos;
@@ -428,7 +429,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_Down:
-        if (_text.findLine(_pos) != _text.lineCount() - 1) {
+        line = _text.findLine(_pos);
+        if (line < _text.lineCount() - 1 || _text.breaksInline(_pos) < _text.visualLinesCount(line) - 1) {
             if (event->modifiers() & Qt::ShiftModifier) {
                 if (_spos == -1)
                     _spos = _pos;

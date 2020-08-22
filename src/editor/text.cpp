@@ -247,6 +247,31 @@ bool Text::isBreak(int pos) const
     return pos == 0 && _lineBreaks[line].contains(word);
 }
 
+int Text::breaksInline(int pos) const
+{
+    int line = _tracker.find(pos);
+    pos -= _tracker[line].start();
+    int word = _tracker[line].find(pos);
+    pos -= _tracker[line][word].start;
+
+    auto set = _lineBreaks.find(line);
+    if (set == _lineBreaks.end())
+        return 0;
+
+    int extra = 0;
+    for (int index : *set)
+        if (index <= word)
+            ++extra;
+
+    return extra;
+}
+
+int Text::visualLinesCount(int line) const
+{
+    auto set = _lineBreaks.find(line);
+    return (set == _lineBreaks.end() ? 0 : set->size()) + 1;
+}
+
 int Text::size() const
 {
     return _tracker[_tracker.size() - 1].start() + _tracker[_tracker.size() - 1].size();
@@ -377,9 +402,6 @@ int Text::findPos(qreal x, qreal y, bool exact) const
     for (; line < _tracker.size() && height + lineHeight(line) <= y; ++line)
         height += lineHeight(line);
 
-//    if (line == _tracker.size() - 1 && height + lineHeight(line) < y)
-//        return size();
-
     int word = 0;
     QMap<int, QSet<int>>::const_iterator set;
     if ((set = _lineBreaks.find(line)) != _lineBreaks.end()) {
@@ -393,14 +415,12 @@ int Text::findPos(qreal x, qreal y, bool exact) const
 
     if (line < _tracker.size()) {
         int pos = _tracker[line].start() + _tracker[line][word].start;
-
-        // Incorrect end
         int end = _tracker[line].start() + _tracker[line].size();
 
         qreal width, left;
         width = 0;
         left = 0;
-        while (pos < end && left < x) {
+        while (pos < end && left < x && !isBreak(pos + 1)) {
             width = advanceWidth(left, pos);
             left += width;
             pos++;
@@ -435,7 +455,7 @@ QPointF Text::findShift(int pos) const
         QVector<int> wordBreaks { 0 };
         for (int pos : *set)
             if (pos <= word)
-            wordBreaks.append(pos);
+                wordBreaks.append(pos);
         std::sort(wordBreaks.begin(), wordBreaks.end());
 
         startWord = wordBreaks.back();

@@ -48,6 +48,8 @@ public:
     qreal lineWidth(int line) const;
 
     bool isBreak(int pos) const;
+    int breaksInline(int pos) const;
+    int visualLinesCount(int line) const;
 
     int size() const;
     int lineCount() const;
