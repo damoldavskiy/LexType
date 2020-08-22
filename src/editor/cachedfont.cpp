@@ -12,7 +12,7 @@ QVector<QStaticText> cacheText(int start, int end, const QFont &font, const QFon
 }
 
 CachedFont::CachedFont(const QFont &font, int tabCount)
-    : _font(font), _metrics(font), _tabWidth(width('x') * tabCount)
+    : _font(font), _metrics(font), _tabWidth(width('x') * tabCount), _height(_metrics.height()), _ascent(_metrics.ascent())
 {
     _cachedText.add(0x0000, cacheText(0x0000, 0x00FF, _font, _metrics)); // ASCII
     _cachedText.add(0x0400, cacheText(0x0400, 0x04FF, _font, _metrics)); // Cyrillic
@@ -30,17 +30,16 @@ QStaticText CachedFont::get(QChar symbol) const
     }
 
     return _cachedText.get(index, code);
-
 }
 
 qreal CachedFont::height() const
 {
-    return _metrics.height();
+    return _height;
 }
 
 qreal CachedFont::ascent() const
 {
-    return _metrics.ascent();
+    return _ascent;
 }
 
 qreal CachedFont::width(QChar symbol) const

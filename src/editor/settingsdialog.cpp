@@ -224,7 +224,7 @@ void SettingsDialog::appendSnippetsList()
     insert->setEnabled(false);
 
     // TODO Better to save indices of all snippets
-    connect(list, &QListWidget::currentItemChanged, this, [list, info, layout, math, position, pattern, value, accept, remove, insert] (QListWidgetItem *) {
+    connect(list, &QListWidget::currentItemChanged, this, [list, math, position, pattern, value, accept, remove, insert] (QListWidgetItem *) {
         SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
         QVector<Snippet> snippets = manager.snippets();
         int index = list->currentRow();
@@ -294,7 +294,7 @@ void SettingsDialog::appendSnippetsList()
             list->addItem(snippet.pattern().replace("\n", " "));
     });
 
-    connect(insert, &QPushButton::clicked, this, [list, math, position, pattern, value, accept, remove, insert] () {
+    connect(insert, &QPushButton::clicked, this, [list] () {
         SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
         QVector<Snippet> &snippets = manager.snippets();
         int index = list->currentRow();

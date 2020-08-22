@@ -241,6 +241,7 @@ void Editor::paintEvent(QPaintEvent *event)
     int height = size().height();
 
     int line = _text.findLine(_pos);
+    bool wordWrap = Styler::get<bool>("editor-flag-wordwrap");
 
     painter.fillRect(0, 0, width, height, Styler::get<QColor>("editor-back"));
 
@@ -270,17 +271,17 @@ void Editor::paintEvent(QPaintEvent *event)
             left = 0;
             cwidth = 0;
             do {
-                if (left - _xshift > width && /*not wordWrapEnabled*/ false)
+                if (left - _xshift > width && !wordWrap)
                     break;
 
                 left += cwidth;
 
-                if (_text.isBreak(pos)) {
-                    top += _text.fontHeight();
-                    left = 0;
-                }
-
                 if (pos < end) {
+                    if (_text.isBreak(pos)) {
+                        top += _text.fontHeight();
+                        left = 0;
+                    }
+
                     cwidth = _text.advanceWidth(left, pos);
 
                     if (QRect(left - _xshift, top, cwidth, _text.fontHeight()).intersects(event->rect())) {

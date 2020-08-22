@@ -33,8 +33,8 @@ void Text::insertLinesAdjust(int pos, const QString &text)
     for (int i = line; i <= line + added; ++i)
         _widths.set(i, lineWidth(i));
 
-    _lastLine = nullptr;
-    _lastWord = nullptr;
+    _lastLine = -1;
+    _lastWord = -1;
 }
 
 void Text::remove(int pos, int count)
@@ -58,8 +58,8 @@ void Text::removeLinesAdjust(int pos, int count)
 
     _widths.set(line, lineWidth(line));
 
-    _lastLine = nullptr;
-    _lastWord = nullptr;
+    _lastLine = -1;
+    _lastWord = -1;
 }
 
 void Text::setWindowWidth(qreal width)
@@ -156,31 +156,19 @@ QChar Text::operator [](int pos) const
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos < size());
 
-    bool newLine = false;
+    auto pair = findLineWord(pos);
+    const Line &line = _tracker[pair.first];
+    const Word &word = line[pair.second];
 
-    if (_lastLine == nullptr ||
-        _lastLine->start() > pos ||
-        _lastLine->start() + _lastLine->size() < pos) {
-        _lastLine = &_tracker[_tracker.find(pos)];
-        newLine = true;
-    }
-    pos -= _lastLine->start();
-
-    if (newLine ||
-        _lastWord == nullptr ||
-        _lastWord->start > pos ||
-        _lastWord->start + _lastWord->text.size() < pos)
-        _lastWord = &(*_lastLine)[_lastLine->find(pos)];
-
-    if (pos == _lastLine->size())
+    pos -= line.start();
+    if (pos == line.size())
         return '\n';
 
-    pos -= _lastWord->start;
+    pos -= word.start;
+    if (pos == word.text.size())
+        return word.leading;
 
-    if (pos == _lastWord->text.size())
-        return _lastWord->leading;
-
-    return _lastWord->text[pos];
+    return word.text[pos];
 }
 
 int Text::findLine(int pos) const
@@ -223,7 +211,6 @@ qreal Text::lineWidth(int line) const
             currentWidth = 0;
         }
 
-        // TODO Word wrap off, long line, incorrect x scroll
         currentWidth += _tracker[line][i].width;
         qreal leading = advanceLeading(currentWidth, _tracker[line][i]);
         if (currentWidth + leading <= _windowWidth)
@@ -233,18 +220,49 @@ qreal Text::lineWidth(int line) const
     return Math::max(width, currentWidth);
 }
 
+QPair<int, int> Text::findLineWord(int pos) const
+{
+    Q_ASSERT(pos >= 0);
+    Q_ASSERT(pos <= size());
+
+    bool newLine = false;
+    if (_lastLine == -1) {
+        newLine = true;
+    } else {
+        const Line &currentLine = _tracker[_lastLine];
+        newLine = currentLine.start() > pos ||
+                  currentLine.start() + currentLine.size() < pos;
+    }
+
+    if (newLine)
+        _lastLine = _tracker.find(pos);
+    const Line &line = _tracker[_lastLine];
+    pos -= line.start();
+
+    bool newWord = false;
+    if (newLine || _lastWord == -1) {
+        newWord = true;
+    } else {
+        const Word &word = line[_lastWord];
+        newWord = word.start > pos ||
+                  word.start + word.text.size() < pos;
+    }
+
+    if (newWord)
+        _lastWord = line.find(pos);
+
+    return { _lastLine, _lastWord };
+}
+
 bool Text::isBreak(int pos) const
 {
-    // TODO Not good solution. We cache words in operator [],
-    // we should use this cache here, because isBreak is called on
-    // every symbol
+    auto pair = findLineWord(pos);
+    const Line &line = _tracker[pair.first];
+    const Word &word = line[pair.second];
 
-    int line = _tracker.find(pos);
-    pos -= _tracker[line].start();
-    int word = _tracker[line].find(pos);
-    pos -= _tracker[line][word].start;
+    pos -= line.start() + word.start;
 
-    return pos == 0 && _lineBreaks[line].contains(word);
+    return pos == 0 && _lineBreaks[pair.first].contains(pair.second);
 }
 
 int Text::breaksInline(int pos) const

@@ -11,7 +11,6 @@ class CachedFont
 {
 public:
     CachedFont(const QFont &font, int tabCount);
-    CachedFont(const CachedFont&) = delete;
 
     QStaticText get(QChar symbol) const;
 
@@ -25,6 +24,8 @@ private:
     QFontMetricsF _metrics;
     MultiRange<QStaticText> _cachedText;
     qreal _tabWidth;
+    qreal _height;
+    qreal _ascent;
 };
 
 #endif // CACHEDFONT_H

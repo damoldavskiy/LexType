@@ -47,6 +47,8 @@ public:
     qreal linesHeightBefore(int line) const;
     qreal lineWidth(int line) const;
 
+    QPair<int, int> findLineWord(int pos) const;
+
     bool isBreak(int pos) const;
     int breaksInline(int pos) const;
     int visualLinesCount(int line) const;
@@ -78,8 +80,8 @@ private:
     QMap<int, QSet<int>> _lineBreaks;
     qreal _windowWidth = qInf();
 
-    mutable const Line *_lastLine = nullptr;
-    mutable const Word *_lastWord = nullptr;
+    mutable int _lastLine = -1;
+    mutable int _lastWord = -1;
 };
 
 #endif // TEXT_H
