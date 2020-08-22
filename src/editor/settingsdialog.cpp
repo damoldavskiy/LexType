@@ -42,6 +42,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     setLayout(_layout);
 
     QListWidgetItem *generalItem = new QListWidgetItem("General");
+    QListWidgetItem *appearanceItem = new QListWidgetItem("Appearance");
     QListWidgetItem *editorItem = new QListWidgetItem("Editor");
     QListWidgetItem *painterItem = new QListWidgetItem("Painter");
     QListWidgetItem *viewerItem = new QListWidgetItem("Viewer");
@@ -49,13 +50,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     QListWidgetItem *mathItem = new QListWidgetItem("Math mode");
 
     _list->addItem(generalItem);
+    _list->addItem(appearanceItem);
     _list->addItem(editorItem);
     _list->addItem(painterItem);
     _list->addItem(viewerItem);
     _list->addItem(snippetsItem);
     _list->addItem(mathItem);
 
-    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, editorItem, painterItem, viewerItem, snippetsItem, mathItem] (QListWidgetItem *item) {
+    connect(_list, &QListWidget::currentItemChanged, this, [this, generalItem, appearanceItem, editorItem, painterItem, viewerItem, snippetsItem, mathItem] (QListWidgetItem *item) {
         clearForm();
         if (item == generalItem) {
             appendCheckBoxes(Properties {
@@ -63,7 +65,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             });
 
             appendButton("Reset to defaults", Styler::reset);
-        } else if (item == editorItem) {
+        } else if (item == appearanceItem) {
             appendFontButtons(Properties {
                 { "editor-font", "Editor font" }
             });
@@ -84,7 +86,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "numbers-fore", "Numbers foreground" },
                 { "numbers-current", "Numbers current" }
             });
-
+        } else if (item == editorItem) {
             appendDoubleEdit({ "editor-caret-width", "Caret width (pixels)" }, [] (qreal n) { return n > 0 && n <= 5; });
             appendIntEdit({ "editor-tab-width", "Tab width (spaces)" }, [] (int n) { return n > 0; });
             appendIntEdit({ "editor-tick-time", "Cursor tick interval (ms)" }, [] (int n) { return n > 0; });
