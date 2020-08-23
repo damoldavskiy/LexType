@@ -130,21 +130,6 @@ int Line::count() const
     return _words.size();
 }
 
-/*qreal Line::width() const
-{
-    qreal result = 0;
-
-    for (int i = 0; i < _words.size(); ++i) {
-        result += _words[i].width;
-        if (_words[i].leading == ' ')
-            result += _font->width(' ');
-        else if (_words[i].leading == '\t')
-            result = appendTab(result, _font->tabWidth());
-    }
-
-    return result;
-}*/
-
 const Word &Line::operator [](int word) const
 {
     return _words[word];

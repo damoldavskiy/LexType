@@ -26,7 +26,6 @@ Editor::Editor(QWidget *parent, LineNumbers *numbers)
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
-    updateSettings();
 
     connect(&_timer, &QTimer::timeout, this, &Editor::tick);
     _timer.start(Styler::get<int>("editor-tick-time"));

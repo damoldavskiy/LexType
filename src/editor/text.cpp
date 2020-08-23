@@ -1,5 +1,18 @@
 #include "text.h"
 
+template <typename T>
+void shift(QMap<int, T> &map, int start, int shift)
+{
+    QVector<QPair<int, QSet<int>>> values;
+    for (auto it = map.lowerBound(start); it != map.end();) {
+        values.append({ it.key() + shift, std::move(*it) });
+        it = map.erase(it);
+    }
+
+    for (int i = 0; i < values.size(); ++i)
+        map.insert(values[i].first, std::move(values[i].second));
+}
+
 Text::Text(const QFont &font, int tabCount)
     : _font(font, tabCount), _widths(1)
 {
@@ -17,21 +30,24 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(pos <= size());
 
     _tracker.insert(pos, text);
-    updateLineBreaks(); // TODO Not effective
-    insertLinesAdjust(pos, text);
-    updateMarkup(pos);
-}
-
-void Text::insertLinesAdjust(int pos, const QString &text)
-{
     int line = _tracker.find(pos);
     int added = _tracker.find(pos + text.size()) - line;
 
-    if (added > 0)
+    insertLinesAdjust(line, added);
+    updateMarkup(pos);
+}
+
+void Text::insertLinesAdjust(int line, int added)
+{
+    if (added > 0) {
         _widths.insert(line, added, 0);
+        shift(_lineBreaks, line, added);
+    }
 
     for (int i = line; i <= line + added; ++i)
         _widths.set(i, lineWidth(i));
+
+    updateLineBreaks(line, added + 1);
 
     _lastLine = -1;
     _lastWord = -1;
@@ -42,21 +58,31 @@ void Text::remove(int pos, int count)
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos + count <= size());
 
-    removeLinesAdjust(pos, count);
+    int line = _tracker.find(pos);
+    int deleted = _tracker.find(pos + count) - line;
     _tracker.remove(pos, count);
-    updateLineBreaks(); // TODO Not effective
+
+    removeLinesAdjust(line, deleted);
     updateMarkup(pos);
 }
 
-void Text::removeLinesAdjust(int pos, int count)
+void Text::removeLinesAdjust(int line, int removed)
 {
-    int line = _tracker.find(pos);
-    int deleted = _tracker.find(pos + count) - line;
+    if (removed > 0) {
+        _widths.remove(line + 1, removed);
 
-    if (deleted > 0)
-        _widths.remove(line + 1, deleted);
+        for (auto it = _lineBreaks.lowerBound(line + 1); it != _lineBreaks.end();) {
+            if (it.key() <= line + removed)
+                it = _lineBreaks.erase(it);
+            else
+                break;
+        }
+        shift(_lineBreaks, line + removed, -removed);
+    }
 
     _widths.set(line, lineWidth(line));
+
+    updateLineBreaks(line, 1);
 
     _lastLine = -1;
     _lastWord = -1;
@@ -64,23 +90,30 @@ void Text::removeLinesAdjust(int pos, int count)
 
 void Text::setWindowWidth(qreal width)
 {
+    if (width == _windowWidth)
+        return;
+
     _windowWidth = width;
-    updateLineBreaks();
+
+    updateLineBreaks(0, _tracker.size());
     for (int i = 0; i < _tracker.size(); ++i)
         _widths.set(i, lineWidth(i));
 }
 
-void Text::updateLineBreaks()
+void Text::updateLineBreaks(int line, int count)
 {
-    _lineBreaks.clear();
-
-    for (int i = 0; i < _tracker.size(); ++i) {
+    for (int i = line; i < line + count; ++i) {
         qreal width = 0;
+
+        auto it = _lineBreaks.find(i);
+        if (it != _lineBreaks.end())
+            _lineBreaks.erase(it);
+
         for (int j = 0; j < _tracker[i].count(); ++j) {
             width += _tracker[i][j].width;
 
             if (width + 1 >= _windowWidth) {
-                if (j != 0)
+                if (j != 0 && _tracker[i][j].text.size() > 0)
                     _lineBreaks[i].insert(j);
                 width = _tracker[i][j].width;
             }
@@ -102,17 +135,22 @@ int Text::undo()
 
     int result;
     if (action.type == Action::Insert) {
-        removeLinesAdjust(action.index, action.text.size());
+        int line = _tracker.find(action.index);
+        int changed = _tracker.find(action.index + action.text.size()) - line;
         _tracker.undo();
+
+        removeLinesAdjust(line, changed);
         result = action.index;
     } else {
         _tracker.undo();
-        insertLinesAdjust(action.index, action.text);
+        int line = _tracker.find(action.index);
+        int changed = _tracker.find(action.index + action.text.size()) - line;
+
+        insertLinesAdjust(line, changed);
         result = action.index + action.text.size();
     }
 
     updateMarkup(action.index);
-    updateLineBreaks(); // TODO Not effective
     return result;
 }
 
@@ -121,18 +159,23 @@ int Text::redo()
     const Action &action = _tracker.foreward();
 
     int result;
-    if (action.type == Action::Insert) {
+    if (action.type == Action::Remove) {
+        int line = _tracker.find(action.index);
+        int changed = _tracker.find(action.index + action.text.size()) - line;
         _tracker.redo();
-        insertLinesAdjust(action.index, action.text);
-        result = action.index + action.text.size();
-    } else {
-        removeLinesAdjust(action.index, action.text.size());
-        _tracker.redo();
+
+        removeLinesAdjust(line, changed);
         result = action.index;
+    } else {
+        _tracker.redo();
+        int line = _tracker.find(action.index);
+        int changed = _tracker.find(action.index + action.text.size()) - line;
+
+        insertLinesAdjust(line, changed);
+        result = action.index + action.text.size();
     }
 
     updateMarkup(action.index);
-    updateLineBreaks(); // TODO Not effective
     return result;
 }
 
@@ -206,14 +249,15 @@ qreal Text::lineWidth(int line) const
     qreal currentWidth = 0;
 
     for (int i = 0; i < _tracker[line].count(); ++i) {
-        if (_lineBreaks[line].contains(i)) {
+        auto it = _lineBreaks.find(line);
+        if (it != _lineBreaks.end() && it->contains(i)) {
             width = Math::max(width, currentWidth);
             currentWidth = 0;
         }
 
         currentWidth += _tracker[line][i].width;
         qreal leading = advanceLeading(currentWidth, _tracker[line][i]);
-        if (currentWidth + leading <= _windowWidth)
+        if (it == _lineBreaks.end() || !it->contains(i + 1))
             currentWidth += leading;
     }
 

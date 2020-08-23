@@ -22,13 +22,13 @@ public:
     void setFont(const QFont &font, int tabCount);
 
     void insert(int pos, const QString &text);
-    void insertLinesAdjust(int pos, const QString &text);
+    void insertLinesAdjust(int line, int added);
 
     void remove(int pos, int count);
-    void removeLinesAdjust(int pos, int count);
+    void removeLinesAdjust(int line, int removed);
 
     void setWindowWidth(qreal width);
-    void updateLineBreaks();
+    void updateLineBreaks(int line, int count);
 
     int find(int pos, const QString &substring, bool matchCase) const;
 
