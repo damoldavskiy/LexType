@@ -8,6 +8,7 @@ SOURCES += \
     ..\..\src\editor\line.cpp \
     ..\..\src\editor\cachedfont.cpp \
     ..\..\src\editor\markupmodel.cpp \
+    ..\..\src\editor\interval.cpp \
     ..\..\src\editor\text.cpp \
     ..\..\src\editor\memorydata.cpp \
     main.cpp
@@ -20,6 +21,7 @@ HEADERS += \
     ..\..\src\editor\line.h \
     ..\..\src\editor\cachedfont.h \
     ..\..\src\editor\markupmodel.h \
+    ..\..\src\editor\interval.h \
     ..\..\src\editor\text.h \
     ..\..\src\editor\memorydata.h \
     tst_text.h

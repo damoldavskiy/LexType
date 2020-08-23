@@ -12,6 +12,7 @@ SOURCES += \
     ..\..\src\editor\text.cpp \
     ..\..\src\editor\memorydata.cpp \
     ..\..\src\editor\keyboardlayout.cpp \
+    ..\..\src\editor\interval.cpp \
     ..\..\src\editor\editor.cpp \
     ..\..\src\editor\styler.cpp \
     ..\..\src\editor\snippet.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     ..\..\src\editor\text.h \
     ..\..\src\editor\memorydata.h \
     ..\..\src\editor\keyboardlayout.h \
+    ..\..\src\editor\interval.h \
     ..\..\src\editor\editor.h \
     ..\..\src\editor\styler.h \
     ..\..\src\editor\snippet.h \

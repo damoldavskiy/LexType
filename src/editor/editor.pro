@@ -4,6 +4,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     cachedfont.cpp \
+    interval.cpp \
     line.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -40,6 +41,8 @@ SOURCES += \
 HEADERS += \
     cachedfont.h \
     gapbuffer.h \
+    interval.h \
+    intervaltype.h \
     line.h \
     mainwindow.h \
     editor.h \
@@ -68,7 +71,6 @@ HEADERS += \
     figurearrow.h \
     snippet.h \
     markupmodel.h \
-    interval.h \
     pathwatcher.h \
     keyboardlayout.h \
     settingsdialog.h \

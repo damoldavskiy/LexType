@@ -8,11 +8,23 @@ Interval MarkupModel::interval(int pos) const
     return _intervals[pos];
 }
 
-void MarkupModel::setInterval(int start, int end, Interval interval)
+int MarkupModel::size() const
 {
-    if (_intervals.size() < end)
-        _intervals.resize(end * 2);
+    return _intervals.size();
+}
 
+void MarkupModel::set(int start, int end, Interval interval)
+{
     for (int i = start; i < end; ++i)
         _intervals[i] = interval;
+}
+
+void MarkupModel::insert(int start, int end, Interval interval)
+{
+    _intervals.insert(start, end - start, interval);
+}
+
+void MarkupModel::remove(int start, int end)
+{
+    _intervals.remove(start, end - start);
 }

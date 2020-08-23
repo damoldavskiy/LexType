@@ -9,11 +9,11 @@
 class MemoryData : public LineTracker
 {
 public:
-    void insert(int pos, const QString &text);
-    void remove(int pos, int count);
+    const Action& insert(int pos, const QString &text);
+    const Action& remove(int pos, int count);
 
-    Action undo();
-    Action redo();
+    const Action& undo();
+    const Action& redo();
 
     const Action& backward() const;
     const Action& foreward() const;

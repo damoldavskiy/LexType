@@ -288,20 +288,20 @@ void Editor::paintEvent(QPaintEvent *event)
                             painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
                             painter.setPen(Styler::get<QColor>("editor-selection-fore"));
                         } else
-                            switch (_text.markup(pos)) {
-                            case Interval::Regular:
+                            switch (_text.markup(pos).type()) {
+                            case IntervalType::Regular:
                                 painter.setPen(Styler::get<QColor>("editor-regular"));
                                 break;
-                            case Interval::Mathematics:
+                            case IntervalType::Mathematics:
                                 painter.setPen(Styler::get<QColor>("editor-mathematics"));
                                 break;
-                            case Interval::Command:
+                            case IntervalType::Command:
                                 painter.setPen(Styler::get<QColor>("editor-command"));
                                 break;
-                            case Interval::Special:
+                            case IntervalType::Special:
                                 painter.setPen(Styler::get<QColor>("editor-special"));
                                 break;
-                            case Interval::Comment:
+                            case IntervalType::Comment:
                                 painter.setPen(Styler::get<QColor>("editor-comment"));
                                 break;
                             }
@@ -460,8 +460,8 @@ void Editor::keyPressEvent(QKeyEvent *event)
                     _lastLayout = QLocale::English;
 
                 if (_lastLayout == QLocale::Russian && text != "`" && (text == "ё"
-                    || (_pos > 0 && _text.markup(_pos - 1) == Interval::Mathematics
-                        && (_pos == 1 || !(_text[_pos - 1] == '`' && _text.markup(_pos - 2) == Interval::Mathematics)))))
+                    || (_pos > 0 && _text.markup(_pos - 1).type() == IntervalType::Mathematics
+                        && (_pos == 1 || !(_text[_pos - 1] == '`' && _text.markup(_pos - 2).type() == IntervalType::Mathematics)))))
                     text = KeyboardLayout::pass(text[0]);
             }
 

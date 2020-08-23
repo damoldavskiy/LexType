@@ -65,7 +65,7 @@ public:
 
     QString text() const;
     QStaticText text(int pos) const;
-    void updateMarkup(int pos);
+    void updateMarkup(const Action &action, bool reverseType = false);
     Interval markup(int pos) const;
 
     int findPos(qreal x, qreal y, bool exact = false) const;

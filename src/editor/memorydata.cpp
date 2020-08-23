@@ -1,20 +1,22 @@
 #include "memorydata.h"
 
-void MemoryData::insert(int pos, const QString &text)
+const Action& MemoryData::insert(int pos, const QString &text)
 {
     _before.push({ pos, text, Action::Insert });
     _after.clear();
     LineTracker::insert(pos, text);
+    return _before.top();
 }
 
-void MemoryData::remove(int pos, int count)
+const Action& MemoryData::remove(int pos, int count)
 {
     _before.push({ pos, LineTracker::mid(pos, count), Action::Remove });
     _after.clear();
     LineTracker::remove(pos, count);
+    return _before.top();
 }
 
-Action MemoryData::undo()
+const Action& MemoryData::undo()
 {
     Q_ASSERT(canUndo());
 
@@ -26,10 +28,10 @@ Action MemoryData::undo()
     else
         LineTracker::insert(action.index, action.text);
 
-    return action;
+    return _after.top();
 }
 
-Action MemoryData::redo()
+const Action& MemoryData::redo()
 {
     Q_ASSERT(canRedo());
 
@@ -41,7 +43,7 @@ Action MemoryData::redo()
     else
         LineTracker::remove(action.index, action.text.size());
 
-    return action;
+    return _before.top();
 }
 
 const Action& MemoryData::backward() const

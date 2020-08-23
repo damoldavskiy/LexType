@@ -29,12 +29,12 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());
 
-    _tracker.insert(pos, text);
+    const Action &action = _tracker.insert(pos, text);
     int line = _tracker.find(pos);
     int added = _tracker.find(pos + text.size()) - line;
 
     insertLinesAdjust(line, added);
-    updateMarkup(pos);
+    updateMarkup(action);
 }
 
 void Text::insertLinesAdjust(int line, int added)
@@ -44,10 +44,9 @@ void Text::insertLinesAdjust(int line, int added)
         shift(_lineBreaks, line, added);
     }
 
+    updateLineBreaks(line, added + 1);
     for (int i = line; i <= line + added; ++i)
         _widths.set(i, lineWidth(i));
-
-    updateLineBreaks(line, added + 1);
 
     _lastLine = -1;
     _lastWord = -1;
@@ -60,10 +59,10 @@ void Text::remove(int pos, int count)
 
     int line = _tracker.find(pos);
     int deleted = _tracker.find(pos + count) - line;
-    _tracker.remove(pos, count);
+    const Action &action = _tracker.remove(pos, count);
 
     removeLinesAdjust(line, deleted);
-    updateMarkup(pos);
+    updateMarkup(action);
 }
 
 void Text::removeLinesAdjust(int line, int removed)
@@ -80,9 +79,8 @@ void Text::removeLinesAdjust(int line, int removed)
         shift(_lineBreaks, line + removed, -removed);
     }
 
-    _widths.set(line, lineWidth(line));
-
     updateLineBreaks(line, 1);
+    _widths.set(line, lineWidth(line));
 
     _lastLine = -1;
     _lastWord = -1;
@@ -150,7 +148,7 @@ int Text::undo()
         result = action.index + action.text.size();
     }
 
-    updateMarkup(action.index);
+    updateMarkup(action, true);
     return result;
 }
 
@@ -175,7 +173,7 @@ int Text::redo()
         result = action.index + action.text.size();
     }
 
-    updateMarkup(action.index);
+    updateMarkup(action);
     return result;
 }
 
@@ -401,51 +399,79 @@ QStaticText Text::text(int pos) const
     return _font.get(operator [](pos));
 }
 
-void Text::updateMarkup(int) // TODO Unused parameter
+void Text::updateMarkup(const Action &action, bool reverseType)
 {
-    Interval interval = Interval::Regular;
-    bool math = false;
-    bool mline = false;
+    int pos = action.index;
+    int count = action.text.size();
 
-    // TODO Extremely inefficient
-    QString data = _tracker.mid(0);
+    Interval interval;
+    if (pos > 0)
+        interval = _markup.interval(pos - 1);
 
-    for (int i = 0; i < data.size(); ++i) {
-        if (data[i] == '%' || (i > 0 && _markup.interval(i - 1) == Interval::Comment && data[i] != '\n')) {
-            interval = Interval::Comment;
+    Interval lastInterval;
+    if (pos + count - 1 < _markup.size())
+        lastInterval = _markup.interval(pos + count - 1);
+
+    int end;
+    if ((action.type == Action::Insert) ^ reverseType) {
+        _markup.insert(pos, pos + count, Interval());
+        end = pos + count;
+    } else {
+        _markup.remove(pos, pos + count);
+        if (interval == lastInterval)
+            return;
+        end = size();
+    }
+
+    for (int i = pos; i < end; ++i) {
+        IntervalType type = interval.type();
+        bool math = interval.isMath();
+        bool display = interval.isDisplay();
+
+        QChar cur = operator [](i);
+        QChar last = i == 0 ? '\0' : operator [](i - 1);
+
+        if ((cur == '%' && (i == 0 || last != '\\')) || (i > 0 && _markup.interval(i - 1).type() == IntervalType::Comment && cur != '\n')) {
+            type = IntervalType::Comment;
             math = false;
+            display = false;
         } else {
-            if (data[i] == '`') {
-                if (math && data[i - 1] == '`' && !mline) {
-                    mline = true;
-                } else if (math && data[i - 1] != '`' && mline) {
-                    // TODO _data[i + 1] SEGFAULT
-                } else
+            if (cur == '`') {
+                if (math && last == '`' && !display)
+                    display = true;
+                else if (!math || last == '`' || !display)
                     math = !math;
                 if (!math)
-                    mline = false;
+                    display = false;
             }
 
-            if (data[i] == '`' || math)
-                interval = Interval::Mathematics;
+            if (cur == '`' || math)
+                type = IntervalType::Mathematics;
             else
-                interval = Interval::Regular;
+                type = IntervalType::Regular;
 
-            if ((interval == Interval::Regular && data[i] == '\\') || (i > 0 && _markup.interval(i - 1) == Interval::Command))
-                interval = Interval::Command;
+            if ((type == IntervalType::Regular && cur == '\\') || (i > 0 && _markup.interval(i - 1).type() == IntervalType::Command))
+                type = IntervalType::Command;
 
-            if (i > 0 && _markup.interval(i - 1) == Interval::Command) {
-                if (data[i].isLetter())
-                    interval = Interval::Command;
-                else if (data[i] != '\\') // \\ should be colored both
-                    interval = Interval::Regular;
+            if (i > 0 && _markup.interval(i - 1).type() == IntervalType::Command) {
+                if (cur.isLetter())
+                    type = IntervalType::Command;
+                else if (cur != '\\' && cur != '%') // Escape here
+                    type = IntervalType::Regular;
             }
 
-            if (interval == Interval::Regular && (data[i] == '{' || data[i] == '}' || data[i] == '$'))
-                interval = Interval::Special;
+            if (type == IntervalType::Regular && (cur == '{' || cur == '}' || cur == '$'))
+                type = IntervalType::Special;
         }
 
-        _markup.setInterval(i, i + 1, interval);
+        interval.setType(type);
+        interval.setMath(math);
+        interval.setDisplay(display);
+
+         _markup.set(i, i + 1, interval);
+
+         if (action.type == Action::Insert && i == end - 1 && end != size() && interval != lastInterval)
+            end = size();
     }
 }
 
