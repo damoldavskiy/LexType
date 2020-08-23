@@ -29,6 +29,9 @@ void Text::insert(int pos, const QString &text)
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos <= size());
 
+    if (text.size() == 0)
+        return;
+
     const Action &action = _tracker.insert(pos, text);
     int line = _tracker.find(pos);
     int added = _tracker.find(pos + text.size()) - line;
@@ -56,6 +59,9 @@ void Text::remove(int pos, int count)
 {
     Q_ASSERT(pos >= 0);
     Q_ASSERT(pos + count <= size());
+
+    if (count == 0)
+        return;
 
     int line = _tracker.find(pos);
     int deleted = _tracker.find(pos + count) - line;
