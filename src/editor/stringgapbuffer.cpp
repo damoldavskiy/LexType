@@ -3,23 +3,24 @@
 #include "math.h"
 
 StringGapBuffer::StringGapBuffer()
-    : _data(new QChar[8])
 { }
 
 StringGapBuffer::StringGapBuffer(const StringGapBuffer &other)
 {
-    *this = other;
+    this->operator =(other);
 }
 
 StringGapBuffer::StringGapBuffer(StringGapBuffer &&other)
 {
-    *this = std::move(other);
+    this->operator =(std::move(other));
 }
 
 StringGapBuffer& StringGapBuffer::operator =(const StringGapBuffer &other)
 {
     if (this == &other)
         return *this;
+
+    delete [] _data;
 
     _allocated = other._allocated;
     _gap = other._gap;
@@ -36,6 +37,8 @@ StringGapBuffer& StringGapBuffer::operator =(StringGapBuffer &&other)
 {
     if (this == &other)
         return *this;
+
+    delete [] _data;
 
     _data = other._data;
     _allocated = other._allocated;

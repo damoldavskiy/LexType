@@ -90,11 +90,11 @@ private:
     QSet<int> _highlighted;
     QSet<int> _error;
 
-    int _lastLayout;
+    int _lastLayout = 0;
 
     QTime _lastDoubleClick;
-    int _doubleX;
-    int _doubleY;
+    int _doubleX = -1;
+    int _doubleY = -1;
 };
 
 #endif // EDITOR_H

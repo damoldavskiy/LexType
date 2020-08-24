@@ -31,7 +31,7 @@ private:
     void copy(QChar *target, int from, int to) const;
     void ensureGap(int pos, int size);
 
-    QChar *_data;
+    QChar *_data = new QChar[8];
     int _allocated = 8;
     int _gap = 0;
     int _gapSize = 8;
