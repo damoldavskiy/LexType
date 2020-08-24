@@ -202,7 +202,11 @@ void MainWindow::options()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, "About LexType", "LexType is a software environment targeted on effecive writing of any kind of lecture or technical notes.\n\nAuthor: DA Moldavsky\n\nContact me: party_50@mail.ru");
+    QMessageBox message(this);
+    message.setTextFormat(Qt::RichText);
+    message.setWindowTitle("About LexType");
+    message.setText("LexType is a software environment targeted on effecive writing of any kind of lecture or technical notes.<br><br>Author: DA Moldavsky<br><br>News & updates: <a href=\"tg://resolve?domain=lextype\">@lextype</a>");
+    message.exec();
 }
 
 void MainWindow::aboutQt()
