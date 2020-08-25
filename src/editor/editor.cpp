@@ -95,9 +95,6 @@ Interval Editor::markup(int pos) const
 
 void Editor::updateSettings()
 {
-    _xshift = 0;
-    _yshift = 0;
-
     setFont(Styler::get<QFont>("editor-font"));
     _text.setFont(font(), Styler::get<int>("editor-tab-width"));
     _timer.setInterval(Styler::get<int>("editor-tick-time"));
@@ -109,6 +106,8 @@ void Editor::updateSettings()
         _numbers->setVisible(Styler::get<bool>("editor-flag-numbers"));
         _numbers->setFont(font());
     }
+
+    updateUi(false);
 }
 
 int Editor::nextWordEnd(int pos, int dir) const
@@ -511,8 +510,8 @@ void Editor::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (_text.size() > 0) { // Last symbol of word is selected until text is empty
         int pos = findPos(event->x(), event->y(), true);
-        _spos = nextWordEnd(pos + 1, -1);
-        _pos = nextWordEnd(pos - 1, 1) + 1;
+        _spos = nextWordEnd(qMin(_text.size() - 1, pos + 1), -1);
+        _pos = nextWordEnd(qMax(0, pos - 1), 1) + 1;
         updateUi(false);
     }
 
@@ -544,8 +543,7 @@ void Editor::wheelEvent(QWheelEvent *event)
     _xshift -= event->angleDelta().x();
     _yshift -= event->angleDelta().y();
 
-    Math::limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.width() - width() + 1));
-    Math::limit(_yshift, static_cast<qreal>(0), _text.visualLinesCount() * _text.fontHeight() - _text.fontHeight());
+    correctShift();
 
     if (x != _xshift || y != _yshift)
         update();
@@ -634,6 +632,12 @@ void Editor::removeSelection()
     _spos = -1;
 
     _text.remove(_pos, length);
+}
+
+void Editor::correctShift()
+{
+    Math::limit(_xshift, static_cast<qreal>(0), qMax(static_cast<qreal>(0), _text.width() - width() + 1));
+    Math::limit(_yshift, static_cast<qreal>(0), _text.visualLinesCount() * _text.fontHeight() - _text.fontHeight());
 }
 
 // Shifts window to the caret

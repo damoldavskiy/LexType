@@ -65,6 +65,7 @@ protected:
 
     void mouseTripleClick(QMouseEvent *event);
     void removeSelection();
+    void correctShift();
     void updateShift();
     void updateShift(QPointF point);
     void updateUi(bool resetCaret);

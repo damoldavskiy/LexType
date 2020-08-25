@@ -22,6 +22,11 @@ Text::Text(const QFont &font, int tabCount)
 void Text::setFont(const QFont &font, int tabCount)
 {
     _font = CachedFont(font, tabCount);
+    _tracker.setFont(&_font);
+
+    updateLineBreaks(0, _tracker.size());
+    for (int i = 0; i < _tracker.size(); ++i)
+        _widths.set(i, lineWidth(i));
 }
 
 void Text::insert(int pos, const QString &text)
