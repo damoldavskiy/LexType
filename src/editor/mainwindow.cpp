@@ -89,11 +89,21 @@ void MainWindow::open()
     if (_path.edited() && QMessageBox::question(this, "Open", "Changes unsaved. Do you really want to open another file?") != QMessageBox::Yes)
         return;
 
-    if (_path.open("LexType (*.lex);;TeX (*tex)")) {
+    if (_path.open("LexType (*.lex);;TeX (*tex);;All types (*.*)")) {
         _editor->setText(readText(_path.path()));
         setWindowTitle(_path.title());
         statusBar()->showMessage("Opened file: " + _path.path());
     }
+}
+
+void MainWindow::close()
+{
+    if (_path.edited() && QMessageBox::question(this, "Open", "Changes unsaved. Do you really want to close the document?") != QMessageBox::Yes)
+        return;
+
+    _path.close();
+    _editor->setText("");
+    setWindowTitle(_path.title());
 }
 
 void MainWindow::save()
@@ -258,6 +268,10 @@ void MainWindow::createActions()
     _openAction->setShortcut(QKeySequence("Ctrl+O"));
     connect(_openAction, &QAction::triggered, this, &MainWindow::open);
 
+    _closeAction = new QAction("Close", this);
+    _closeAction->setShortcut(QKeySequence("Ctrl+W"));
+    connect(_closeAction, &QAction::triggered, this, &MainWindow::close);
+
     _saveAction = new QAction("Save", this);
     _saveAction->setShortcut(QKeySequence("Ctrl+S"));
     connect(_saveAction, &QAction::triggered, this, &MainWindow::save);
@@ -329,7 +343,9 @@ void MainWindow::createMenus()
     QMenu *menu;
 
     menu = menuBar()->addMenu("File");
-    menu->addActions({ _openAction, _saveAction, _saveAsAction });
+    menu->addActions({ _openAction, _closeAction });
+    menu->addSeparator();
+    menu->addActions({ _saveAction, _saveAsAction });
     menu->addSeparator();
     menu->addActions({ _quitAction });
 

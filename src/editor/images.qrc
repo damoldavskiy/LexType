@@ -1,5 +1,6 @@
 <RCC>
     <qresource>
+        <file alias="point.png">../../res/images/point.png</file>
         <file alias="line.png">../../res/images/line.png</file>
         <file alias="rectangle.png">../../res/images/rectangle.png</file>
         <file alias="ellipse.png">../../res/images/ellipse.png</file>
@@ -10,7 +11,9 @@
         <file alias="tipSoft.png">../../res/images/tipSoft.png</file>
         <file alias="tipArrow.png">../../res/images/tipArrow.png</file>
         <file alias="tipDouble.png">../../res/images/tipDouble.png</file>
-        <file alias="fillSolid.png">../../res/images/fillSolid.png</file>
         <file alias="fillEmpty.png">../../res/images/fillEmpty.png</file>
+        <file alias="fillLinesHorizontal.png">../../res/images/fillLinesHorizontal.png</file>
+        <file alias="fillLinesVertical.png">../../res/images/fillLinesVertical.png</file>
+        <file alias="fillSolid.png">../../res/images/fillSolid.png</file>
     </qresource>
 </RCC>

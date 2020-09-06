@@ -1,0 +1,72 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lexpack}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T2A]{fontenc}
+\RequirePackage[russian]{babel}
+\RequirePackage{tikz}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{0pt}
+\setlength{\fboxsep}{5pt}
+
+\newcommand{\wordtheorem}{Теорема}
+\newcommand{\worddefinition}{Определение}
+\newcommand{\wordproof}{Доказательство}
+\newcommand{\wordcorollary}{Следствие}
+\newcommand{\wordremark}{Замечание}
+\newcommand{\wordlemma}{Лемма}
+\newcommand{\wordexample}{Пример}
+
+\usetikzlibrary{patterns}
+
+\newsavebox{\defaultbox}
+
+\newenvironment{boxedenv}
+{\begin{lrbox}{\defaultbox}\begin{minipage}{\dimexpr\textwidth-\fboxsep*2\relax}}
+{\end{minipage}\end{lrbox}\framebox[\textwidth]{\usebox{\defaultbox}}}
+
+\newcommand{\optparam}[1]{\ifx&#1&\else\textnormal{~(#1)}\fi}
+
+\newenvironment{theorem}[1][]
+{\par\begin{boxedenv}\textbf{\wordtheorem}\optparam{#1}. \ignorespaces}
+{\end{boxedenv}\par}
+
+\newenvironment{definition}[1][]
+{\par\begin{boxedenv}\textbf{\worddefinition}\optparam{#1}. \ignorespaces}
+{\end{boxedenv}\par}
+
+\newenvironment{proof}[1][]
+{\par\textit{\wordproof}\optparam{#1}. \ignorespaces}
+{\hfill$\square$\par}
+
+\newenvironment{corollary}[1][]
+{\par\textbf{\wordcorollary}\optparam{#1}. \ignorespaces}
+{\par}
+
+\newenvironment{remark}[1][]
+{\par\textbf{\wordremark}\optparam{#1}. \ignorespaces}
+{\par}
+
+\newenvironment{lemma}[1][]
+{\par\textbf{\wordlemma}\optparam{#1}. \ignorespaces}
+{\par}
+
+\newenvironment{example}[1][]
+{\par\textbf{\wordexample}\optparam{#1}. \ignorespaces}
+{\par}
+
+\renewenvironment{picture}
+{\begin{center}\begin{tikzpicture}}
+{\end{tikzpicture}\end{center}}
+
+\newcommand{\comment}[2]{\underbrace{#1}_{\text{\hbox to 0pt{\hss#2\hss}}}}
+
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\theta}{\vartheta}
+\renewcommand{\phi}{\varphi}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}

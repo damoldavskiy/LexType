@@ -8,6 +8,7 @@ class PathWatcher
 public:
     PathWatcher(const QString &app);
     bool open(const QString &filter);
+    void close();
     bool save(const QString &filter);
     bool exists() const;
     QString path() const;

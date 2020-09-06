@@ -19,6 +19,7 @@ public:
 
 public slots:
     void open();
+    void close();
     void save();
     void saveAs();
     void quit();
@@ -51,6 +52,7 @@ private:
     SnippetManager _snippets;
 
     QAction *_openAction;
+    QAction *_closeAction;
     QAction *_saveAction;
     QAction *_saveAsAction;
     QAction *_quitAction;

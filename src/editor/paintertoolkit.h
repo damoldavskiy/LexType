@@ -12,6 +12,7 @@ public:
     void reset();
 
 signals:
+    void point();
     void line();
     void rectangle();
     void ellipse();
@@ -23,7 +24,10 @@ signals:
     void tipArrow();
     void tipDouble();
     void fillEmpty();
+    void fillLinesHor();
+    void fillLinesVer();
     void fillSolid();
+
 
 private:
     void uncheckTools();
@@ -38,6 +42,7 @@ private:
     void createActions();
     void createMenus();
 
+    QAction *_point;
     QAction *_line;
     QAction *_rectangle;
     QAction *_ellipse;
@@ -49,6 +54,8 @@ private:
     QAction *_tipArrow;
     QAction *_tipDouble;
     QAction *_fillEmpty;
+    QAction *_fillLinesHor;
+    QAction *_fillLinesVer;
     QAction *_fillSolid;
     QAction *_lineSeparator;
     QAction *_tipSeparator;

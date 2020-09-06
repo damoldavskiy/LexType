@@ -111,7 +111,7 @@ void Painter::mousePressEvent(QMouseEvent *event)
 
     _figures.append(_current);
     _current->setStart(_mouse);
-    _current->setEnd(_mouse);
+    _current->setEnd(_mouse, event->modifiers() & Qt::ShiftModifier);
 
     for (auto figure : _afterFigures)
         delete figure;

@@ -150,7 +150,9 @@ QStringList FigurePath::modifiers() const
         listArrow.clear();
     }
 
-    return listArrow + listFill;
+    QStringList result = listArrow + listFill;
+    result.removeDuplicates();
+    return result;
 }
 
 QPointF FigurePath::attract(QPointF point) const

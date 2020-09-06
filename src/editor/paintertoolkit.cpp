@@ -19,6 +19,7 @@ void PainterToolkit::reset()
 
 void PainterToolkit::uncheckTools()
 {
+    _point->setChecked(false);
     _line->setChecked(false);
     _rectangle->setChecked(false);
     _ellipse->setChecked(false);
@@ -42,6 +43,8 @@ void PainterToolkit::uncheckTip()
 void PainterToolkit::uncheckFill()
 {
     _fillEmpty->setChecked(false);
+    _fillLinesHor->setChecked(false);
+    _fillLinesVer->setChecked(false);
     _fillSolid->setChecked(false);
 }
 
@@ -70,11 +73,25 @@ void PainterToolkit::showFill(bool value)
     _fillEmpty->setChecked(true);
     _fillSeparator->setVisible(value);
     _fillEmpty->setVisible(value);
+    _fillLinesHor->setVisible(value);
+    _fillLinesVer->setVisible(value);
     _fillSolid->setVisible(value);
 }
 
 void PainterToolkit::createActions()
 {
+    _point = new QAction(QIcon(":/point.png"), "Point", this);
+    _point->setShortcut(QKeySequence("."));
+    _point->setCheckable(true);
+    connect(_point, &QAction::triggered, this, [this] () {
+        uncheckTools();
+        _point->setChecked(true);
+        showLine(false);
+        showTip(false);
+        showFill(false);
+        emit point();
+    });
+
     _line = new QAction(QIcon(":/line.png"), "Line", this);
     _line->setShortcut(QKeySequence("L"));
     _line->setCheckable(true);
@@ -189,6 +206,24 @@ void PainterToolkit::createActions()
         emit fillEmpty();
     });
 
+    _fillLinesHor = new QAction(QIcon(":/fillLinesHorizontal.png"), "Horizontal lines pattern", this);
+    _fillLinesHor->setShortcut(QKeySequence("V"));
+    _fillLinesHor->setCheckable(true);
+    connect(_fillLinesHor, &QAction::triggered, this, [this] () {
+        uncheckFill();
+        _fillLinesHor->setChecked(true);
+        emit fillLinesHor();
+    });
+
+    _fillLinesVer = new QAction(QIcon(":/fillLinesVertical.png"), "Vertical lines pattern", this);
+    _fillLinesVer->setShortcut(QKeySequence("H"));
+    _fillLinesVer->setCheckable(true);
+    connect(_fillLinesVer, &QAction::triggered, this, [this] () {
+        uncheckFill();
+        _fillLinesVer->setChecked(true);
+        emit fillLinesVer();
+    });
+
     _fillSolid = new QAction(QIcon(":/fillSolid.png"), "Solid fill", this);
     _fillSolid->setShortcut(QKeySequence("F"));
     _fillSolid->setCheckable(true);
@@ -201,7 +236,7 @@ void PainterToolkit::createActions()
 
 void PainterToolkit::createMenus()
 {
-    addActions({ _line, _rectangle, _ellipse, _path, _text});
+    addActions({ _point, _line, _rectangle, _ellipse, _path, _text});
 
     _lineSeparator = addSeparator();
     addActions({ _lineSolid, _lineDash });
@@ -210,5 +245,5 @@ void PainterToolkit::createMenus()
     addActions({ _tipSoft, _tipArrow, _tipDouble });
 
     _fillSeparator = addSeparator();
-    addActions({ _fillEmpty, _fillSolid });
+    addActions({ _fillEmpty, _fillLinesHor, _fillLinesVer, _fillSolid });
 }

@@ -3,6 +3,7 @@
 #include <QLayout>
 #include <QShortcut>
 
+#include "figurepoint.h"
 #include "figureline.h"
 #include "figurerectangle.h"
 #include "figureellipse.h"
@@ -17,7 +18,7 @@ PainterDialog::PainterDialog(QWidget *parent)
     setWindowTitle("Painter");
     setStyleSheet(Styler::get<QString>("widget-style"));
     setLayout(new QVBoxLayout);
-    resize(480, 480);
+    resize(640, 480);
 
     _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
 
@@ -49,6 +50,7 @@ PainterDialog::PainterDialog(QWidget *parent)
     layout()->addWidget(_painter);
     layout()->addWidget(_editor);
 
+    connect(_toolkit, &PainterToolkit::point, this, &PainterDialog::point);
     connect(_toolkit, &PainterToolkit::line, this, &PainterDialog::line);
     connect(_toolkit, &PainterToolkit::rectangle, this, &PainterDialog::rectangle);
     connect(_toolkit, &PainterToolkit::ellipse, this, &PainterDialog::ellipse);
@@ -60,6 +62,8 @@ PainterDialog::PainterDialog(QWidget *parent)
     connect(_toolkit, &PainterToolkit::tipArrow, this, &PainterDialog::tipArrow);
     connect(_toolkit, &PainterToolkit::tipDouble, this, &PainterDialog::tipDouble);
     connect(_toolkit, &PainterToolkit::fillSolid, this, &PainterDialog::fillSolid);
+    connect(_toolkit, &PainterToolkit::fillLinesHor, this, &PainterDialog::fillLinesHor);
+    connect(_toolkit, &PainterToolkit::fillLinesVer, this, &PainterDialog::fillLinesVer);
     connect(_toolkit, &PainterToolkit::fillEmpty, this, &PainterDialog::fillEmpty);
 
     new QShortcut(QKeySequence("Ctrl+D"), this, SLOT(accept()));
@@ -77,6 +81,13 @@ void PainterDialog::accept()
 {
     _accepted = true;
     close();
+}
+
+void PainterDialog::point()
+{
+    _editor->setVisible(false);
+    _editor->setEnabled(false);
+    _painter->setFigure(new FigurePoint);
 }
 
 void PainterDialog::line()
@@ -149,6 +160,18 @@ void PainterDialog::fillSolid()
 {
     FigureFillable *figure = dynamic_cast<FigureFillable*>(_painter->figure());
     figure->setFill(FigureFillable::Solid);
+}
+
+void PainterDialog::fillLinesHor()
+{
+    FigureFillable *figure = dynamic_cast<FigureFillable*>(_painter->figure());
+    figure->setFill(FigureFillable::LinesHorizontal);
+}
+
+void PainterDialog::fillLinesVer()
+{
+    FigureFillable *figure = dynamic_cast<FigureFillable*>(_painter->figure());
+    figure->setFill(FigureFillable::LinesVertical);
 }
 
 void PainterDialog::fillEmpty()

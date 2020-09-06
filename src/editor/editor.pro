@@ -36,7 +36,8 @@ SOURCES += \
     paintertoolkit.cpp \
     snippetmanager.cpp \
     finddialog.cpp \
-    colorbutton.cpp
+    colorbutton.cpp \
+    figurepoint.cpp
 
 HEADERS += \
     cachedfont.h \
@@ -78,7 +79,8 @@ HEADERS += \
     snippetmanager.h \
     finddialog.h \
     colorbutton.h \
-    word.h
+    word.h \
+    figurepoint.h
 
 RESOURCES += \
     fonts.qrc \

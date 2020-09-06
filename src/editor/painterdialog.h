@@ -18,6 +18,7 @@ public:
 
 public slots:
     void accept();
+    void point();
     void line();
     void ellipse();
     void rectangle();
@@ -29,6 +30,8 @@ public slots:
     void tipArrow();
     void tipDouble();
     void fillSolid();
+    void fillLinesHor();
+    void fillLinesVer();
     void fillEmpty();
 
 private:

@@ -11,6 +11,12 @@ bool PathWatcher::open(const QString &filter)
     return update(QFileDialog::getOpenFileName(nullptr, "Open", "", filter));
 }
 
+void PathWatcher::close()
+{
+    _info.setFile("");
+    _edited = false;
+}
+
 bool PathWatcher::save(const QString &filter)
 {
     return update(QFileDialog::getSaveFileName(nullptr, "Save", "", filter));

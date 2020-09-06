@@ -9,6 +9,8 @@ public:
     enum Fill
     {
         Solid,
+        LinesHorizontal,
+        LinesVertical,
         Empty
     };
 

@@ -9,6 +9,10 @@ void FigureFillable::paint(QPainter *painter) const
     QBrush brush = painter->brush();
     if (_fill == Fill::Solid)
         brush.setStyle(Qt::SolidPattern);
+    else if (_fill == Fill::LinesHorizontal)
+        brush.setStyle(Qt::HorPattern);
+    else if (_fill == Fill::LinesVertical)
+        brush.setStyle(Qt::VerPattern);
     else if (_fill == Fill::Empty)
         brush.setStyle(Qt::NoBrush);
     brush.setColor(Styler::get<QColor>("painter-fore")); // TODO Move it to painter.cpp?
@@ -22,6 +26,10 @@ QStringList FigureFillable::modifiers() const
 
     if (_fill == Fill::Solid)
         list.append("fill=black");
+    else if (_fill == Fill::LinesHorizontal)
+        list.append("pattern=horizontal lines");
+    else if (_fill == Fill::LinesVertical)
+        list.append("pattern=vertical lines");
 
     return list;
 }
