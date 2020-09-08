@@ -479,9 +479,9 @@ void Text::updateMarkup(const Action &action, bool reverseType)
         interval.setMath(math);
         interval.setDisplay(display);
 
-         _markup.set(i, i + 1, interval);
+        _markup.set(i, i + 1, interval);
 
-         if (action.type == Action::Insert && i == end - 1 && end != size() && interval != lastInterval)
+        if (action.type == Action::Insert && i == end - 1 && end != size() && interval != lastInterval)
             end = size();
     }
 }
