@@ -48,5 +48,5 @@ QPointF FigurePoint::attract(QPointF point) const
 
 QStringList FigurePoint::modifiers() const
 {
-    return _modifier ? QStringList { "" } : QStringList { "fill=black" };
+    return _modifier ? QStringList { } : QStringList { "fill=black" };
 }
