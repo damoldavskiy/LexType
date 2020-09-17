@@ -495,6 +495,8 @@ int Text::findPos(qreal x, qreal y, bool exact) const
 {
     if (x < 0)
         x = 0;
+    if (y < 0)
+        y = 0;
 
     int line = 0;
     qreal height = 0;
@@ -525,7 +527,7 @@ int Text::findPos(qreal x, qreal y, bool exact) const
             pos++;
         }
 
-        if (exact || left - x > width / 2)
+        if (pos > 0 && (exact || left - x > width / 2))
             --pos;
 
         Q_ASSERT(pos >= 0);

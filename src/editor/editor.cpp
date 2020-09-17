@@ -284,7 +284,10 @@ void Editor::paintEvent(QPaintEvent *event)
 
                     if (QRect(left - _xshift, top, cwidth, _text.fontHeight()).intersects(event->rect())) {
                         if ((_spos != -1 && ((_spos <= pos && pos < _pos) || (_spos > pos && pos >= _pos))) || _highlighted.contains(pos)) {
-                            painter.fillRect(QRectF { left - _xshift, top, cwidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
+                            qreal swidth = cwidth;
+                            if (pos < end && _text.isBreak(pos + 1))
+                                swidth = width - left + _xshift;
+                            painter.fillRect(QRectF { left - _xshift, top, swidth, _text.fontHeight() }, _error.contains(pos) ? Styler::get<QColor>("editor-error") : Styler::get<QColor>("editor-selection-back"));
                             painter.setPen(Styler::get<QColor>("editor-selection-fore"));
                         } else
                             switch (_text.markup(pos).type()) {
@@ -592,6 +595,7 @@ void Editor::resizeEvent(QResizeEvent *)
 {
     if (Styler::get<bool>("editor-flag-wordwrap"))
         _text.setWindowWidth(width());
+    correctShift();
 }
 
 bool Editor::event(QEvent *event)

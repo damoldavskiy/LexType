@@ -95,7 +95,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             appendCheckBoxes(Properties {
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
-                { "editor-flag-autocompile", "Compile on type" },
+                { "editor-flag-autocompile", "Save and compile on type" },
                 { "editor-flag-brackets", "Smart brackets" }
             });
         } else if (item == painterItem) {
