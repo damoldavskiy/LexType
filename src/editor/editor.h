@@ -17,6 +17,7 @@ public:
     Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
 
     int textSize() const;
+    QString selectedText() const;
 
     QString text() const;
     void setText(const QString &text);
@@ -67,6 +68,7 @@ protected:
     void removeSelection();
     void correctShift();
     void updateShift();
+    void updateShiftToSelection();
     void updateShift(QPointF point);
     void updateUi(bool resetCaret);
     void highlightSpecial();

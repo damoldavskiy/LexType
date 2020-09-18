@@ -135,7 +135,7 @@ void MainWindow::quit()
 
 void MainWindow::find()
 {
-    FindDialog *dialog = new FindDialog;
+    FindDialog *dialog = new FindDialog(_editor->selectedText());
     connect(dialog, &FindDialog::find, _editor, &Editor::find);
     connect(dialog, &FindDialog::replace, _editor, &Editor::replace);
     dialog->exec();

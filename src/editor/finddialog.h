@@ -11,7 +11,7 @@ class FindDialog : public QDialog
     Q_OBJECT
 
 public:
-    FindDialog(QWidget *parent = 0);
+    FindDialog(const QString &text = "", QWidget *parent = 0);
 
 signals:
     void find(const QString &substring, bool matchCase);

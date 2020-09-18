@@ -38,6 +38,17 @@ int Editor::textSize() const
     return _text.size();
 }
 
+QString Editor::selectedText() const
+{
+    if (_spos == -1)
+        return "";
+
+    int left = Math::min(_spos, _pos);
+    int right = Math::max(_spos, _pos);
+
+    return _text.mid(left, right - left);
+}
+
 QString Editor::text() const
 {
     return _text.text();
@@ -132,6 +143,8 @@ void Editor::find(const QString &substring, bool matchCase)
 
     _pos = pos;
     _spos = pos + substring.size();
+
+    updateShiftToSelection();
     updateUi(true);
 }
 
@@ -151,12 +164,13 @@ void Editor::replace(const QString &before, const QString &after, bool all, bool
         _text.insert(pos, after);
 
         pos += after.size();
+        _pos = pos;
     } while (all);
 
-    Math::limit(_pos, 0, _text.size());
     _spos = -1;
 
     emit changed();
+
     updateUi(true);
 }
 
@@ -648,6 +662,13 @@ void Editor::correctShift()
 void Editor::updateShift()
 {
     updateShift(_text.findShift(_pos));
+}
+
+void Editor::updateShiftToSelection()
+{
+    if (_spos != -1)
+        updateShift(_text.findShift(_spos));
+    updateShift();
 }
 
 void Editor::updateShift(QPointF point)

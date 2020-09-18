@@ -7,14 +7,14 @@
 
 #include "styler.h"
 
-FindDialog::FindDialog(QWidget *parent)
+FindDialog::FindDialog(const QString &text, QWidget *parent)
     : QDialog(parent)
 {
     setWindowTitle("Find & Replace");
     setStyleSheet(Styler::get<QString>("widget-style"));
     setMaximumHeight(0);
 
-    _findText = new QLineEdit;
+    _findText = new QLineEdit(text);
     _replaceText = new QLineEdit;
     _case = new QCheckBox("Match case");
     _find = new QPushButton("Find");
