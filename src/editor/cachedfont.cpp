@@ -1,5 +1,7 @@
 #include "cachedfont.h"
 
+#include "math.h"
+
 QVector<QStaticText> cacheText(int start, int end, const QFont &font, const QFontMetricsF &metrics)
 {
     QVector<QStaticText> values(end - start + 1);
@@ -44,7 +46,7 @@ qreal CachedFont::ascent() const
 
 qreal CachedFont::width(QChar symbol) const
 {
-    return get(symbol).textWidth();
+    return Math::max(0.0, get(symbol).textWidth());
 }
 
 qreal CachedFont::tabWidth() const
