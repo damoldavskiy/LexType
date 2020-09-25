@@ -122,7 +122,7 @@ void Text::updateLineBreaks(int line, int count)
             width += _tracker[i][j].width;
 
             if (width + 1 >= _windowWidth) {
-                if (j != 0 && _tracker[i][j].text.size() > 0)
+                if (j != 0)
                     _lineBreaks[i].insert(j);
                 width = _tracker[i][j].width;
             }
