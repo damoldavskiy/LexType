@@ -129,6 +129,12 @@ QVector<QPair<QString, QString>> MathWriter::snippetList()
     dict.append({ "∀", "\\forall" });
     dict.append({ "∈", "\\in" });
     dict.append({ "∃", "\\exists" });
+    dict.append({ "∩", "\\cap" });
+    dict.append({ "∪", "\\cup" });
+    dict.append({ "⊆", "\\subseteq" });
+    dict.append({ "⊂", "\\subset" });
+    dict.append({ "⊇", "\\supseteq" });
+    dict.append({ "⊃", "\\supset" });
     dict.append({ "not", "\\not" });
 
     dict.append({ "≠", "\\ne" });
@@ -161,7 +167,7 @@ QVector<QPair<QString, QString>> MathWriter::snippetList()
     dict.append({ "β", "{\\beta}" });
     dict.append({ "Γ", "{\\Gamma}" });
     dict.append({ "γ", "{\\gamma}" });
-    dict.append({ "Δ", "{Delta}" });
+    dict.append({ "Δ", "{\\Delta}" });
     dict.append({ "δ", "{\\delta}" });
     dict.append({ "ɛ", "{\\epsilon}" }); // varepsilon
     dict.append({ "ζ", "{\\zeta}" });

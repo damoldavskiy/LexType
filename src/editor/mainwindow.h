@@ -31,7 +31,8 @@ public slots:
     void options();
     void about();
     void aboutQt();
-    void textChanged(bool undoRedo);
+    void textChanged();
+    void textTyped(int pos, QChar symbol);
 
 private slots:
     void output();

@@ -77,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->setStyleSheet(Styler::get<QString>("status-style"));
 
     connect(_editor, &Editor::changed, this, &MainWindow::textChanged);
+    connect(_editor, &Editor::typed, this, &MainWindow::textTyped);
 
     connect(&_compilation, &QProcess::readyRead, this, &MainWindow::output);
     connect(&_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
@@ -224,17 +225,18 @@ void MainWindow::aboutQt()
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::textChanged(bool undoRedo)
+void MainWindow::textChanged()
 {
-    // TODO Insert from clipborad doesn't emit Editor::typed
     _path.setEdited(_editor->textSize() > 0);
     setWindowTitle(_path.title());
 
-    if (!undoRedo)
-        _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
-
     if (Styler::get<bool>("editor-flag-autocompile") && _timer.remainingTime() == -1)
         _timer.start(Styler::get<int>("editor-autocompile-interval"));
+}
+
+void MainWindow::textTyped(int, QChar)
+{
+    _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
 }
 
 void MainWindow::output()
