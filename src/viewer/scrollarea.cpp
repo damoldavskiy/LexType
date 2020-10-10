@@ -210,7 +210,7 @@ void ScrollArea::recolor(QImage *image) const
     uchar backArray[4] = { static_cast<uchar>(back.blue()), static_cast<uchar>(back.green()), static_cast<uchar>(back.red()), 0 };
     uchar foreArray[4] = { static_cast<uchar>(fore.blue()), static_cast<uchar>(fore.green()), static_cast<uchar>(fore.red()), 0 };
 
-    int size = image->byteCount();
+    int size = image->sizeInBytes();
     uchar *begin = image->bits();
 
     int threadsCount = QThreadPool::globalInstance()->maxThreadCount();

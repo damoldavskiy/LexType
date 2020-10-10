@@ -222,7 +222,7 @@ QString MathWriter::applyParameters(QString source)
 QString MathWriter::applyMatrices(QString source)
 {
     if (!Styler::get<bool>("math-flag-matrices"))
-        return std::move(source);
+        return source;
 
     QVector<QVector<QString>> matrices {
         { "\\(", ")", "pmatrix" },
@@ -280,7 +280,7 @@ QString MathWriter::applyMatrices(QString source)
 QString MathWriter::applyFractions(QString source)
 {
     if (!Styler::get<bool>("math-flag-fractions"))
-        return std::move(source);
+        return source;
 
     for (int i = 0; i < source.size(); ++i) {
         if (source[i] == '/') {
