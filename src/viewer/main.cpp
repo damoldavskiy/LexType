@@ -9,7 +9,11 @@ int main(int argc, char *argv[])
     QFontDatabase::addApplicationFont(":/Lato-Regular.ttf");
     a.setFont(QFont("Lato", 11));
 
-    Viewer::MainWindow w;
+    QString path;
+    if (argc > 1)
+        path = argv[1];
+
+    Viewer::MainWindow w(0, path);
     w.show();
 
     return a.exec();

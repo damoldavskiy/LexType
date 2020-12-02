@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0, const QString &path = "");
 
 public slots:
     void open();
@@ -28,6 +28,7 @@ private slots:
     void fileChanged();
 
 private:
+    void tryOpenFile(const QString &path);
     void createActions();
     void createMenus();
     void loadDocument();

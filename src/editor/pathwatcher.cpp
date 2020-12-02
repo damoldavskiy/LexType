@@ -11,6 +11,14 @@ bool PathWatcher::open(const QString &filter)
     return update(QFileDialog::getOpenFileName(nullptr, "Open", "", filter));
 }
 
+bool PathWatcher::openExisting(const QString &path)
+{
+    QFileInfo info(path);
+    if (!info.exists() || !info.isFile())
+        return false;
+    return update(path);
+}
+
 void PathWatcher::close()
 {
     _info.setFile("");

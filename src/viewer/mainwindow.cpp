@@ -8,7 +8,7 @@
 
 namespace Viewer {
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, const QString &path)
     : QMainWindow(parent)
 {
     Styler::init(); // TODO Should we do it in main.cpp?
@@ -24,18 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     menuBar()->setStyleSheet(Styler::get<QString>("menu-style"));
+
+    tryOpenFile(path);
 }
 
 void MainWindow::open()
 {
-    if (_path.exists())
-        _watcher.removePath(_path.path());
-
-    if (_path.open("PDF (*.pdf)")) {
-        _watcher.addPath(_path.path());
-        loadDocument();
-        setWindowTitle(_path.title());
-    }
+    if (_path.open("PDF (*.pdf)"))
+        tryOpenFile(_path.path());
 }
 
 void MainWindow::quit()
@@ -56,6 +52,18 @@ void MainWindow::zoomOut()
 void MainWindow::fileChanged()
 {
     loadDocument();
+}
+
+void MainWindow::tryOpenFile(const QString &path)
+{
+    if (_path.openExisting(path))
+    {
+        if (!_watcher.files().empty())
+            _watcher.removePaths(_watcher.files());
+        _watcher.addPath(_path.path());
+        loadDocument();
+        setWindowTitle(_path.title());
+    }
 }
 
 void MainWindow::createActions()

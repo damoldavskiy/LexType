@@ -15,11 +15,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0, const QString &path = "");
 
 public slots:
-    void open();
-    void close();
+    void openFile();
+    void closeFile();
     void save();
     void saveAs();
     void quit();
@@ -42,6 +42,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
+    void tryOpenFile(const QString &path);
     void createActions();
     void createMenus();
 

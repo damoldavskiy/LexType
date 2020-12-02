@@ -14,7 +14,7 @@ class Editor : public QWidget
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = 0, LineNumbers *numbers = 0);
+    Editor(QWidget *parent = 0, LineNumbers *numbers = 0, bool readOnly = false);
 
     int textSize() const;
     QString selectedText() const;
@@ -86,6 +86,7 @@ private:
     int _spos = -1;
     qreal _xshift = 0;
     qreal _yshift = 0;
+    bool _readOnly;
 
     QTimer _timer;
     bool _caret = true;

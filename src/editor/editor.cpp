@@ -21,8 +21,8 @@ int charClass(QChar symbol)
     return 2;
 }
 
-Editor::Editor(QWidget *parent, LineNumbers *numbers)
-    : QWidget(parent), _text(font(), Styler::get<int>("editor-tab-width")), _numbers(numbers) // TODO Pass font parameter
+Editor::Editor(QWidget *parent, LineNumbers *numbers, bool readOnly)
+    : QWidget(parent), _text(font(), Styler::get<int>("editor-tab-width")), _numbers(numbers), _readOnly(readOnly) // TODO Pass font parameter
 {
     setCursor(Qt::IBeamCursor);
     setFocusPolicy(Qt::ClickFocus);
@@ -241,6 +241,8 @@ void Editor::selectAll()
 
 void Editor::tick()
 {
+    if (_readOnly)
+        return;
     QPointF point = findShift(_pos);
     update(point.x(), point.y(), qCeil(Styler::get<qreal>("editor-caret-width")) + 1, _text.fontHeight());
     _caret = !_caret;
@@ -327,7 +329,7 @@ void Editor::paintEvent(QPaintEvent *event)
                     }
                 }
 
-                if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus())
+                if (pos == _pos && _caret && (_spos == -1 || _spos == _pos) && hasFocus() && !_readOnly)
                     painter.fillRect({ QPointF { left - _xshift, top }, QSizeF { Styler::get<qreal>("editor-caret-width"), _text.fontHeight() } }, Styler::get<QColor>("editor-caret"));
             } while (pos++ < end);
 
@@ -347,6 +349,9 @@ void Editor::paintEvent(QPaintEvent *event)
 
 void Editor::keyPressEvent(QKeyEvent *event)
 {
+    if (_readOnly)
+        return;
+
     int line;
     int newpos = -1;
 
@@ -475,9 +480,14 @@ void Editor::keyPressEvent(QKeyEvent *event)
                 else if (text == "`")
                     _lastLayout = QLocale::English;
 
-                if (_lastLayout == QLocale::Russian && text != "`" && (text == "ё"
-                    || (_pos > 0 && _text.markup(_pos - 1).type() == IntervalType::Mathematics
-                        && (_pos == 1 || !(_text[_pos - 1] == '`' && _text.markup(_pos - 2).type() == IntervalType::Mathematics)))))
+                Interval interval;
+                QChar last = '\0';
+                if (_pos > 0) {
+                    interval = _text.markup(_pos - 1);
+                    last = _text[_pos - 1];
+                }
+
+                if (text == "ё" || (_lastLayout == QLocale::Russian && _text.predictInterval(interval, last, text[0]).isMath()))
                     text = KeyboardLayout::pass(text[0]);
             }
 

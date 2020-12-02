@@ -31,7 +31,7 @@ QString readText(const QString &path)
     return in.readAll();
 }
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, const QString &path)
     : QMainWindow(parent)
 {
     // TODO Terrible approach
@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(_numbers);
     layout->addWidget(_editor);
 
-    _console = new Editor(0, 0);
+    _console = new Editor(0, 0, true);
 
     QWidget *editorWidget = new QWidget;
     editorWidget->setLayout(layout);
@@ -83,21 +83,21 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&_compilation, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &MainWindow::compiled);
 
     connect(&_timer, &QTimer::timeout, this, &MainWindow::compile);
+
+    if (path != "")
+        tryOpenFile(path);
 }
 
-void MainWindow::open()
+void MainWindow::openFile()
 {
     if (_path.edited() && QMessageBox::question(this, "Open", "Changes unsaved. Do you really want to open another file?") != QMessageBox::Yes)
         return;
 
-    if (_path.open("LexType (*.lex);;TeX (*tex);;All types (*.*)")) {
-        _editor->setText(readText(_path.path()));
-        setWindowTitle(_path.title());
-        statusBar()->showMessage("Opened file: " + _path.path());
-    }
+    if (_path.open("LexType (*.lex);;TeX (*tex);;All types (*.*)"))
+        tryOpenFile(_path.path());
 }
 
-void MainWindow::close()
+void MainWindow::closeFile()
 {
     if (_path.edited() && QMessageBox::question(this, "Open", "Changes unsaved. Do you really want to close the document?") != QMessageBox::Yes)
         return;
@@ -264,15 +264,26 @@ void MainWindow::closeEvent(QCloseEvent *event)
         event->ignore();
 }
 
+void MainWindow::tryOpenFile(const QString &path)
+{
+    if (_path.openExisting(path)) {
+        _editor->setText(readText(_path.path()));
+        setWindowTitle(_path.title());
+        statusBar()->showMessage("Opened file: " + _path.path());
+    } else {
+        statusBar()->showMessage("File not exists: " + path);
+    }
+}
+
 void MainWindow::createActions()
 {
     _openAction = new QAction("Open", this);
     _openAction->setShortcut(QKeySequence("Ctrl+O"));
-    connect(_openAction, &QAction::triggered, this, &MainWindow::open);
+    connect(_openAction, &QAction::triggered, this, &MainWindow::openFile);
 
     _closeAction = new QAction("Close", this);
     _closeAction->setShortcut(QKeySequence("Ctrl+W"));
-    connect(_closeAction, &QAction::triggered, this, &MainWindow::close);
+    connect(_closeAction, &QAction::triggered, this, &MainWindow::closeFile);
 
     _saveAction = new QAction("Save", this);
     _saveAction->setShortcut(QKeySequence("Ctrl+S"));
