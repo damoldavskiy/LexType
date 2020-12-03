@@ -160,10 +160,9 @@ void MainWindow::compile()
 
     QFileInfo fileInfo(_path.dir(), _path.baseName() + ".tex");
 
-    if (_path.edited() || !fileInfo.exists()) {
+    if (_path.edited() || !fileInfo.exists())
         save(); // .lex
-        writeText(fileInfo.filePath(), MathWriter::pass(_editor->text())); // .tex
-    }
+    writeText(fileInfo.filePath(), MathWriter::pass(_editor->text())); // .tex
 
     if (_compilation.state() != QProcess::NotRunning) {
         _compilation.kill();
@@ -205,6 +204,7 @@ void MainWindow::options()
     SettingsDialog *dialog = new SettingsDialog;
     dialog->exec();
     _editor->updateSettings();
+    _console->updateSettings();
     _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
     _wordWrap->setChecked(Styler::get<bool>("editor-flag-wordwrap"));
     statusBar()->showMessage("Settings applied");

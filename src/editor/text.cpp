@@ -410,52 +410,6 @@ QStaticText Text::text(int pos) const
     return _font.get(operator [](pos));
 }
 
-Interval Text::predictInterval(Interval interval, QChar last, QChar cur) const
-{
-    IntervalType type = interval.type();
-    bool math = interval.isMath();
-    bool display = interval.isDisplay();
-
-    if ((cur == '%' && (last != '\\')) || (interval.type() == IntervalType::Comment && cur != '\n')) {
-        type = IntervalType::Comment;
-        math = false;
-        display = false;
-    } else {
-        if (cur == '`') {
-            if (math && last == '`' && !display)
-                display = true;
-            else if (!math || last == '`' || !display)
-                math = !math;
-            if (!math)
-                display = false;
-        }
-
-        if (cur == '`' || math)
-            type = IntervalType::Mathematics;
-        else
-            type = IntervalType::Regular;
-
-        if ((type == IntervalType::Regular && cur == '\\') || (interval.type() == IntervalType::Command))
-            type = IntervalType::Command;
-
-        if (interval.type() == IntervalType::Command) {
-            if (cur.isLetter())
-                type = IntervalType::Command;
-            else if (cur != '\\' && cur != '%') // Escape here
-                type = IntervalType::Regular;
-        }
-
-        if (type == IntervalType::Regular && (cur == '{' || cur == '}' || cur == '$'))
-            type = IntervalType::Special;
-    }
-
-    interval.setType(type);
-    interval.setMath(math);
-    interval.setDisplay(display);
-
-    return interval;
-}
-
 void Text::updateMarkup(const Action &action, bool reverseType)
 {
     int pos = action.index;
@@ -483,12 +437,16 @@ void Text::updateMarkup(const Action &action, bool reverseType)
     for (int i = pos; i < end; ++i) {
         QChar cur = operator [](i);
         QChar last = i == 0 ? '\0' : operator [](i - 1);
-        interval = predictInterval(interval, last, cur);
+        interval.update(last, cur);
 
         _markup.set(i, i + 1, interval);
 
-        if (action.type == Action::Insert && i == end - 1 && end != size() && interval != lastInterval)
-            end = size();
+        if (action.type == Action::Insert && i == end - 1 && end != size()) {
+            Interval next = interval;
+            next.update(cur, operator [](i + 1));
+            if (next != lastInterval)
+                end = size();
+        }
     }
 }
 

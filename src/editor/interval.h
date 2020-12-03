@@ -3,6 +3,8 @@
 
 #include "intervaltype.h"
 
+#include <QChar>
+
 class Interval
 {
 public:
@@ -11,10 +13,14 @@ public:
     IntervalType type() const;
     bool isMath() const;
     bool isDisplay() const;
+    bool isEscape() const;
 
     void setType(IntervalType type);
     void setMath(bool math);
     void setDisplay(bool display);
+    void setEscape(bool escape);
+
+    Interval& update(QChar last, QChar cur);
 
     friend bool operator ==(const Interval &lhs, const Interval &rhs);
     friend bool operator !=(const Interval &lhs, const Interval &rhs);

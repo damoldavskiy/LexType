@@ -65,7 +65,6 @@ public:
 
     QString text() const;
     QStaticText text(int pos) const;
-    Interval predictInterval(Interval interval, QChar last, QChar cur) const;
     void updateMarkup(const Action &action, bool reverseType = false);
     Interval markup(int pos) const;
 

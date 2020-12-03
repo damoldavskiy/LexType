@@ -2,6 +2,7 @@
 
 #include "styler.h"
 #include "keyboardlayout.h"
+#include "interval.h"
 
 QVector<QChar> delimeters = { ' ', ',', ':', ';', '\n', '\t' };
 QVector<QChar> openBrackets = { '(', '{', '[' };
@@ -47,33 +48,45 @@ bool isClosing(QChar open, QChar close, int direction)
 QString MathWriter::pass(const QString &source)
 {
     QString result;
-    bool math = false;
-    bool mline = false;
-    int start;
+    QString math;
+
+    Interval interval;
+    QChar last = '\0';
+    bool display;
 
     QVector<QPair<QString, QString>> dict = snippetList();
 
     for (int i = 0; i < source.size(); ++i) {
-        if (source[i] == '`') {
-            if (math && source[i - 1] == '`' && !mline) {
-                mline = true;
-                continue;
+        interval.update(last, source[i]);
+
+        if (interval.type() != IntervalType::Mathematics || i == source.size() - 1) {
+            if (math.size() > 0) {
+                if (display && math.size() > 3)
+                    result += "$$" + apply(math.mid(2, math.size() - 4), dict) + "$$";
+                else if (math.size() > 1)
+                    result += "$" + apply(math.mid(1, math.size() - 2), dict) + "$";
+                math = "";
             }
-            if (math && source[i - 1] != '`' && source[i + 1] == '`' && mline)
-                continue;
-            math = !math;
-            if (math)
-                start = i + 1;
-            else { // TODO string_view
-                if (mline)
-                    result += "$$" + apply(source.mid(start + 1, i - start - 2), dict) + "$$";
-                else
-                    result += "$" + apply(source.mid(start, i - start), dict) + "$";
-                mline = false;
-            }
-        } else if (!math) {
-            result += source[i];
         }
+
+        if (interval.type() != IntervalType::Mathematics) {
+            if (source[i] == '`') // Escaped `
+                result.back() = source[i];
+            else
+                result += source[i];
+        } else {
+            if (math.isEmpty())
+                display = false;
+            else if (math.size() == 1 && source[i] == '`')
+                display = true;
+
+            if (source[i] == '`' && interval.isEscape())
+                math.back() = source[i];
+            else
+                math += source[i];
+        }
+
+        last = source[i];
     }
 
     return result;

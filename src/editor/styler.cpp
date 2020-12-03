@@ -63,6 +63,7 @@ void Styler::reset()
     set("editor-flag-snippets-math", true);
     set("editor-flag-autocompile", true);
     set("editor-flag-brackets", true);
+    set("editor-flag-yo", false);
 
     set("math-flag-fractions", true);
     set("math-flag-matrices", true);

@@ -96,7 +96,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
                 { "editor-flag-line", "Highlight current line" },
                 { "editor-flag-numbers", "Show line numbers" },
                 { "editor-flag-autocompile", "Save and compile on type" },
-                { "editor-flag-brackets", "Smart brackets" }
+                { "editor-flag-brackets", "Smart brackets" },
+                { "editor-flag-yo", "In Russian layout, escape ` as ё" }
             });
         } else if (item == painterItem) {
             appendColorButtons(Properties {

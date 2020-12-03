@@ -487,8 +487,9 @@ void Editor::keyPressEvent(QKeyEvent *event)
                     last = _text[_pos - 1];
                 }
 
-                if (text == "ё" || (_lastLayout == QLocale::Russian && _text.predictInterval(interval, last, text[0]).isMath()))
-                    text = KeyboardLayout::pass(text[0]);
+                if (text == "ё" || (_lastLayout == QLocale::Russian && interval.update(last, text[0]).isMath()))
+                    if (!(last == '\\' && !interval.isEscape() && Styler::get<bool>("editor-flag-yo")))
+                        text = KeyboardLayout::pass(text[0]);
             }
 
             if (Styler::get<bool>("editor-flag-brackets")) {
