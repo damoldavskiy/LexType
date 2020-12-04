@@ -273,6 +273,7 @@ void SettingsDialog::appendSnippetsList()
         snippet.setPattern(pattern->toPlainText());
         snippet.setValue(value->toPlainText());
 
+        list->currentItem()->setText(snippet.pattern());
         Styler::set<QVariant>("snippets", QVariant::fromValue(manager));
     });
 
@@ -291,6 +292,11 @@ void SettingsDialog::appendSnippetsList()
         accept->setEnabled(false);
         remove->setEnabled(false);
         insert->setEnabled(false);
+
+        math->setChecked(false);
+        position->setText("");
+        pattern->setText("");
+        value->setText("");
 
         list->clear();
         for (const Snippet &snippet : snippets)
