@@ -3,6 +3,7 @@ QT += widgets
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
+    algorithms.cpp \
     cachedfont.cpp \
     interval.cpp \
     line.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
     figurepoint.cpp
 
 HEADERS += \
+    algorithms.h \
     cachedfont.h \
     gapbuffer.h \
     interval.h \

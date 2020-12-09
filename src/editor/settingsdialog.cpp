@@ -107,6 +107,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
             });
 
             appendIntEdit({ "painter-attract-radius", "Attract radius (px)" }, [] (int n) { return n > 0; });
+            appendIntEdit({ "painter-curve-size", "Path curve length (px)" }, [] (int n) { return n > 0; });
         } else if (item == viewerItem) {
             appendColorButtons(Properties {
                 { "viewer-back", "Viewer background" },
@@ -196,7 +197,7 @@ void SettingsDialog::appendSnippetsList()
     list->setMaximumWidth(150);
 
     SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
-    QVector<Snippet> snippets = manager.snippets();
+    QVector<Snippet> &snippets = manager.snippets();
 
     for (const Snippet &snippet : snippets)
         list->addItem(snippet.pattern().replace("\n", " "));
@@ -229,7 +230,7 @@ void SettingsDialog::appendSnippetsList()
     // TODO Better to save indices of all snippets
     connect(list, &QListWidget::currentItemChanged, this, [list, math, position, pattern, value, accept, remove, insert] (QListWidgetItem *) {
         SnippetManager manager = Styler::get<QVariant>("snippets").value<SnippetManager>();
-        QVector<Snippet> snippets = manager.snippets();
+        QVector<Snippet> &snippets = manager.snippets();
         int index = list->currentRow();
         if (index == -1)
             return;

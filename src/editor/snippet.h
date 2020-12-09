@@ -2,8 +2,8 @@
 #define SNIPPET_H
 
 #include <QString>
-
-#include "editor.h"
+#include <QDataStream>
+#include <QMetaType>
 
 class Snippet
 {
@@ -11,8 +11,6 @@ public:
     Snippet();
     Snippet(bool regular, const QString &pattern, const QString &value, bool tabular = false);
     Snippet(bool regular, const QString &pattern, const QString &value, int position, bool tabular = false);
-
-    bool apply(Editor *editor) const;
 
     bool regular() const;
     void setRegular(bool value);

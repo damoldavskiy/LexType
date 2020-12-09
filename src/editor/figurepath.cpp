@@ -1,5 +1,7 @@
 #include "figurepath.h"
 
+#include "styler.h"
+
 void FigurePath::setStart(QPointF point)
 {
     Figure::setStart(point);
@@ -30,8 +32,9 @@ bool FigurePath::release()
 
     QVector<QPointF> filtered { _path[0] };
 
+    int curveSize = Styler::get<int>("painter-curve-size");
     for (int i = 1; i < _path.size(); ++i)
-        if (Math::dist(filtered.last(), _path[i]) > 30)
+        if (Math::dist(filtered.last(), _path[i]) > curveSize)
             filtered.append(_path[i]);
 
     if (Math::dist(filtered.last(), _path.last()) > 0) {

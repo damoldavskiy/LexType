@@ -1,7 +1,10 @@
 #include "snippetmanager.h"
 
-SnippetManager::SnippetManager()
-{ }
+SnippetManager::SnippetManager(bool reset)
+{
+    if (reset)
+        this->reset();
+}
 
 void SnippetManager::reset()
 {
@@ -137,16 +140,6 @@ void SnippetManager::reset()
     _snippets.append(Snippet(false, "psi", "ψ"));
     _snippets.append(Snippet(false, "Ome", "Ω"));
     _snippets.append(Snippet(false, "ome", "ω"));
-}
-
-void SnippetManager::apply(Editor *editor, bool regular, bool math)
-{
-    for (const auto &snippet : _snippets) {
-        if ((snippet.regular() && !regular) || (!snippet.regular() && !math))
-            continue;
-        if (snippet.apply(editor))
-            break;
-    }
 }
 
 QVector<Snippet> &SnippetManager::snippets()

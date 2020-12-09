@@ -15,6 +15,8 @@ win32 {
 
 SOURCES += \
     ../editor/styler.cpp \
+    ../editor/snippet.cpp \
+    ../editor/snippetmanager.cpp \
     ../editor/pathwatcher.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -22,6 +24,8 @@ SOURCES += \
 
 HEADERS += \
     ../editor/styler.h \
+    ../editor/snippet.h \
+    ../editor/snippetmanager.h \
     ../editor/pathwatcher.h \
     mainwindow.h \
     scrollarea.h \

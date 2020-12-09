@@ -3,6 +3,7 @@
 #include <QLayout>
 #include <QShortcut>
 
+#include "algorithms.h"
 #include "figurepoint.h"
 #include "figureline.h"
 #include "figurerectangle.h"
@@ -32,7 +33,7 @@ PainterDialog::PainterDialog(QWidget *parent)
             _toolkit->reset();
             return;
         }
-        _snippets.apply(_editor, false, Styler::get<bool>("painter-flag-snippets"));
+        Algorithms::apply(_editor, _snippets, false, Styler::get<bool>("painter-flag-snippets"));
 
         FigureText *figure = dynamic_cast<FigureText*>(_painter->figure());
         figure->setText(_editor->text());

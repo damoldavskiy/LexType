@@ -30,6 +30,7 @@ public:
     void appendButton(const QString &title, T handler)
     {
         QPushButton *button = new QPushButton(title);
+        button->setMaximumWidth(200);
         connect(button, &QPushButton::clicked, this, handler);
         _form->addRow(button);
     }

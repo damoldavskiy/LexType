@@ -3,13 +3,14 @@
 #include <QColor>
 #include <QFont>
 
-bool Styler::init()
-{
-    if (_settings.allKeys().size() > 0)
-        return false;
+#include "snippetmanager.h"
+#include "cachedfont.h"
 
+void Styler::init()
+{
+    _soft = true;
     reset();
-    return true;
+    _soft = false;
 }
 
 void Styler::reset()
@@ -78,6 +79,7 @@ void Styler::reset()
     set("editor-autocompile-interval", 1000);
 
     set("painter-attract-radius", 10);
+    set("painter-curve-size", 30);
 
     set("viewer-page-shift", 0.5);
     set("viewer-zoom-factor", 1.2);
@@ -85,6 +87,9 @@ void Styler::reset()
     set("viewer-dpi-min", 10);
     set("viewer-dpi-max", 350);
     set("viewer-resolution", 2.0);
+
+    set("snippets", QVariant::fromValue(SnippetManager(true)));
 }
 
 QSettings Styler::_settings("DMSoft", "LexType");
+bool Styler::_soft = false;

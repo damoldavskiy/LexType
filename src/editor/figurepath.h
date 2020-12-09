@@ -28,7 +28,6 @@ private:
     QVector<QPointF> _path;
     bool _cycle = false;
 
-    qreal _threshold = 30;
     qreal _cycleDist = 30;
 };
 

@@ -22,28 +22,6 @@ Snippet::Snippet(bool regular, const QString &pattern, const QString &value, int
         _pattern += '\t';
 }
 
-bool Snippet::apply(Editor *editor) const
-{
-    Q_ASSERT(_value.size() >= _position);
-
-    int pos = editor->caret() - _pattern.size();
-    if (pos < 0)
-        return false;
-
-    if (_regular ^ (editor->markup(editor->caret() - 1).type() != IntervalType::Mathematics))
-        return false;
-
-    for (int i = 0; i < _pattern.size(); ++i)
-        if ((*editor)[pos + i] != _pattern[i])
-            return false;
-
-    editor->remove(pos, _pattern.size());
-    editor->insert(pos, _value);
-    editor->setCaret(pos + _position);
-
-    return true;
-}
-
 bool Snippet::regular() const
 {
     return _regular;

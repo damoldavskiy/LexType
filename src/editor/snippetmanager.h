@@ -1,16 +1,16 @@
 #ifndef SNIPPETMANAGER_H
 #define SNIPPETMANAGER_H
 
+#include <QVector>
+
 #include "snippet.h"
-#include "editor.h"
 
 class SnippetManager
 {
 public:
-    SnippetManager();
+    SnippetManager(bool reset = false);
 
     void reset();
-    void apply(Editor *editor, bool regular = true, bool math = true);
 
     QVector<Snippet> &snippets();
     const QVector<Snippet> &snippets() const;

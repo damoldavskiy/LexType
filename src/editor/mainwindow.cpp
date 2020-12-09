@@ -7,6 +7,7 @@
 #include <QLayout>
 #include <QStatusBar>
 
+#include "algorithms.h"
 #include "styler.h"
 #include "finddialog.h"
 #include "painterdialog.h"
@@ -34,12 +35,8 @@ QString readText(const QString &path)
 MainWindow::MainWindow(QWidget *parent, const QString &path)
     : QMainWindow(parent)
 {
-    // TODO Terrible approach
-    if (Styler::init()) {
-        _snippets.reset();
-        Styler::set("snippets", QVariant::fromValue(_snippets));
-    } else
-        _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
+    Styler::init();
+    _snippets = Styler::get<QVariant>("snippets").value<SnippetManager>();
 
     setWindowTitle("LexType");
     resize(640, 480);
@@ -236,7 +233,7 @@ void MainWindow::textChanged()
 
 void MainWindow::textTyped(int, QChar)
 {
-    _snippets.apply(_editor, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
+    Algorithms::apply(_editor, _snippets, Styler::get<bool>("editor-flag-snippets-regular"), Styler::get<bool>("editor-flag-snippets-math"));
 }
 
 void MainWindow::output()
