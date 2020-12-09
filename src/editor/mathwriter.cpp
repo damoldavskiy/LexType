@@ -52,7 +52,7 @@ QString MathWriter::pass(const QString &source)
 
     Interval interval;
     QChar last = '\0';
-    bool display;
+    bool display = false;
 
     QVector<QPair<QString, QString>> dict = snippetList();
 
