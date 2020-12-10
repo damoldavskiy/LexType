@@ -29,7 +29,8 @@ QString readText(const QString &path)
     file.open(QIODevice::ReadOnly);
     QTextStream in(&file);
     in.setCodec("UTF-8");
-    return in.readAll();
+    QString text = in.readAll();
+    return text.mid(0, text.size() - 1);
 }
 
 MainWindow::MainWindow(QWidget *parent, const QString &path)
